@@ -2,12 +2,13 @@
 import sys
 from moby2.scripting import get_filebase
 import cPickle as pickle
+import moby2
 
 # define glitch cut parameters
 glitchp ={ 'nSig': 10, 'tGlitch' : 0.007, 'minSeparation': 30, 'maxGlitch': 50000, 'highPassFc': 6.0, 'buffer': 0 }
 
 # load cut results from loic
-with open("mr3_pa3_s16_results.pickle", "r") as f:
+with open("data/mr3_pa3_s16_results.pickle", "r") as f:
     cut_results = pickle.load(f)
 
 # get all tod names
