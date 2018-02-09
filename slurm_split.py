@@ -9,10 +9,10 @@ slurm_template='''#!/bin/sh
 #SBATCH --ntasks-per-node=1                # ppn=6 
 #SBATCH -J {{ name }}                      # job name 
 #SBATCH -t 90:00:00                        # 90 hours walltime
-#SBATCH --mem=4000MB                       # memory in MB 
-#SBATCH --output= {{ logfile }}            # file for STDOUT 
-#SBATCH --mail-user= {{ email }}           # mail id of the user 
-#SBATCH --mail-type=end                    # Slurm will send at the completion of your job 
+#SBATCH --mem=8000MB                       # memory in MB 
+#SBATCH --output={{ logfile }}            # file for STDOUT 
+#SBATCH --mail-user={{ email }}           # mail id of the user
+
 
 python {{ script }} {{ opts }}
 '''
@@ -21,9 +21,9 @@ def generate_bash(name, script, options, enum=0):
     """Generate bash based on the template"""
     compiled = Environment().from_string(slurm_template).render(
         name = name,
-        logfile = "../logs/%s_%d.log" % (name, enum),
-        email = "yig20@pitt.edu",
+        logfile = "logs/%s_%d.log" % (name, enum),
         script = script,
+        email = "yig20@pitt.edu",
         opts = options
     )
     print '[INFO] Compiling with options:', options
@@ -58,13 +58,13 @@ def generate_parameters_2d(start, end, n):
 
 def run_bash(list_of_filenames):
     for f in list_of_filenames:
-        print '[INFO] Running ./%s' % f
-        #os.system("./%s" % f)
+        print '[INFO] Running qsub %s' % f
+        os.system("qsub %s" % f)
 
 if __name__ == "__main__":
-    parameters = generate_parameters_2d(0, 8175, 10)
-    name = "compile_cuts.py"
-    script = "../find_cut.py"
+    parameters = generate_parameters_2d(200, 8175, 40)
+    name = "compile_cuts"
+    script = "compile_glitch_cuts.py"
     filenames = []
     for i, p in enumerate(parameters):
         filenames.append(generate_bash(name, script, p, i))
