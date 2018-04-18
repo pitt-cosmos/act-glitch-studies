@@ -31,3 +31,24 @@ def common_cuts(cut1, cut2):
     cm = np.logical_and(c1m, c2m)
     common = moby2.tod.CutsVector.from_mask(mask=cm)
     return common
+
+def remove_overlap_vector(original, to_remove, buff=0):
+    """remove the to_remove CutVector from original CutVector"""
+    for row in to_remove:
+        original = original[(original[:,1]<row[0]-buff) | (original[:,0]>row[1]+buff)]
+    return original
+
+def remove_overlap_tod(original, to_remove, buff=0):
+    """remove the to_remove TODCuts from original TODCuts"""
+    ndet = len(original.cuts)
+    for i in range(ndet):
+        # loop over detector
+        original.cuts[i] = remove_overlap_vector(original.cuts[i], to_remove.cuts[i], buff)
+    return original
+
+def trim_edge_cuts(cuts, nsamps):
+    """remove edge cuts, cuts covering first/last THRES sampling points are removed"""
+    THRES = 100 # sampling points
+    for i in range(1056):
+        cuts.cuts[i] = cuts.cuts[i][(cuts.cuts[i][:,0]>THRES) & (cuts.cuts[i][:,1]<(nsamps-THRES))]
+    return cuts

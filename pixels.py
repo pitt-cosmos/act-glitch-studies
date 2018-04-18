@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 class PixelReader:
-    def __init__(self):
+    def __init__(self, mask=None):
         self._array_info = 'data/ar3.txt'
         self._pixel_dict = {
             '1': {'f150': [97, 161], 'f90': [1, 960]},
@@ -255,7 +255,8 @@ class PixelReader:
             '927': {'f150': [959, 1023], 'f90': [927, 991]}
         }
         self.getAdjacentDetectors = self.adjacentDetectorGenerator()
-    
+        self.mask = mask
+
     def adjacentDetectorGenerator(self):
         """
         Generate a get_adjacent_pixels function
@@ -266,7 +267,6 @@ class PixelReader:
         detector_dir = self._array_info
         self._array_data = pd.read_csv(detector_dir, delim_whitespace=True, header=None)
         self._array_data.columns=['det_uid','row','col','freq','pol_family','array_x','array_y']
-
         # Get data from file
         ar = self._array_data[['array_x','array_y']].as_matrix()
         self._ar = ar
@@ -286,14 +286,20 @@ class PixelReader:
 
         return getAdjacentDetectors
 
-    def getPixels(self):
+    def getPixels(self, mask=None):
         return [int(key) for key in self._pixel_dict]
-    
+
     def getF90(self, pixel):
-        return self._pixel_dict[str(pixel)]['f90']
+        if self.mask is not None:
+            return [det for det in self._pixel_dict[str(pixel)]['f90'] if self.mask[det]==1]
+        else:
+            return self._pixel_dict[str(pixel)]['f90']
     
     def getF150(self, pixel):
-        return self._pixel_dict[str(pixel)]['f150']
+        if self.mask is not None:
+            return [det for det in self._pixel_dict[str(pixel)]['f150'] if self.mask[det]==1]
+        else:
+            return self._pixel_dict[str(pixel)]['f150'] 
     
     def getAdjacentPixels(self, pixel):
         all_adj_det = self.getAdjacentDetectors(pixel)
@@ -304,9 +310,10 @@ class PixelReader:
         dist = np.sqrt(np.sum((ar - ar[pixel,:])**2, axis=1))
         return [det for det in np.arange(1055)[dist<radius] if str(det) in self._pixel_dict]
         
-    def plot(self, pixels):
+    def plot(self, pixels=None):
         plt.plot(self._array_data['array_x'], self._array_data['array_y'],'r.')
-        plt.plot(self._array_data['array_x'][pixels], self._array_data['array_y'][pixels],'b.')
+        if pixels:
+            plt.plot(self._array_data['array_x'][pixels], self._array_data['array_y'][pixels],'b.')
 
     def getXY(self, pixel):
         return [self._array_data['array_x'][pixel], self._array_data['array_y'][pixel]]

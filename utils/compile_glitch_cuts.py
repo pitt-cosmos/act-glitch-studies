@@ -5,11 +5,11 @@ import cPickle as pickle
 import moby2
 from cuts import *
 
+
 # define glitch cut parameters
 glitchp ={ 'nSig': 10, 'tGlitch' : 0.007, 'minSeparation': 30, 'maxGlitch': 50000, 'highPassFc': 6.0, 'buffer': 0 }
 
 # load cut results from loic
-print '[INFO] Loading pickle file from Loic'
 with open("data/mr3_pa3_s16_results.pickle", "r") as f:
     cut_results = pickle.load(f)
 
@@ -25,7 +25,7 @@ end = int(sys.argv[2])
 fb = get_filebase()
 
 # option to remove mce
-remove_mce = False # no longer used
+remove_mce = True
 
 # loop over the tods
 for n in range(start, end):
@@ -36,16 +36,16 @@ for n in range(start, end):
     print '[INFO] Get TOD successfully'
 
     print '[INFO] Finding glitches'
-    nsamps = tod_data.nsamps
     cuts = moby2.tod.get_glitch_cuts(tod=tod_data, params=glitchp)
-    mce_cuts = moby2.tod.get_mce_cuts(tod=tod_data) # get mce cuts
-    if remove_mce: # no longer used
+    if remove_mce:
         print '[INFO] Removing mce cuts'
         mce_cuts = moby2.tod.get_mce_cuts(tod=tod_data) # get mce cuts
         mce_cuts_complement = mce_cuts.get_complement() # for convience, get the complement cuts
         # loop over each detectors
-        for i in range(len(cuts.cuts)):
+        for i in range(cuts.cuts):
             cuts.cuts[i] = common_cuts(cuts.cuts[i], mce_cuts_complement.cuts[i]) # remove mce cuts
+        
+        
         
     print "[INFO] Finding glitches done"
 
@@ -54,9 +54,7 @@ for n in range(start, end):
         "TOD": tod_name,
         "glitch_param": glitchp, # save the parameters used to generate
         "sel": tod_sel[:,n], # save the detector mask (indicating which one is good or bad)
-        "cuts": cuts, # save the cuts
-        "mce": mce_cuts,
-        "nsamps": nsamps
+        "cuts": cuts # save the cuts
     }
     pickle.dump(meta, open("outputs/cuts/" + str(n) + ".cut", "wb"), pickle.HIGHEST_PROTOCOL)
     print("Cut for TOD " + str(n) + " written successfully")
