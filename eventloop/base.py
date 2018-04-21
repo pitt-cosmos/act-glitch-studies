@@ -3,6 +3,7 @@ import glob
 import os
 
 
+
 class EventLoop:
     """Main driving class for looping through coincident signals of different TODs"""
     def __init__(self):
@@ -10,10 +11,12 @@ class EventLoop:
         self._veto = False
         self._store = DataStore()  # initialize data store
         self._sh = None  # sample handler
+        self._tod_id = None
         
     def add_routine(self, routine):
         """Add a routine to the event loop"""
         self._routines.append(routine)
+        print '[INFO] Added routine: %s' % routine.__class__.__name__
         routine.add_context(self)  # make event loop accessible in each routine
         
     def add_handler(self, sh):
@@ -47,12 +50,15 @@ class EventLoop:
         for routine in self._routines:
             routine.finalize()
     
-    def run(self, start, end):
+    def run(self,start,end):
         files = self.fetch_files()  # fetch all files
         
         self.initialize()
-        for filename in files[start, end]:
+        for filename in files[start:end]:
+            # get tod_id
+            self._tod_id = int(os.path.basename(filename).split(".")[0])
             with open(filename, "r") as f:
+                print '[INFO] Working on %s' % filename
                 cosig = cPickle.load(f)  # load coinsident signal from each file
                 self.get_store().set("cosig", cosig)  # store it in shared memory
             self.execute()
@@ -61,14 +67,22 @@ class EventLoop:
     def veto(self):
         """Veto a TOD from subsequent routines"""
         self._veto = True
+    
+    def get_id(self):
+        return self._tod_id
 
-        
         
 class Routine:
     def __init__(self):
         self._context = None
     
     def initialize(self):
+        pass
+    
+    def execute(self):
+        pass
+    
+    def finalize(self):
         pass
     
     def veto(self):
@@ -79,18 +93,19 @@ class Routine:
         
     def get_context(self):
         return self._context
-    
 
     
+    
 class SampleHandler:
-    def __init__(self, depot=None, postfix=None):
+    def __init__(self, depot=None, postfix="pickle"):
         self._depot = depot
         self._postfix = postfix
         self._files = None
         self._metadata = None
     
-    def fetch_files(self, depot=self._depot, postfix=self._postfix):
-        self._files = glob.glob(depot + "*." + postfix)
+    def fetch_files(self):
+        self._files = glob.glob(self._depot + "*." + self._postfix)
+        return self._files
         
     def load_metadata(self):
         """Load metadata if there is one"""
