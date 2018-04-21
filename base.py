@@ -1,8 +1,8 @@
 import cPickle
 
 
-class CutLoop:
-    def __init__(self, depot = "outputs/cuts/"):
+class EventLoop:
+    def __init__(self, depot = "outputs/coincident_signals/"):
         self._routines = []
         self._veto = False
         self._depot = depot

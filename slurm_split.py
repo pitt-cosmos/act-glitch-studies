@@ -73,7 +73,7 @@ if __name__ == "__main__":
     #name = "get_cut"
     #script = "coincident_signals_subset.py"
     name = "get_tracks"
-    script = "get_tracks_with_spread.py"
+    script = "get_tracks_db.py"
     filenames = []
     for i, p in enumerate(parameters):
         filenames.append(generate_bash(name, script, p, i))
