@@ -2,6 +2,7 @@
 from jinja2 import Environment
 import os
 import math
+import argparse
 
 # Define slurm script
 slurm_template='''#!/bin/sh 
@@ -62,18 +63,16 @@ def run_bash(list_of_filenames):
         os.system("qsub %s" % f)
 
 if __name__ == "__main__":
-    #parameters = generate_parameters_2d(0, 16167, 80)
-    parameters = generate_parameters_2d(0, 14782, 80)
-    #parameters = generate_parameters_2d(0, 8175, 50)
-    #name = "cs_finder"
-    #script = "compile_glitch_cuts_all.py"
-    #script = "coincident_signals_clean.py"
-    #name = "get_tracks"
-    #script = "get_tracks.py"
-    #name = "get_cut"
-    #script = "coincident_signals_subset.py"
-    name = "get_tracks"
-    script = "get_tracks_db.py"
+    parser = argparse.ArgumentParser()
+    parser.add_argument("script", help="name of script")
+    parser.add_argument("name", help="name of the job on SLURM")
+    parser.add_argument("nworker", help="number of workers", type=int)
+    parser.add_argument("start", help="starting index", type=int)
+    parser.add_argument("end", help="ending index", type=int)
+    args = parser.parse_args()
+    name = args.name
+    script = args.script
+    parameters = generate_parameters_2d(args.start, args.end, args.nworker) 
     filenames = []
     for i, p in enumerate(parameters):
         filenames.append(generate_bash(name, script, p, i))
