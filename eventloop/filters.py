@@ -31,4 +31,14 @@ class PixelFilter(Routine):
         cosig['peaks'] = peaks_filtered
         print '[INFO] After: n_tracks = %d' % len(cosig['peaks'])
         self.get_context().get_store().set("cosig", cosig)
+
+        
+class SpreadFilter(Routine):
+    """An event filter based on the spread of the pixels affected (set max spread)"""
+    def __init__(self, max_spread=10):
+        Routine.__init__(self)
+        self.max_spread = max_spread
+        
+    def execute(self):
+        cosig = self.get_context().get_store().get("cosig")
         
