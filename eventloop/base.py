@@ -27,9 +27,6 @@ class EventLoop:
         """Access the shared data storage"""
         return self._store
     
-    def fetch_files(self):
-        return self._sh.fetch_files()
-    
     def initialize(self):
         """Initialize all routines"""
         for routine in self._routines:
@@ -50,8 +47,12 @@ class EventLoop:
         for routine in self._routines:
             routine.finalize()
     
-    def run(self,start,end):
-        files = self.fetch_files()  # fetch all files
+    def run(self, start, end):
+        """Main driver function to run the loop
+        @param:
+            start: starting tod_id
+            end:   ending tod_id"""
+        files = self._sh.fetch_batch(start, end)  # fetch all files
         
         self.initialize()
         for filename in files[start:end]:
@@ -103,10 +104,21 @@ class SampleHandler:
         self._files = None
         self._metadata = None
     
-    def fetch_files(self):
+    def fetch_all(self):
         self._files = glob.glob(self._depot + "*." + self._postfix)
         return self._files
         
+    def fetch_batch(self, start, end):
+        """A function that fetch a batch of files in order"""
+        files = []
+        for i in range(start, end):
+            filepath = "%s%s.%s" % (self._depot, i, self._postfix)
+            if os.path.isfile(filepath):
+                files.append(filepath)
+                print '[INFO] Fetched: %s' % filepath
+        self._files = files
+        return files
+    
     def load_metadata(self):
         """Load metadata if there is one"""
         metadata_path = self._depot + ".metadata"
@@ -116,7 +128,6 @@ class SampleHandler:
     
     def get_metadata(self):
         return self._metadata
-    
     
     
 class DataStore:

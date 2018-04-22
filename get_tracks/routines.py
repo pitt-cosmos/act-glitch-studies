@@ -1,4 +1,3 @@
-import sys
 import os
 import cPickle
 import matplotlib as mpl
@@ -58,13 +57,13 @@ class GetTrack(Routine):
 
 
 class GetTrackWithSpread(GetTrack):
-    def __init__(self, output_dir):
-        GetTrack.__init__(self, output_dir, downsample = 1)
-        self.downsample = 1
+    def __init__(self, output_dir, downsample=1):
+        GetTrack.__init__(self, output_dir)
+        self.downsample = downsample
 
     def affected_pos_with_spread(self, cs, v):
         pixels = self.pixels_affected(cs, v)
-        pos = np.array([pr.getXY(p) for p in pixels])
+        pos = np.array([self.pr.getXY(p) for p in pixels])
         std = np.std(pos, 0)
         spread = np.sqrt(std[0]**2+std[1]**2)
         return np.hstack([np.mean(pos, 0), [spread]])
@@ -87,7 +86,7 @@ class GetTrackWithSpread(GetTrack):
             pos_downsample = pos[::self.downsample]
             plt.scatter(pos_downsample[:,0], pos_downsample[:,1], marker='o', s=3000*pos_downsample[:,2]**2, alpha=0.1)
             plt.plot(pos[:,0],pos[:,1])
-            plt.savefig(output_dir+"%d.png" % tod_id)
+            plt.savefig(self.output_dir+"%d.png" % tod_id)
 
 
 class GetTrackDB(GetTrackWithSpread):
@@ -106,5 +105,5 @@ class GetTrackDB(GetTrackWithSpread):
             pos_downsample = pos[::self.downsample]
             tracks_db.append(pos_downsample)
 
-        with open(output_dir+str(tod_id)+".pickle", "w") as f:
+        with open(self.output_dir+str(tod_id)+".pickle", "w") as f:
             cPickle.dump(tracks_db, f, cPickle.HIGHEST_PROTOCOL)
