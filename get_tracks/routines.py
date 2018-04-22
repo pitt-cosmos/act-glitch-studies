@@ -78,6 +78,7 @@ class GetTrackWithSpread(GetTrack):
         tod_id = self.get_context().get_id()
  
         cs = cosig['coincident_signals']
+        print '[INFO] n_tracks = %d' % len(cosig['peaks'])
         signals = [p[0:2] for p in cosig['peaks']]
         plt.figure(figsize=(10,10))
         self.pr.plot()
