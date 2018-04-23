@@ -3,13 +3,14 @@ import matplotlib as mpl
 mpl.use('Agg')
 from matplotlib import pyplot as plt
 import numpy as np
-from pixels import PixelReader
+from eventloop.utils.pixels import PixelReader
 from eventloop.base import Routine
 
 
 class GetTracks(Routine):
     def __init__(self, downsample=1):
         Routine.__init__(self)
+        self._pr = None  # pixel reader
         self.downsample = downsample
         
     def cut_contains(self, cv, v):
@@ -23,7 +24,7 @@ class GetTracks(Routine):
 
     def affected_pos_with_spread(self, cs, v):
         pixels = self.pixels_affected(cs, v)
-        pos = np.array([self.pr.getXY(p) for p in pixels])
+        pos = np.array([self._pr.getXY(p) for p in pixels])
         std = np.std(pos, 0)
         spread = np.sqrt(std[0]**2+std[1]**2)
         return np.hstack([np.mean(pos, 0), [spread]])
@@ -32,6 +33,9 @@ class GetTracks(Routine):
         start_v = time_range[0]
         end_v = time_range[1]
         return np.vstack([self.affected_pos_with_spread(cs, v) for v in range(start_v, end_v)])   
+
+    def initialize(self):
+        self._pr = PixelReader()
     
     def execute(self):
         cosig = self.get_context().get_store().get("cosig")

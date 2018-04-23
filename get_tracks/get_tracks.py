@@ -1,6 +1,6 @@
 from eventloop.base import EventLoop, SampleHandler
 from eventloop.filters import DurationFilter, PixelFilter
-from routines import GetTrackWithSpread
+from routines import GetTracks, PlotTracks
 
 loop = EventLoop()
 
@@ -8,11 +8,14 @@ loop = EventLoop()
 loop.add_handler(SampleHandler(depot="outputs/coincident_signals_subset/"))
 
 # add filters
-loop.add_routine(DurationFilter(max_duration = 10))
-loop.add_routine(PixelFilter(max_pixels = 5))
+loop.add_routine(DurationFilter(max_duration=10))
+loop.add_routine(PixelFilter(max_pixels=5))
 
 # add main routine
-loop.add_routine(GetTrackWithSpread(output_dir="outputs/get_track_filtered/"))
+loop.add_routine(GetTracks())
+
+# add plot routine
+loop.add_routine(PlotTracks(output_dir="outputs/get_tracks_filtered"))
 
 # specify range of tods of interests 
 loop.run(0, 2)
