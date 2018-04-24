@@ -43,8 +43,10 @@ class SpreadFilter(Routine):
         
     def execute(self):
         tracks = self.get_context().get_store().get("tracks")
+        print '[INFO] Before: n_tracks = %d' % len(tracks)
         # filter based on mean spread
         tracks_new = [track for track in tracks if np.mean(track[:, 2]) < self._max_spread]
+        print '[INFO] After: n_tracks = %d' % len(tracks_new)
         self.get_context().get_store().set("tracks", tracks_new)
 
 

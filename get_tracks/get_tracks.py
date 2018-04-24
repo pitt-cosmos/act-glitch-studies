@@ -1,5 +1,5 @@
 from eventloop.base import EventLoop, SampleHandler
-from eventloop.filters import DurationFilter, PixelFilter
+from eventloop.filters import DurationFilter, PixelFilter, SpreadFilter
 from routines import GetTracks, PlotTracks
 
 loop = EventLoop()
@@ -13,9 +13,10 @@ loop.add_routine(PixelFilter(max_pixels=5))
 
 # add main routine
 loop.add_routine(GetTracks())
+loop.add_routine(SpreadFilter(max_spread=1))
 
 # add plot routine
-loop.add_routine(PlotTracks(output_dir="outputs/get_tracks_filtered"))
+loop.add_routine(PlotTracks(output_dir="outputs/get_tracks_filtered/"))
 
 # specify range of tods of interests 
 loop.run(0, 2)

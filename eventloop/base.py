@@ -72,6 +72,12 @@ class EventLoop:
     def get_id(self):
         return self._tod_id
 
+    def get_name(self):
+        """Return name of the TOD"""
+        # get metadata
+        metadata = self._sh.get_metadata()
+        return metadata[self.get_id()]
+
         
 class Routine:
     def __init__(self):
@@ -106,6 +112,8 @@ class SampleHandler:
     
     def fetch_all(self):
         self._files = glob.glob(self._depot + "*." + self._postfix)
+        # load metadata
+        self.load_metadata()
         return self._files
         
     def fetch_batch(self, start, end):
@@ -117,14 +125,20 @@ class SampleHandler:
                 files.append(filepath)
                 print '[INFO] Fetched: %s' % filepath
         self._files = files
+
+        # load metadata
+        self.load_metadata()
+
         return files
     
     def load_metadata(self):
         """Load metadata if there is one"""
         metadata_path = self._depot + ".metadata"
-        if os.path.isfile(matadata_path):
+        if os.path.isfile(metadata_path):
+            print '[INFO] Metadata found!'
             with open(self._depot + ".metadata", "r") as meta:
                 self._metadata = cPickle.load(meta)
+                print '[INFO] Metadata loaded!'
     
     def get_metadata(self):
         return self._metadata

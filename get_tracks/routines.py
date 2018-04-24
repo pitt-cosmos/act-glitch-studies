@@ -66,8 +66,10 @@ class PlotTracks(Routine):
             os.makedirs(self._output_dir)
     
     def execute(self):
+        print self.get_context().get_name()
         tod_id = self.get_context().get_id()
         tracks = self.get_context().get_store().get("tracks")
+        print '[INFO] n_tracks = %d' % len(tracks)
         
         plt.figure(figsize=(10,10))
         self._pr.plot()  # plot the array
@@ -77,6 +79,6 @@ class PlotTracks(Routine):
                 plt.plot(track[:,0],track[:,1])
             else:
                 plt.scatter(track[:,0], track[:,1], alpha=0.7)
-                
-            # save image
+        # save image
+        print '[INFO] Saving image ...'
         plt.savefig(self._output_dir+"%d.png" % tod_id)
