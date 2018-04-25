@@ -1,10 +1,10 @@
 import numpy as np
 import moby2
 
+
 def merge_cuts(cut1, cut2):
-    '''Merge two cutvectors
-    input cuts have to be CutVector type
-    '''
+    """Merge two cutvectors
+    input cuts have to be CutVector type"""
     if len(cut1) == 0:
         return cut2
     if len(cut2) == 0:
@@ -17,10 +17,10 @@ def merge_cuts(cut1, cut2):
     merged = moby2.tod.CutsVector.from_mask(mask=cm)
     return merged
 
+
 def common_cuts(cut1, cut2):
-    '''Find common cuts from two cuts
-    Input cuts must be of CutVectors type
-    '''
+    """Find common cuts from two cuts
+    Input cuts must be of CutVectors type"""
     if len(cut1) == 0:
         return cut1
     if len(cut2) == 0:
@@ -32,11 +32,13 @@ def common_cuts(cut1, cut2):
     common = moby2.tod.CutsVector.from_mask(mask=cm)
     return common
 
+
 def remove_overlap_vector(original, to_remove, buff=0):
     """remove the to_remove CutVector from original CutVector"""
     for row in to_remove:
-        original = original[(original[:,1]<row[0]-buff) | (original[:,0]>row[1]+buff)]
+        original = original[(original[:, 1]<row[0]-buff) | (original[:, 0]>row[1]+buff)]
     return original
+
 
 def remove_overlap_tod(original, to_remove, buff=0):
     """remove the to_remove TODCuts from original TODCuts"""
@@ -46,9 +48,23 @@ def remove_overlap_tod(original, to_remove, buff=0):
         original.cuts[i] = remove_overlap_vector(original.cuts[i], to_remove.cuts[i], buff)
     return original
 
+
 def trim_edge_cuts(cuts, nsamps):
     """remove edge cuts, cuts covering first/last THRES sampling points are removed"""
-    THRES = 100 # sampling points
+    thres = 100 # sampling points
     for i in range(1056):
-        cuts.cuts[i] = cuts.cuts[i][(cuts.cuts[i][:,0]>THRES) & (cuts.cuts[i][:,1]<(nsamps-THRES))]
+        cuts.cuts[i] = cuts.cuts[i][(cuts.cuts[i][:, 0] > thres) & (cuts.cuts[i][:, 1] < (nsamps-thres))]
     return cuts
+
+
+def cut_contains(cv, v):
+    """check if a specific time is cut in a det (provided CutVector)"""
+    for c in cv:
+        if c[0] <= v <= c[1]:
+            return True
+    return False
+
+
+def pixels_affected(cs, v):
+        return [int(p) for p in cs if cut_contains(cs[p], v)]
+

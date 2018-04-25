@@ -1,10 +1,11 @@
 import os
 import matplotlib as mpl
-mpl.use('Agg')
 from matplotlib import pyplot as plt
 import numpy as np
 from eventloop.utils.pixels import PixelReader
 from eventloop.base import Routine
+from eventloop.utils.cuts import *
+mpl.use('Agg')
 
 
 class GetTracks(Routine):
@@ -12,18 +13,9 @@ class GetTracks(Routine):
         Routine.__init__(self)
         self._pr = None  # pixel reader
         self.downsample = downsample
-        
-    def cut_contains(self, cv, v):
-        for c in cv:
-            if c[0]<=v and c[1]>=v:
-                return True
-        return False
-    
-    def pixels_affected(self, cs, v):
-        return [int(p) for p in cs if self.cut_contains(cs[p], v)]
 
     def affected_pos_with_spread(self, cs, v):
-        pixels = self.pixels_affected(cs, v)
+        pixels = pixels_affected(cs, v)
         pos = np.array([self._pr.getXY(p) for p in pixels])
         std = np.std(pos, 0)
         spread = np.sqrt(std[0]**2+std[1]**2)
