@@ -16,7 +16,7 @@ class GetTracks(Routine):
 
     def affected_pos_with_spread(self, cs, v):
         pixels = pixels_affected(cs, v)
-        pos = np.array([self._pr.getXY(p) for p in pixels])
+        pos = np.array([self._pr.get_xy(p) for p in pixels])
         std = np.std(pos, 0)
         spread = np.sqrt(std[0]**2+std[1]**2)
         return np.hstack([np.mean(pos, 0), [spread]])

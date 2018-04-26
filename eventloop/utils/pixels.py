@@ -254,10 +254,10 @@ class PixelReader:
             '926': {'f150': [958, 1022], 'f90': [926, 990]},
             '927': {'f150': [959, 1023], 'f90': [927, 991]}
         }
-        self.getAdjacentDetectors = self.adjacentDetectorGenerator()
+        self.getAdjacentDetectors = self.adjacent_detector_generator()
         self.mask = mask
 
-    def adjacentDetectorGenerator(self):
+    def adjacent_detector_generator(self):
         """
         Generate a get_adjacent_pixels function
         Return a function to get adjacent detectors
@@ -280,32 +280,33 @@ class PixelReader:
             mask = _mask.flatten()
             indexes = np.where(mask == True)
             adj_dets[i]= list(list(indexes)[0]) # Normalize the np array output to list
+
         # Generate a function to access the data to make sure above procedures run once only
-        def getAdjacentDetectors(detector):
+        def get_adjacent_detectors(detector):
             return adj_dets[detector]
 
-        return getAdjacentDetectors
+        return get_adjacent_detectors
 
-    def getPixels(self, mask=None):
+    def get_pixels(self, mask=None):
         return [int(key) for key in self._pixel_dict]
 
-    def getF90(self, pixel):
+    def get_f90(self, pixel):
         if self.mask is not None:
             return [det for det in self._pixel_dict[str(pixel)]['f90'] if self.mask[det]==1]
         else:
             return self._pixel_dict[str(pixel)]['f90']
     
-    def getF150(self, pixel):
+    def get_f150(self, pixel):
         if self.mask is not None:
             return [det for det in self._pixel_dict[str(pixel)]['f150'] if self.mask[det]==1]
         else:
             return self._pixel_dict[str(pixel)]['f150'] 
     
-    def getAdjacentPixels(self, pixel):
+    def get_adjacent_pixels(self, pixel):
         all_adj_det = self.getAdjacentDetectors(pixel)
         return [int(det) for det in all_adj_det if str(det) in self._pixel_dict]
     
-    def getPixelsWithinRadius(self, pixel, radius):
+    def get_pixels_within_radius(self, pixel, radius):
         ar = self._ar
         dist = np.sqrt(np.sum((ar - ar[pixel,:])**2, axis=1))
         return [det for det in np.arange(1055)[dist<radius] if str(det) in self._pixel_dict]
@@ -315,11 +316,11 @@ class PixelReader:
         if pixels:
             plt.plot(self._array_data['array_x'][pixels], self._array_data['array_y'][pixels],'b.')
 
-    def getXY(self, pixel):
+    def get_xy(self, pixel):
         return [self._array_data['array_x'][pixel], self._array_data['array_y'][pixel]]
 
-    def getX(self, pixel):
+    def get_x(self, pixel):
         return self._array_data['array_x'][pixel]
 
-    def getY(self, pixel):
+    def get_y(self, pixel):
         return self._array_data['array_y'][pixel]
