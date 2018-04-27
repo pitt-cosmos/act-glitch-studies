@@ -53,9 +53,7 @@ class PlotTracks(Routine):
     
     def initialize(self):
         self._pr = PixelReader()
-        if not os.path.exists(self._output_dir):
-            print '[INFO] Path %s does not exist, creating ...' % self._output_dir
-            os.makedirs(self._output_dir)
+
     
     def execute(self):
         print self.get_context().get_name()

@@ -3,20 +3,35 @@ from eventloop.base import Routine
 import cPickle
 
 
-class DataDump(Routine):
-    """A routine to save data in data store"""
-    def __init__(self, key, output_dir):
+class OutputRoutine(Routine):
+    """A base routine that has output functionality"""
+    def __init__(self, output_dir):
         Routine.__init__(self)
-        self._key = key
         self._output_dir = output_dir
-        
-    def initialize(self):
-        if not os.path.exists(self.output_dir):
+
+    def initialize(self, output_dir):
+        if not os.path.exists(self._output_dir):
             print '[INFO] Path %s does not exist, creating ...' % self._output_dir
             os.makedirs(self._output_dir)
-    
+
+    def save_data(self, data):
+        tod_id = self.get_context().get_id()
+        with open(self._output_dir+str(tod_id)+".pickle", "w") as f:
+            cPickle.dump(data, f, cPickle.HIGHEST_PROTOCOL)
+
+    def save_figure(self, fig):
+        tod_id = self.get_context().get_id()
+        fig.savefig(self._output_dir+str(tod_id)+".png",)
+
+
+class DataDump(OutputRoutine):
+    """A routine to save data in data store"""
+    def __init__(self, key, output_dir):
+        OutputRoutine.__init__(self, output_dir)
+        self._key = key
+
     def execute(self):
         tod_id = self.get_context().get_id()
         data = self.get_context().get_store().get(self._key)
-        with open(self._output_dir+str(tod_id)+".pickle", "w") as f:
-            cPickle.dump(data, f, cPickle.HIGHEST_PROTOCOL)
+        self.save_data(data)
+
