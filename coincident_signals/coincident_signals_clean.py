@@ -57,11 +57,11 @@ for cut_no in range(start, end):
             det_f150 = []
             has_f90 = True
             has_f150 = True
-            for det in pr.get_f90(p):
+            for det in pr.get_f1(p):
                 if ardata['det_type'][det] == 'tes':
                     det_f90.append(det)
 
-            for det in pr.get_f150(p):
+            for det in pr.get_f2(p):
                 if ardata['det_type'][det] == 'tes':
                     det_f150.append(det)
 

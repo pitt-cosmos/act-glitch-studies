@@ -1,5 +1,4 @@
 import moby2
-import math
 import cPickle
 import numpy as np
 #import matplotlib
@@ -8,6 +7,7 @@ from pixels import PixelReader
 from cuts import *
 from matplotlib import pyplot as plt
 import sys
+
 
 def find_peaks(hist):
     nsamps = len(hist)
@@ -24,7 +24,8 @@ def find_peaks(hist):
         last = hist[i]
     return peaks
 
-ardata = moby2.scripting.get_array_data({'season':'2016', 'array_name':'AR3'})
+
+ardata = moby2.scripting.get_array_data({'season': '2016', 'array_name': 'AR3'})
 start = int(sys.argv[1])
 end = int(sys.argv[2])
 loose = True # loose means we merge across polarization instead find overlap
@@ -55,11 +56,11 @@ for cut_no in range(start, end):
             det_f150 = []
             has_f90 = True
             has_f150 = True
-            for det in pr.get_f90(p):
+            for det in pr.get_f1(p):
                 if ardata['det_type'][det] == 'tes':
                     det_f90.append(det)
 
-            for det in pr.get_f150(p):
+            for det in pr.get_f2(p):
                 if ardata['det_type'][det] == 'tes':
                     det_f150.append(det)
 
