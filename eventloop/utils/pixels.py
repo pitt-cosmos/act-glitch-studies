@@ -259,7 +259,7 @@ class PixelReader:
             '926': {'f150': [958, 1022], 'f90': [926, 990]},
             '927': {'f150': [959, 1023], 'f90': [927, 991]}
         }
-        self.getAdjacentDetectors = self.adjacent_detector_generator()
+        self.get_adjacentDetectors = self.adjacent_detector_generator()
         self.mask = mask
 
     def adjacent_detector_generator(self):
@@ -270,11 +270,11 @@ class PixelReader:
         return: [int] function(int det)
         """
         # Get data from file
-        ar = self._array_data[['array_x','array_y']].as_matrix()
-        self._ar = ar
+        ar = np.vstack([self._array_data['array_x'], self._array_data['array_y']]).T
+        self._ar = ar  # store the array_x array_y data into a variable in the obj
 
         # Find the adjacent detectors
-        adj_dets = [None] * len(self._array_data) # Generate an empty list to store adjacent detector lists
+        adj_dets = [None] * len(self._array_data['array_x']) # Generate an empty list to store adjacent detector lists
 
         for i in range(len(self._array_data)):
             dis = np.dot((ar - ar[i,:])**2,[[1],[1]])
