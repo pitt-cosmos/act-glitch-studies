@@ -59,8 +59,8 @@ class EventLoop:
             self._tod_id = int(os.path.basename(filename).split(".")[0])
             with open(filename, "r") as f:
                 print '[INFO] Working on %s' % filename
-                cosig = cPickle.load(f)  # load coinsident signal from each file
-                self.get_store().set("cosig", cosig)  # store it in shared memory
+                data = cPickle.load(f)  # load data from each file
+                self.get_store().set("data", data)  # store it in shared memory
             self.execute()
         self.finalize()
         

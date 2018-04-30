@@ -9,7 +9,7 @@ import traceback
 glitchp ={ 'nSig': 10, 'tGlitch' : 0.007, 'minSeparation': 30, 'maxGlitch': 50000, 'highPassFc': 6.0, 'buffer': 0 }
 
 # load pickled tod list
-with open("get_tod_list/output.txt", "r") as f:
+with open("get_tod_list/tod_list.txt", "r") as f:
     tod_names = f.readlines()
 
 array = 'AR3'

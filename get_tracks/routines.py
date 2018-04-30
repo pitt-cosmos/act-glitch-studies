@@ -12,7 +12,7 @@ class GetTracks(Routine):
     def __init__(self, downsample=1):
         Routine.__init__(self)
         self._pr = None  # pixel reader
-        self.downsample = downsample
+        self._downsample = downsample
 
     def affected_pos_with_spread(self, cs, v):
         pixels = pixels_affected(cs, v)
@@ -30,13 +30,13 @@ class GetTracks(Routine):
         self._pr = PixelReader()
     
     def execute(self):
-        cosig = self.get_context().get_store().get("cosig")
+        cosig = self.get_context().get_store().get("data")
         cs = cosig['coincident_signals']
         signals = [p[0:2] for p in cosig['peaks']]
         tracks = []
         for s in signals:
             pos = self.get_tracks_with_spread(cs, s)
-            pos_downsample = pos[::self.downsample]
+            pos_downsample = pos[::self._downsample]
             tracks.append(pos_downsample)
             
         # save to data store
@@ -54,7 +54,6 @@ class PlotTracks(Routine):
     def initialize(self):
         self._pr = PixelReader()
 
-    
     def execute(self):
         print self.get_context().get_name()
         tod_id = self.get_context().get_id()
