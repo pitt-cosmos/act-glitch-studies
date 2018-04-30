@@ -1,10 +1,15 @@
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
+import moby2
 
 class PixelReader:
-    def __init__(self, mask=None):
-        self._array_info = 'data/ar3.txt'
+    def __init__(self, season='2016', array='AR3', mask=None):
+        self._array_info = {
+            'season': season,
+            'array_name': array
+        }
+        self._array_data = moby2.scripting.get_array_data(self._array_info)
         self._pixel_dict = {
             '1': {'f150': [97, 161], 'f90': [1, 960]},
             '10': {'f150': [42, 106], 'f90': [10, 969]},
@@ -264,9 +269,6 @@ class PixelReader:
 
         return: [int] function(int det)
         """
-        detector_dir = self._array_info
-        self._array_data = pd.read_csv(detector_dir, delim_whitespace=True, header=None)
-        self._array_data.columns=['det_uid','row','col','freq','pol_family','array_x','array_y']
         # Get data from file
         ar = self._array_data[['array_x','array_y']].as_matrix()
         self._ar = ar
