@@ -42,7 +42,7 @@ for cut_no in range(start, end):
         # Get a unique list of lixels
         pr = PixelReader(mask=cuts_data['sel'])
         # pr = PixelReader() # test without selection mask
-        pixels = pr.getPixels()
+        pixels = pr.get_pixels()
 
         # Get nsamples
         #nsamps = max([cut[-1][1] for cut in cuts.cuts if len(cut)!=0])
@@ -55,11 +55,11 @@ for cut_no in range(start, end):
             det_f150 = []
             has_f90 = True
             has_f150 = True
-            for det in pr.getF90(p):
+            for det in pr.get_f90(p):
                 if ardata['det_type'][det] == 'tes':
                     det_f90.append(det)
 
-            for det in pr.getF150(p):
+            for det in pr.get_f150(p):
                 if ardata['det_type'][det] == 'tes':
                     det_f150.append(det)
 

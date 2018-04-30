@@ -3,7 +3,6 @@ import glob
 import os
 
 
-
 class EventLoop:
     """Main driving class for looping through coincident signals of different TODs"""
     def __init__(self):
@@ -60,8 +59,8 @@ class EventLoop:
             self._tod_id = int(os.path.basename(filename).split(".")[0])
             with open(filename, "r") as f:
                 print '[INFO] Working on %s' % filename
-                cosig = cPickle.load(f)  # load coinsident signal from each file
-                self.get_store().set("cosig", cosig)  # store it in shared memory
+                data = cPickle.load(f)  # load data from each file
+                self.get_store().set("data", data)  # store it in shared memory
             self.execute()
         self.finalize()
         
@@ -82,7 +81,7 @@ class EventLoop:
 class Routine:
     def __init__(self):
         self._context = None
-    
+
     def initialize(self):
         pass
     
@@ -101,8 +100,7 @@ class Routine:
     def get_context(self):
         return self._context
 
-    
-    
+
 class SampleHandler:
     def __init__(self, depot=None, postfix="pickle"):
         self._depot = depot
@@ -168,4 +166,3 @@ class DataStore:
             obj: a object of arbitrary type
         @ret: nil"""
         self._store[key] = obj
-        

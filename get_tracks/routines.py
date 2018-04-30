@@ -12,11 +12,11 @@ class GetTracks(Routine):
     def __init__(self, downsample=1):
         Routine.__init__(self)
         self._pr = None  # pixel reader
-        self.downsample = downsample
+        self._downsample = downsample
 
     def affected_pos_with_spread(self, cs, v):
         pixels = pixels_affected(cs, v)
-        pos = np.array([self._pr.getXY(p) for p in pixels])
+        pos = np.array([self._pr.get_xy(p) for p in pixels])
         std = np.std(pos, 0)
         spread = np.sqrt(std[0]**2+std[1]**2)
         return np.hstack([np.mean(pos, 0), [spread]])
@@ -30,13 +30,13 @@ class GetTracks(Routine):
         self._pr = PixelReader()
     
     def execute(self):
-        cosig = self.get_context().get_store().get("cosig")
+        cosig = self.get_context().get_store().get("data")
         cs = cosig['coincident_signals']
         signals = [p[0:2] for p in cosig['peaks']]
         tracks = []
         for s in signals:
             pos = self.get_tracks_with_spread(cs, s)
-            pos_downsample = pos[::self.downsample]
+            pos_downsample = pos[::self._downsample]
             tracks.append(pos_downsample)
             
         # save to data store
@@ -53,10 +53,7 @@ class PlotTracks(Routine):
     
     def initialize(self):
         self._pr = PixelReader()
-        if not os.path.exists(self._output_dir):
-            print '[INFO] Path %s does not exist, creating ...' % self._output_dir
-            os.makedirs(self._output_dir)
-    
+
     def execute(self):
         print self.get_context().get_name()
         tod_id = self.get_context().get_id()
