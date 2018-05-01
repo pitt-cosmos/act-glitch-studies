@@ -9,7 +9,7 @@ class OutputRoutine(Routine):
         Routine.__init__(self)
         self._output_dir = output_dir
 
-    def initialize(self, output_dir):
+    def initialize(self):
         if not os.path.exists(self._output_dir):
             print '[INFO] Path %s does not exist, creating ...' % self._output_dir
             os.makedirs(self._output_dir)

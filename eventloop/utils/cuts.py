@@ -66,5 +66,5 @@ def cut_contains(cv, v):
 
 
 def pixels_affected(cs, v):
-        return [int(p) for p in cs if cut_contains(cs[p], v)]
+    return [int(p) for p in cs if cut_contains(cs[p], v)]
 
