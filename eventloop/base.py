@@ -79,7 +79,7 @@ class EventLoop:
     def get_name(self):
         """Return name of the TOD"""
         # get metadata
-        return self._metadata[self.get_id()]
+        return self._sh.get_metadata()[self.get_id()]
 
 
 class Routine:
