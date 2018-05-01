@@ -28,11 +28,13 @@ class TODLoop(EventLoop):
             end:   ending tod_id"""
 
         self.initialize()
-
         for tod_id in range(start, end):
             tod_name = self._tod_list[tod_id]
+            print '[INFO] tod_name: %s' % tod_name
             self._tod_id = tod_id
-            tod_filename = self._fb.filename_from_name(tod_name)  # get file path
+            print '[INFO] tod_id: %d' % tod_id
+            tod_filename = self._fb.filename_from_name(tod_name, single=True)  # get file path
+            print '[INFO] tod_filename: %s' % tod_filename
             tod_data = moby2.scripting.get_tod({'filename': tod_filename, 'repair_pointing': True})
             self.get_store().set("tod_data", tod_data)  # save tod_data in memory for routines to process
             self.execute()
