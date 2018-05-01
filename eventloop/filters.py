@@ -9,13 +9,13 @@ class DurationFilter(Routine):
         self._max_duration = max_duration
         
     def execute(self):
-        cosig = self.get_context().get_store().get("cosig")
+        cosig = self.get_context().get_store().get("data")
         peaks = cosig['peaks']
         print '[INFO] Before: n_tracks = %d' % len(cosig['peaks'])
         peaks_filtered = [peak for peak in peaks if peak[2] < self._max_duration]
         cosig['peaks'] = peaks_filtered
         print '[INFO] After: n_tracks = %d' % len(cosig['peaks'])
-        self.get_context().get_store().set("cosig", cosig)
+        self.get_context().get_store().set("data", cosig)
         
         
 class PixelFilter(Routine):
@@ -25,13 +25,13 @@ class PixelFilter(Routine):
         self._max_pixels = max_pixels
         
     def execute(self):
-        cosig = self.get_context().get_store().get("cosig")
+        cosig = self.get_context().get_store().get("data")
         peaks = cosig['peaks']
         print '[INFO] Before: n_tracks = %d' % len(cosig['peaks'])
         peaks_filtered = [peak for peak in peaks if peak[3] < self._max_pixels]
         cosig['peaks'] = peaks_filtered
         print '[INFO] After: n_tracks = %d' % len(cosig['peaks'])
-        self.get_context().get_store().set("cosig", cosig)
+        self.get_context().get_store().set("data", cosig)
 
         
 class SpreadFilter(Routine):
@@ -58,7 +58,7 @@ class NCosigFilter(Routine):
         self._max_cosig = max_cosig
 
     def execute(self):
-        cosig = self.get_context().get_store().get("cosig")
+        cosig = self.get_context().get_store().get("data")
         peaks = cosig['peaks']
         if len(peaks) > self._max_cosig:
             self.veto()  # halt subsequent routines
