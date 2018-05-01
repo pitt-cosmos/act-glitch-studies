@@ -23,6 +23,13 @@ class OutputRoutine(Routine):
         tod_id = self.get_context().get_id()
         fig.savefig(self._output_dir+str(tod_id)+".png",)
 
+    def finalize(self):
+        # write metadata to the directory
+        metadata = self.get_context().get_metadata()
+        if metadata:  # if metadata exists
+            with open(self._output_dir+".metadata", "w") as f:
+                cPickle.dump(metadata, f, cPickle.HIGHEST_PROTOCOL)
+
 
 class DataDump(OutputRoutine):
     """A routine to save data in data store"""
@@ -31,7 +38,6 @@ class DataDump(OutputRoutine):
         self._key = key
 
     def execute(self):
-        tod_id = self.get_context().get_id()
         data = self.get_context().get_store().get(self._key)
         self.save_data(data)
 

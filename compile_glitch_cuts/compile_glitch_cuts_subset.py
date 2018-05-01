@@ -21,7 +21,7 @@ end = int(sys.argv[2])
 fb = get_filebase()
 
 print '[INFO] Total number of TODs: %d' % len(tod_names)
-# loop over the tods
+t# loop over the tods
 for n in range(start, end):
     try:
         tod_name = tod_names[n].split('\n')[0]

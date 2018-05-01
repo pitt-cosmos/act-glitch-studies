@@ -11,7 +11,8 @@ class EventLoop:
         self._store = DataStore()  # initialize data store
         self._sh = None  # sample handler
         self._tod_id = None
-        
+        self._metadata = None  # store metadata here
+
     def add_routine(self, routine):
         """Add a routine to the event loop"""
         self._routines.append(routine)
@@ -21,7 +22,8 @@ class EventLoop:
     def add_handler(self, sh):
         """Add a sample handler to the event loop"""
         self._sh = sh
-        
+        self._metadata = self._sh.get_metadata()
+
     def get_store(self):
         """Access the shared data storage"""
         return self._store
@@ -71,13 +73,15 @@ class EventLoop:
     def get_id(self):
         return self._tod_id
 
+    def get_metadata(self):
+        return self._metadata
+
     def get_name(self):
         """Return name of the TOD"""
         # get metadata
-        metadata = self._sh.get_metadata()
-        return metadata[self.get_id()]
+        return self._metadata[self.get_id()]
 
-        
+
 class Routine:
     def __init__(self):
         self._context = None
