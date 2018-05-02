@@ -12,7 +12,6 @@ slurm_template='''#!/bin/sh
 #SBATCH -t 90:00:00                        # 90 hours walltime
 #SBATCH --mem=8000MB                       # memory in MB 
 #SBATCH --output={{ logfile }}            # file for STDOUT 
-#SBATCH --mail-user={{ email }}           # mail id of the user
 
 
 python {{ script }} {{ opts }}
@@ -24,7 +23,6 @@ def generate_bash(name, script, options, enum=0):
         name = name,
         logfile = "logs/%s_%d.log" % (name, enum),
         script = script,
-        email = "yig20@pitt.edu",
         opts = options
     )
     print '[INFO] Compiling with options:', options
@@ -64,11 +62,11 @@ def run_bash(list_of_filenames):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("script", help="name of script")
-    parser.add_argument("name", help="name of the job on SLURM")
-    parser.add_argument("nworker", help="number of workers", type=int)
-    parser.add_argument("start", help="starting index", type=int)
-    parser.add_argument("end", help="ending index", type=int)
+    parser.add_argument("--script", help="name of script", required=True)
+    parser.add_argument("--name", help="name of the job on SLURM", required=True)
+    parser.add_argument("--nworker", help="number of workers", type=int, required=True)
+    parser.add_argument("--start", help="starting index", type=int, required=True)
+    parser.add_argument("--end", help="ending index", type=int, required=True)
     args = parser.parse_args()
     name = args.name
     script = args.script

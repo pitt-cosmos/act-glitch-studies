@@ -9,20 +9,24 @@ class EventLoop:
         self._routines = []
         self._veto = False
         self._store = DataStore()  # initialize data store
-        self._sh = None  # sample handler
+        self._metadata = {}  # store metadata here
+        self._tod_list = None
         self._tod_id = None
-        self._metadata = None  # store metadata here
+        self._tod_name = None
 
     def add_routine(self, routine):
         """Add a routine to the event loop"""
         self._routines.append(routine)
         print '[INFO] Added routine: %s' % routine.__class__.__name__
         routine.add_context(self)  # make event loop accessible in each routine
-        
-    def add_handler(self, sh):
-        """Add a sample handler to the event loop"""
-        self._sh = sh
-        self._metadata = self._sh.get_metadata()
+
+    def add_tod_list(self, tod_list_dir):
+        """Add a list of TODs as input
+        @par:
+            tod_list_dir: string"""
+        with open(tod_list_dir, "r") as f:
+            self._tod_list = [line.split('\n')[0] for line in f.readlines()]
+            self._metadata['list'] = self._tod_list
 
     def get_store(self):
         """Access the shared data storage"""
@@ -53,17 +57,13 @@ class EventLoop:
         @param:
             start: starting tod_id
             end:   ending tod_id"""
-        files = self._sh.fetch_batch(start, end)  # fetch all files
-        
+
         self.initialize()
-        for filename in files[start:end]:
-            # get tod_id
-            self._tod_id = int(os.path.basename(filename).split(".")[0])
-            with open(filename, "r") as f:
-                print '[INFO] Working on %s' % filename
-                data = cPickle.load(f)  # load data from each file
-                self.get_store().set("data", data)  # store it in shared memory
+        for tod_id in range(start, end):
+            self._tod_id = tod_id
+            self._tod_name = self._tod_list[tod_id]
             self.execute()
+
         self.finalize()
         
     def veto(self):
@@ -71,80 +71,125 @@ class EventLoop:
         self._veto = True
     
     def get_id(self):
+        """Return the index of current TOD in the list"""
         return self._tod_id
-
-    def get_metadata(self):
-        return self._metadata
 
     def get_name(self):
         """Return name of the TOD"""
         # get metadata
-        return self._sh.get_metadata()[self.get_id()]
+        return self._tod_name
+
+    def add_metadata(self, key, obj):
+        """Add a metadata, which will be saved together with the output
+        to be used as reference for the future, for example, the list
+        of TODs may be a reference for the future
+        @par:
+            key: string
+            obj: any object
+        """
+        self._metadata[key] = obj
+
+    def get_metadata(self, key=None):
+        """Get metadata stored, by convention the list of TODs will
+        be stored in the key metadata['list']"""
+        if key:  # if a key is provided, return the metadata with the key
+            if key in self._metadata:  # key exists
+                return self._metadata[key]
+            else:  # key doesn't exist
+                return None
+        else:  # if a key is not provided, return the entire metadata
+            return self._metadata
 
 
 class Routine:
+    """A routine is a reusable unit of a particular algorithm,
+    for example, it can be filtering algorithms that can be used
+    in various studies."""
     def __init__(self):
         self._context = None
 
     def initialize(self):
+        """Script that runs when the pipeline is initializing. It's
+         a good place for scripts that need to run only once."""
         pass
     
     def execute(self):
+        """Script that runs for each TOD"""
         pass
     
     def finalize(self):
+        """Method that runs after all TODs have been processed. It's
+        a good place to close opened files or connection if any."""
         pass
     
     def veto(self):
+        """Prevent the TOD to be processed by other routines (stopped
+        the pipeline for the TOD currently running. It's useful for
+        filtering TODs"""
         self.get_context().veto()
         
     def add_context(self, context):
+        """An internal function that's not to be called by users"""
         self._context = context
         
     def get_context(self):
+        """Return the pipeline (event loop) that this routine is part of.
+        This is useful because the pipeline contains a shared data store
+        and metadata that may be useful"""
         return self._context
 
+    def get_id(self):
+        """A short cut to calling the get_id of parent pipeline"""
+        return self.get_context().get_id()
 
-class SampleHandler:
-    def __init__(self, depot=None, postfix="pickle"):
-        self._depot = depot
+    def get_store(self):
+        """A short cut to calling the get_store of parent pipeline"""
+        return self.get_context().get_store()
+
+    def get_name(self):
+        """A short cut to calling the get_name of parent pipeline"""
+        return self.get_context().get_name()
+
+
+class DataLoader(Routine):
+    """A routine that load the saved coincident signals"""
+    def __init__(self, input_dir=None, postfix="pickle", output_key="data"):
+        """
+        :param input_dir:  string
+        :param postfix:    string - file extension
+        :param output_key: string - key used to store loaded data
+        """
+        self._input_dir = input_dir
         self._postfix = postfix
-        self._files = None
+        self._output_key = output_key
         self._metadata = None
-    
-    def fetch_all(self):
-        self._files = glob.glob(self._depot + "*." + self._postfix)
-        # load metadata
+
+    def initialize(self):
         self.load_metadata()
-        return self._files
-        
-    def fetch_batch(self, start, end):
+
+    def execute(self):
         """A function that fetch a batch of files in order"""
-        files = []
-        for i in range(start, end):
-            filepath = "%s%s.%s" % (self._depot, i, self._postfix)
-            if os.path.isfile(filepath):
-                files.append(filepath)
+        i = self.get_id()
+        filepath = "%s%s.%s" % (self._input_dir, i, self._postfix)
+        if os.path.isfile(filepath):
+            with open(filepath, "r") as f:
+                self.get_store().set(self._output_key, cPickle.load(f))
                 print '[INFO] Fetched: %s' % filepath
-        self._files = files
+        else:
+            print '[WARNING] Not found: %s' % filepath
 
-        # load metadata
-        self.load_metadata()
-
-        return files
-    
     def load_metadata(self):
         """Load metadata if there is one"""
-        metadata_path = self._depot + ".metadata"
+        metadata_path = self._input_dir + ".metadata"
         if os.path.isfile(metadata_path):
             print '[INFO] Metadata found!'
-            with open(self._depot + ".metadata", "r") as meta:
+            with open(self._input_dir + ".metadata", "r") as meta:
                 self._metadata = cPickle.load(meta)
                 print '[INFO] Metadata loaded!'
-    
+
     def get_metadata(self):
         return self._metadata
-    
+
     
 class DataStore:
     """Cache class for event loop"""
@@ -153,7 +198,7 @@ class DataStore:
     
     def get(self, key):
         """Retrieve an object based on a key
-        @par: 
+        @par:
             key: str
         @ret:   
             Object of an arbitrary type associated with the key

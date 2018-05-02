@@ -5,11 +5,7 @@ from routines import TestRoutine
 #create an event loop		
 loop = EventLoop()
 
-#Load coincident signals in folder outputs/coincident_signals/
-# add sample handler
-loop.add_handler(SampleHandler(depot="outputs/coincident_signals_subset/"))
-
-#Add PixelFilter Routine
+loop.add_handler(SampleHandler(input_dir="outputs/coincident_signals_subset/"))
 loop.add_routine(TestRoutine())
 
 
