@@ -15,7 +15,7 @@ class TestRoutine(Routine):
     def execute(self):
         cosig = self.get_context().get_store().get("data")
         cs = cosig['coincident_signals']
-        print cs
+        return cs
         tod_name = self.get_context().get_name()
 	name = self.filebase.filename_from_name(tod_name,single=True)
-	print name
+	return name
