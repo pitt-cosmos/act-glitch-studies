@@ -1,11 +1,12 @@
-from eventloop.base import EventLoop, SampleHandler
+from eventloop.base import EventLoop, DataLoader
 from eventloop.filters import DurationFilter, PixelFilter, SpreadFilter
 from routines import GetTracks, PlotTracks
 
 loop = EventLoop()
+loop.add_tod_list("data/s16_pa3_list.txt")
 
 # add sample handler
-loop.add_handler(SampleHandler(input_dir="outputs/coincident_signals_subset/"))
+loop.add_routine(DataLoader(input_dir="outputs/coincident_signals_subset/"))
 
 # add filters
 loop.add_routine(DurationFilter(max_duration=10))

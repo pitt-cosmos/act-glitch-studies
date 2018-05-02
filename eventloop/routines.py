@@ -21,7 +21,7 @@ class OutputRoutine(Routine):
 
     def save_figure(self, fig):
         tod_id = self.get_context().get_id()
-        fig.savefig(self._output_dir+str(tod_id)+".png",)
+        fig.savefig(self._output_dir+str(tod_id)+".png")
 
     def finalize(self):
         # write metadata to the directory

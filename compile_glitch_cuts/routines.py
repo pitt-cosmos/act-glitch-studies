@@ -4,13 +4,14 @@ from eventloop.routines import OutputRoutine
 
 class CompileCuts(OutputRoutine):
     """A routine that compile cuts"""
-    def __init__(self, glitchp, output_dir):
+    def __init__(self, input_key, glitchp, output_dir):
         OutputRoutine.__init__(self, output_dir)
+        self._input_key = input_key
         self._glitchp = glitchp
 
     def execute(self):
         print '[INFO] Finding glitches'
-        tod_data = self.get_context().get_store().get("tod_data")  # retrieve tod_data
+        tod_data = self.get_context().get_store().get(self._input_key)  # retrieve tod_data
         glitch_cuts = moby2.tod.get_glitch_cuts(tod=tod_data, params=self._glitchp)
         mce_cuts = moby2.tod.get_mce_cuts(tod=tod_data)  # get mce cuts
         print "[INFO] Finding glitches complete"
