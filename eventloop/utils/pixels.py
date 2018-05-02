@@ -31,8 +31,10 @@ class PixelReader:
             dets = np.where(np.all(self._array_pos == self._array_pos[det_id, :], axis=1))[0]
             # make a dictionary of frequencies: f1: lower freq, f2: higher freq
             pol_dict = {
-                'f1': [i for i in dets if self._array_data['nom_freq'][i] == self._freqs[0]],
-                'f2': [i for i in dets if self._array_data['nom_freq'][i] == self._freqs[1]]
+                'f1': [i for i in dets if self._array_data['nom_freq'][i] == self._freqs[0] and
+                       self._array_data['det_type'][det_id] == 'tes'],
+                'f2': [i for i in dets if self._array_data['nom_freq'][i] == self._freqs[1] and
+                       self._array_data['det_type'][det_id] == 'tes']
             }
             pixel_id = dets[0]  # index pixel by the smallest det_uid
             pixel_dict[str(pixel_id)] = pol_dict
