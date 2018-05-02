@@ -5,7 +5,7 @@ from routines import GetTracks, PlotTracks
 loop = EventLoop()
 
 # add sample handler
-loop.add_handler(SampleHandler(depot="outputs/coincident_signals_subset/"))
+loop.add_handler(SampleHandler(input_dir="outputs/coincident_signals_subset/"))
 
 # add filters
 loop.add_routine(DurationFilter(max_duration=10))

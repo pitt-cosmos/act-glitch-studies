@@ -106,14 +106,14 @@ class Routine:
 
 
 class SampleHandler:
-    def __init__(self, depot=None, postfix="pickle"):
-        self._depot = depot
+    def __init__(self, input_dir=None, postfix="pickle"):
+        self._input_dir = input_dir
         self._postfix = postfix
         self._files = None
         self._metadata = None
     
     def fetch_all(self):
-        self._files = glob.glob(self._depot + "*." + self._postfix)
+        self._files = glob.glob(self._input_dir + "*." + self._postfix)
         # load metadata
         self.load_metadata()
         return self._files
@@ -122,7 +122,7 @@ class SampleHandler:
         """A function that fetch a batch of files in order"""
         files = []
         for i in range(start, end):
-            filepath = "%s%s.%s" % (self._depot, i, self._postfix)
+            filepath = "%s%s.%s" % (self._input_dir, i, self._postfix)
             if os.path.isfile(filepath):
                 files.append(filepath)
                 print '[INFO] Fetched: %s' % filepath
@@ -135,10 +135,10 @@ class SampleHandler:
     
     def load_metadata(self):
         """Load metadata if there is one"""
-        metadata_path = self._depot + ".metadata"
+        metadata_path = self._input_dir + ".metadata"
         if os.path.isfile(metadata_path):
             print '[INFO] Metadata found!'
-            with open(self._depot + ".metadata", "r") as meta:
+            with open(self._input_dir + ".metadata", "r") as meta:
                 self._metadata = cPickle.load(meta)
                 print '[INFO] Metadata loaded!'
     
