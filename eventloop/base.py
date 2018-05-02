@@ -165,7 +165,7 @@ class DataLoader(Routine):
         self._metadata = None
 
     def initialize(self):
-        self.load_metadata(self)
+        self.load_metadata()
 
     def execute(self):
         """A function that fetch a batch of files in order"""
