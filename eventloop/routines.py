@@ -41,3 +41,13 @@ class DataDump(OutputRoutine):
         data = self.get_context().get_store().get(self._key)
         self.save_data(data)
 
+
+class Logger(Routine):
+    """A routine to log a key, for debugging purpose"""
+    def __init__(self, input_key):
+        Routine.__init__(self)
+        self._input_key = input_key
+
+    def execute(self):
+        data = self.get_store().get(self._input_key)
+        print data
