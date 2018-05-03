@@ -59,7 +59,6 @@ class PlotTracks(Routine):
         self._pr = PixelReader(season=self._season, array=self._array)
 
     def execute(self):
-        print self.get_context().get_name()
         tod_id = self.get_context().get_id()
         tracks = self.get_context().get_store().get("tracks")
         print '[INFO] n_tracks = %d' % len(tracks)
@@ -75,3 +74,4 @@ class PlotTracks(Routine):
         # save image
         print '[INFO] Saving image ...'
         plt.savefig(self._output_dir+"%d.png" % tod_id)
+        print '[INFO] Image saved: %s%d.png' % (self._output_dir, tod_id)

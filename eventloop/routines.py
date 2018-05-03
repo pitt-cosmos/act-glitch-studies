@@ -18,6 +18,7 @@ class OutputRoutine(Routine):
         tod_id = self.get_context().get_id()
         with open(self._output_dir+str(tod_id)+".pickle", "w") as f:
             cPickle.dump(data, f, cPickle.HIGHEST_PROTOCOL)
+            print '[INFO] Data saved: %s' % self._output_dir+str(tod_id)+".pickle"
 
     def save_figure(self, fig):
         tod_id = self.get_context().get_id()

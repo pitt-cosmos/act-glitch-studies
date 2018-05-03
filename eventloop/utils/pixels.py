@@ -14,6 +14,7 @@ class PixelReader:
         self._array_data = moby2.scripting.get_array_data(self._array_info)
         self._pixel_dict = self.generate_pixel_dict()
         self._mask = mask
+        self.calibrate_array(season=self._array_info['season'])
         # self.get_adjacent_detectors = self.adjacent_detector_generator()
 
     def generate_pixel_dict(self):
@@ -40,6 +41,14 @@ class PixelReader:
             pixel_dict[str(pixel_id)] = pol_dict
             
         return pixel_dict
+
+    def calibrate_array(self, season):
+        """Calibrate the array_data based on season since different
+        seasons have different array_data units"""
+        if season == '2017':
+            self._array_data['array_x'] /= 10000.0
+            self._array_data['array_y'] /= 10000.0
+
         
     def adjacent_detector_generator(self):
         """
