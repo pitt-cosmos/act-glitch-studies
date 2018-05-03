@@ -48,7 +48,7 @@ It serves as a pipeline of different routines that can be applied to the data. R
 Here is a list of written routines and their whereabouts
 - `eventloop.base.DataLoader`: useful for loading data. Retrieve the data in a folder and save it to a key.
 - `eventloop.tod.TODLoader`: useful for loading TOD data. TOD data will be saved in a given key. 
-- `eventloop.routines.DataDump`: useful for saving data. Take the data in a key and save it in a folder.
+- `eventloop.routines.SaveData`: useful for saving data. Take the data in a key and save it in a folder.
 - `eventloop.routines.Logger`: useful for debugging, simply print the variable inside a given key. 
 - `eventloop.filters.DurationFilter`: useful for filtering glitches by their duration.
 - `eventloop.filters.PixelFilter`: useful for filtering glitches by the number of pixels affected
