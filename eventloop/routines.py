@@ -50,4 +50,4 @@ class Logger(Routine):
 
     def execute(self):
         data = self.get_store().get(self._input_key)
-        print data
+        print '[INFO] Logger: %s = %s' % (self._input_key, data)

@@ -155,8 +155,16 @@ class FindCosigs(Routine):
 
                     cosig[str(p)] = common_cuts(cuts_f1, cuts_f2)  # store coincident signals by pixel id
 
-        self.get_store().set(self._output_key, cosig)  # save the coincident signals under the output_key
-        self.get_store().set("nsamps", nsamps)  # save the number of sampling points
+        # cosig may contain empty cut vectors because we didn't enforce it, filter them out now
+        cosig_filtered = {}
+        for pixel in cosig:
+            cuts = cosig[pixel]
+            if len(cuts) != 0:
+                cosig_filtered[pixel] = cuts
+
+        # save cosig for further processing
+        self.get_store().set(self._output_key, cosig_filtered)  # save the coincident signals under the output_key
+        self.get_store().set("nsamps", nsamps)  # save the number of sampling points, not graceful
 
 
 class FindEvents(Routine):
@@ -189,12 +197,13 @@ class FindEvents(Routine):
 
     def execute(self):
         self._cosig = self.get_store().get(self._input_key)
-        self._nsamps = self.get_store().get("nsamps")  # get nsamps from FindCosigs, not very graceful
+        self._nsamps = self.get_store().get("nsamps")  # get nsamps from FindCosigs, not graceful
 
         # generate a histogram of cosigs
-        cosig_hist = np.zeros(1, self._nsamps)
+        cosig_hist = np.zeros(self._nsamps)
 
-        for pixel, cuts in self._cosig:  # loop through key and value pair in cosig dict
+        for pixel in self._cosig:  # loop through key and value pair in cosig dict
+            cuts = self._cosig[pixel]
             mask = cuts.get_mask(nsamps=self._nsamps)
             cosig_hist += mask
 
