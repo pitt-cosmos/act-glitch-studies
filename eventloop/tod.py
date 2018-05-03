@@ -33,23 +33,25 @@ class TODLoader(Routine):
 
 class TODInfoLoader(Routine):
     """A routine to load TODInfo"""
-    def __init__(self, season='2016', array='AR3'):
+    def __init__(self, output_key="tod_info", season='2016', array='AR3'):
         Routine.__init__(self)
         self._tod_info = None
         self._season = season
         self._array = array
+        self._output_key = output_key
 
     def initialize(self):
         self._tod_info = pd.read_csv('data/s16_pa3_tod_info.csv', header=None)
         self._tod_info.columns = ['TOD', 'hour', 'altitude', 'azimuth', 'PWV', 'cut_status', 'field']
 
-        def get_tod_info(tod_name, field):
-            tod = self._tod_info[self._tod_info['TOD']==tod_name]
-            if len(tod) != 0:  # if an entry is found
-                return tod[field]
-            else:  # if no entry is found
-                print '[WARNING] No TOD found with name: %s' % tod_name
-
-        # A hack to store functions in shared datastore. Prefix with f_ to denote this fact. 
-        self.get_store().set("f_get_tod_info", get_tod_info)
-
+    def execute(self):
+        tod_name = self.get_name()
+        tod_info_index = list(self._tod_info.index[self._tod_info['TOD']==tod_name])
+        if len(tod_info_index) != 0:  # if an entry is found
+            tod_info_dict = {}
+            for col in self._tod_info.columns:
+                tod_info_dict[col] = self._tod_info.iloc[tod_info_index[0]][col]
+            print '[INFO] TODInfo found: %s' % tod_info_dict
+            self.get_store().set(self._output_key, tod_info_dict)
+        else:  # if no entry is found
+            print '[WARNING] No TODInfo found with name: %s' % tod_name
