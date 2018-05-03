@@ -58,6 +58,10 @@ Here is a list of written routines and their whereabouts
 - `compile_glitch_cuts.routines.CompileCuts`: compile cuts given a TOD. 
 - `get_tracks.routines.GetTracks`: compile all tracks of a TOD and save to a key.
 - `get_tracks.routines.PlotTracks`: plot the tracks and save the plot in a folder. 
+- `coincident_signals.routines.RemoveMCE`: remove mce cuts from glitch cuts.
+- `coincident_signals.routines.TrimEdge`: remove glitch cuts at the edges of each TOD.
+- `coincident_signals.routines.FindCosigs`: find coincident signals (cosigs) based on cuts.
+- `coincident_signals.routines.FindEvents`: find peaks in cosigs which correspond to physical events.
 
 ## List of Utility Functions
 - `eventloop.utils.pixels`: contains useful functions for accessing pixels.
