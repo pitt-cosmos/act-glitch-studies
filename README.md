@@ -44,6 +44,28 @@ It serves as a pipeline of different routines that can be applied to the data. R
 ## Instructions
 1. Add the project folder to your pythonpath.
 
+## List of Routines
+Here is a list of written routines and their whereabouts
+- `eventloop.base.DataLoader`: useful for loading data. Retrieve the data in a folder and save it to a key.
+- `eventloop.tod.TODLoader`: useful for loading TOD data. TOD data will be saved in a given key. 
+- `eventloop.routines.SaveData`: useful for saving data. Take the data in a key and save it in a folder.
+- `eventloop.routines.Logger`: useful for debugging, simply print the variable inside a given key. 
+- `eventloop.filters.DurationFilter`: useful for filtering glitches by their duration.
+- `eventloop.filters.PixelFilter`: useful for filtering glitches by the number of pixels affected
+- `eventloop.filters.SpreadFilter`: filter tracks by their spreads.
+- `eventloop.filters.NCosigFilter`: filter TODs by the number of coincident signals seen. 
+- `eventloop.filters.TrackLengthFilter`: filter tracks by their lengths. 
+- `compile_glitch_cuts.routines.CompileCuts`: compile cuts given a TOD. 
+- `get_tracks.routines.GetTracks`: compile all tracks of a TOD and save to a key.
+- `get_tracks.routines.PlotTracks`: plot the tracks and save the plot in a folder. 
+- `coincident_signals.routines.RemoveMCE`: remove mce cuts from glitch cuts.
+- `coincident_signals.routines.TrimEdge`: remove glitch cuts at the edges of each TOD.
+- `coincident_signals.routines.FindCosigs`: find coincident signals (cosigs) based on cuts.
+- `coincident_signals.routines.FindEvents`: find peaks in cosigs which correspond to physical events.
+
+## List of Utility Functions
+- `eventloop.utils.pixels`: contains useful functions for accessing pixels.
+- `eventloop.utils.cuts`: contains useful function when working with cuts.
 ## Development Guidelines
 1. Class name use camel case like `GetTrackWithSpread`. 
 2. Method name use lowercase with underscores like `get_tod_id`. 

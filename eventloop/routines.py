@@ -18,6 +18,7 @@ class OutputRoutine(Routine):
         tod_id = self.get_context().get_id()
         with open(self._output_dir+str(tod_id)+".pickle", "w") as f:
             cPickle.dump(data, f, cPickle.HIGHEST_PROTOCOL)
+            print '[INFO] Data saved: %s' % self._output_dir+str(tod_id)+".pickle"
 
     def save_figure(self, fig):
         tod_id = self.get_context().get_id()
@@ -31,13 +32,23 @@ class OutputRoutine(Routine):
                 cPickle.dump(metadata, f, cPickle.HIGHEST_PROTOCOL)
 
 
-class DataDump(OutputRoutine):
-    """A routine to save data in data store"""
-    def __init__(self, key, output_dir):
+class SaveData(OutputRoutine):
+    """A routine to save data from data store"""
+    def __init__(self, input_key, output_dir):
         OutputRoutine.__init__(self, output_dir)
-        self._key = key
+        self._input_key = input_key
 
     def execute(self):
-        data = self.get_context().get_store().get(self._key)
+        data = self.get_context().get_store().get(self._input_key)
         self.save_data(data)
 
+
+class Logger(Routine):
+    """A routine to log a key, for debugging purpose"""
+    def __init__(self, input_key):
+        Routine.__init__(self)
+        self._input_key = input_key
+
+    def execute(self):
+        data = self.get_store().get(self._input_key)
+        print '[INFO] Logger: %s = %s' % (self._input_key, data)

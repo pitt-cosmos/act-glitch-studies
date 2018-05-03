@@ -14,6 +14,7 @@ class PixelReader:
         self._array_data = moby2.scripting.get_array_data(self._array_info)
         self._pixel_dict = self.generate_pixel_dict()
         self._mask = mask
+        self.calibrate_array(season=self._array_info['season'])
         # self.get_adjacent_detectors = self.adjacent_detector_generator()
 
     def generate_pixel_dict(self):
@@ -31,13 +32,23 @@ class PixelReader:
             dets = np.where(np.all(self._array_pos == self._array_pos[det_id, :], axis=1))[0]
             # make a dictionary of frequencies: f1: lower freq, f2: higher freq
             pol_dict = {
-                'f1': [i for i in dets if self._array_data['nom_freq'][i] == self._freqs[0]],
-                'f2': [i for i in dets if self._array_data['nom_freq'][i] == self._freqs[1]]
+                'f1': [i for i in dets if self._array_data['nom_freq'][i] == self._freqs[0] and
+                       self._array_data['det_type'][det_id] == 'tes'],
+                'f2': [i for i in dets if self._array_data['nom_freq'][i] == self._freqs[1] and
+                       self._array_data['det_type'][det_id] == 'tes']
             }
             pixel_id = dets[0]  # index pixel by the smallest det_uid
             pixel_dict[str(pixel_id)] = pol_dict
             
         return pixel_dict
+
+    def calibrate_array(self, season):
+        """Calibrate the array_data based on season since different
+        seasons have different array_data units"""
+        if season == '2017':
+            self._array_data['array_x'] /= 10000.0
+            self._array_data['array_y'] /= 10000.0
+
         
     def adjacent_detector_generator(self):
         """
