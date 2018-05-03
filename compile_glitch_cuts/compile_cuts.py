@@ -3,7 +3,7 @@ from eventloop.base import EventLoop
 from routines import CompileCuts
 
 loop = EventLoop()
-loop.add_tod_list("data/s17_pa4_sublist.txt")
+loop.add_tod_list("data/s16_pa3_sublist.txt")
 
 glitchp = {
     'nSig': 10, 

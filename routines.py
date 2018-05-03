@@ -1,21 +1,27 @@
-from eventloop.utils.pixels import PixelReader
-from eventloop.base import Routine
-from eventloop.utils.cuts import *
 import moby2
-from moby2.instruments import actpol
-from moby2.scripting import get_filebase
+from eventloop.routines import OutputRoutine
 
-class TestRoutine(Routine):
-    def __init__(self):
-        Routine.__init__(self)
 
-    def initialize(self):
-        self.filebase = get_filebase()
+class CompileCuts(OutputRoutine):
+    """A routine that compile cuts"""
+    def __init__(self, input_key, glitchp, output_dir):
+        OutputRoutine.__init__(self, output_dir)
+        self._input_key = input_key
+        self._glitchp = glitchp
 
     def execute(self):
-        cosig = self.get_context().get_store().get("data")
-        cs = cosig['coincident_signals']
-        return cs
-        tod_name = self.get_context().get_name()
-	name = self.filebase.filename_from_name(tod_name,single=True)
-	return name
+        print '[INFO] Finding glitches'
+        tod_data = self.get_context().get_store().get(self._input_key)  # retrieve tod_data
+        glitch_cuts = moby2.tod.get_glitch_cuts(tod=tod_data, params=self._glitchp)
+        mce_cuts = moby2.tod.get_mce_cuts(tod=tod_data)  # get mce cuts
+        print "[INFO] Finding glitches complete"
+
+        # Save into pickle file
+        cut_data = {
+            "TOD": self.get_context().get_name(),
+            "glitch_param": self._glitchp,  # save the parameters used to generate
+            "cuts": glitch_cuts,  # save the cuts
+            "mce": mce_cuts,
+            "nsamps": tod_data.nsamps
+        }
+        self.save_data(cut_data)
