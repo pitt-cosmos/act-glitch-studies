@@ -52,7 +52,7 @@ def remove_overlap_tod(original, to_remove, buff=0):
 def trim_edge_cuts(cuts, nsamps):
     """remove edge cuts, cuts covering first/last THRES sampling points are removed"""
     thres = 100 # sampling points
-    for i in range(1056):
+    for i in range(len(cuts.cuts)):
         cuts.cuts[i] = cuts.cuts[i][(cuts.cuts[i][:, 0] > thres) & (cuts.cuts[i][:, 1] < (nsamps-thres))]
     return cuts
 

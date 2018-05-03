@@ -17,6 +17,6 @@ glitchp = {
 
 loop.add_routine(TODLoader(output_key="tod_data", abspath=True))
 loop.add_routine(TODInfoLoader(output_key="tod_info"))
-#loop.add_routine(CompileCuts(input_key="tod_data", glitchp=glitchp, output_dir="outputs/s17_pa4_sublist/"))
+loop.add_routine(CompileCuts(input_key="tod_data", glitchp=glitchp, output_dir="outputs/s17_pa4_sublist/"))
 
 loop.run(0, 10)
