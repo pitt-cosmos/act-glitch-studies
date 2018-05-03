@@ -1,0 +1,16 @@
+timeseries(577,0)
+timeseries(577,2)
+
+[192110,..,..,18]
+timeseries(796,37)
+
+[155706, 155731, 25, 34]
+timeseries(77,7)
+timeseries(143, 11)
+
+[218306, 218449, 143, 37]
+timeseries(796,43)
+
+[256302, 256332, 30, 35]
+timeseries(73,13)
+#timeseries(73,14) *not part of this peak,but possibly interesting spike
