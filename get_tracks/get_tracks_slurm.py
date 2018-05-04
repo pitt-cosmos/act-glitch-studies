@@ -1,6 +1,7 @@
 from eventloop.base import EventLoop, DataLoader
 from eventloop.filters import DurationFilter, PixelFilter, SpreadFilter
 from routines import GetTracks, PlotTracks
+import sys
 
 loop = EventLoop()
 loop.add_tod_list("data/s17_pa4_sublist.txt")
@@ -22,4 +23,6 @@ loop.add_routine(GetTracks(season='2017', array='AR4'))
 loop.add_routine(PlotTracks(output_dir="outputs/s17_pa4_sublist_tracks/", season='2017', array='AR4'))
 
 # specify range of tods of interests 
-loop.run(0, 2)
+start = int(sys.argv[1])
+end = int(sys.argv[2])
+loop.run(start, end)

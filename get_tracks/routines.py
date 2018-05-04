@@ -5,6 +5,7 @@ import numpy as np
 from eventloop.utils.pixels import PixelReader
 from eventloop.base import Routine
 from eventloop.utils.cuts import *
+from eventloop.routines import OutputRoutine
 mpl.use('Agg')
 
 
@@ -45,11 +46,10 @@ class GetTracks(Routine):
         self.get_context().get_store().set("tracks", tracks)
 
             
-class PlotTracks(Routine):
+class PlotTracks(OutputRoutine):
     """A routine that plots the tracks and save to file, it is to be used with GetTracks"""
     def __init__(self, output_dir, season='2016', array='AR3', spreads=True):
-        Routine.__init__(self)
-        self._output_dir = output_dir
+        OutputRoutine.__init__(self, output_dir)
         self._spreads = spreads  # whether to plot spreads
         self._pr = None
         self._season = season
