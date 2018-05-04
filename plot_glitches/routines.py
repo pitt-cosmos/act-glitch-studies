@@ -1,30 +1,30 @@
 import moby2
 import matplotlib
-
 matplotlib.use("TKAgg")
-from eventloop.routines import OutputRoutine
 import matplotlib.pyplot as plt
-from jpixels import PixelReader
+
+from eventloop.routines import Routine
+from eventloop.utils.pixels import PixelReader
 
 
-class CompileCuts(OutputRoutine):
+class PlotGlitches(Routine):
     """A routine that compile cuts"""
 
-    def __init__(self, input_key, glitchp, output_dir):
-        OutputRoutine.__init__(self, output_dir)
-        self._input_key = input_key
-        self._glitchp = glitchp
+    def __init__(self, cosig_key, tod_key):
+        Routine.__init__(self)
+        self._cosig_key = cosig_key
+        self._tod_key = tod_key
+        self._pr = None
 
     def initialize(self):
         self._pr = PixelReader()
 
     def execute(self):
-        print '[INFO] Finding glitches'
-        tod_data = self.get_context().get_store().get(self._input_key)  # retrieve tod_data
-        moby2.tod.remove_mean(tod_data)
-        cuts = self.get_context().get_store().get("cuts")
-        cosig_data = self.get_context().get_store().get("data")
-        print(cuts)
+        print '[INFO] Plotting glitches ...'
+        tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data
+        cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
+        # moby2.tod.remove_mean(tod_data)
+        print '[INFO] cuts: ', cuts
 
         def timeseries(pixel_id, cut_num, buffer=10):
             start_time = cuts['coincident_signals'][str(pixel_id)][cut_num][0]
