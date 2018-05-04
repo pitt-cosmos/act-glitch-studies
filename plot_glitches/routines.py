@@ -7,8 +7,7 @@ import numpy as np
 
 
 class PlotGlitches(Routine):
-    """A routine that compile cuts"""
-
+    """A routine that plot glitches"""
     def __init__(self, cosig_key, tod_key):
         Routine.__init__(self)
         self._cosig_key = cosig_key
