@@ -27,16 +27,17 @@ class PlotGlitches(Routine):
         cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
         # moby2.tod.remove_mean(tod_data)
         print ('[INFO] cuts: ', cuts)
-        pixels = pixels_affected(cuts['coincident_signals'], 256317)
+        pixels = pixels_affected(cuts['coincident_signals'], 142065)
         print('[INFO] pixels affected: ',pixels)
 
         def timeseries(pixel_id, s_time,e_time, buffer=10):
-            #start_time = cuts['coincident_signals'][str(pixel_id)][cut_num][0]
+
             start_time = s_time
             start_time -= buffer
-            #end_time = cuts['coincident_signals'][str(pixel_id)][cut_num][1]
+
             end_time = e_time
             end_time += buffer
+
             a1, a2 = self._pr.get_f1(pixel_id)
             b1, b2 = self._pr.get_f2(pixel_id)
             d1, d2 = tod_data.data[a1], tod_data.data[a2]
@@ -48,25 +49,34 @@ class PlotGlitches(Routine):
             d3 -= np.mean(d3[start_time:end_time])
             d4 -= np.mean(d4[start_time:end_time])
             
-            # plot the running average over 5 points to smooth data
-            smooth_data = lambda data, n=5: pd.rolling_mean(data,n)
-            d1_avg = smooth_data(d1[start_time:end_time])
-            d2_avg = smooth_data(d2[start_time:end_time]) 
-            d3_avg = smooth_data(d3[start_time:end_time])
-            d4_avg = smooth_data(d4[start_time:end_time])
-
-
-
-            
             time = tod_data.ctime - tod_data.ctime[0]
             time = time[start_time:end_time]
+            
+            d_1 = d1[start_time:end_time]
+            d_2 = d2[start_time:end_time]
+            d_3 = d3[start_time:end_time]
+            d_4 = d4[start_time:end_time]
 
+            return time,d_1  
 
-            plt.plot(time, d1[start_time:end_time], '.-', label=str(a1) + ' 90 Hz')
+            """
+            plt.plot(time,d1[start_time:end_time], '.-', label=str(a1) + ' 90 Hz')
             plt.plot(time, d2[start_time:end_time], '.-', label=str(a2) + ' 90 Hz')
             plt.plot(time, d3[start_time:end_time], '.-', label=str(b1) + ' 150 Hz')
             plt.plot(time, d4[start_time:end_time], '.-', label=str(b2) + ' 150 Hz')
             plt.legend(title='Detector UID')
             plt.show()
+            """
+        #Plot all pixels affected given an array of pixel ids and a starting time and ending time
+        def plotter(pixels,start_time,end_time):
+            for pid in pixels:
+               plt.plot(timeseries(pid,start_time,end_time)[0],timeseries(pid,start_time,end_time)[1],'.-')
+            plt.show()
 
-        timeseries(271,256302, 256332,100)
+            
+            
+        stime = 142050
+        etime = 142080
+        pixels = np.asarray([668, 667, 411, 412, 539, 795, 155, 796])
+        plotter(pixels,stime,etime)
+
