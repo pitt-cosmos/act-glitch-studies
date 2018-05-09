@@ -5,12 +5,14 @@ from routines import PlotGlitches
 
 
 loop = EventLoop()
-loop.add_tod_list("data/s16_pa3_list.txt")
+loop.add_tod_list("../data/s16_pa3_list.txt")
 
 #will load the data stored in the folder specified one by one
 #and store the loaded data in the shared date store under a key called data
-loop.add_routine(DataLoader(input_dir="outputs/coincident_signals_subset/", output_key="cuts"))
-loop.add_routine(TODLoader(output_key="tod_data"))
-loop.add_routine(PlotGlitches(tod_key="tod_data", cosig_key="cuts"))
+loop.add_routine(DataLoader(input_dir="../outputs/coincident_signals_subset/", output_key="cuts"))
 
-loop.run(10000, 10001)
+loop.add_routine(TODLoader(output_key="tod_data"))
+pixel = 340
+cut_num = 4
+loop.add_routine(PlotGlitches(tod_key="tod_data", cosig_key="cuts", pixel=pixel, cut_num=cut_num))
+loop.run(318, 319)

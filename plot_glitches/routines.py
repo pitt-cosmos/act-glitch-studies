@@ -8,8 +8,10 @@ import numpy as np
 
 class PlotGlitches(Routine):
     """A routine that plot glitches"""
-    def __init__(self, cosig_key, tod_key):
+    def __init__(self, cosig_key, tod_key, pixel, cut_num):
         Routine.__init__(self)
+        self._pixel = pixel
+        self._cut_num = cut_num
         self._cosig_key = cosig_key
         self._tod_key = tod_key
         self._pr = None
@@ -49,5 +51,4 @@ class PlotGlitches(Routine):
             plt.legend(title='Detector UID')
             plt.show()
 
-        # print(cuts['coincident_signals']['23'])
-        timeseries(73, 14)
+        timeseries(self._pixel, self._cut_num)
