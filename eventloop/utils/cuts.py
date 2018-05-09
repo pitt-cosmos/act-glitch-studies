@@ -68,3 +68,12 @@ def cut_contains(cv, v):
 def pixels_affected(cs, v):
     return [int(p) for p in cs if cut_contains(cs[p], v)]
 
+def pixels_affected_in_event(cs, event):
+    pixels_affected_list = []
+    start_time = event[0]
+    end_time = event[1]
+    for t in range(start_time, end_time):
+        pixels_affected_list.extend(pixels_affected(t))
+
+    return list(set(pixels_affected_list))
+
