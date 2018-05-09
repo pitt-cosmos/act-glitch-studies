@@ -25,7 +25,7 @@ class PlotGlitches(Routine):
         cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
         # moby2.tod.remove_mean(tod_data)
         print ('[INFO] cuts: ', cuts)
-        pixels = pixels_affected(cuts['coincident_signals'], 142065)
+        pixels = pixels_affected(cuts['coincident_signals'], 209660)
         print('[INFO] pixels affected: ',pixels)
 
         def timeseries(pixel_id, s_time,e_time, buffer=10):
@@ -73,9 +73,9 @@ class PlotGlitches(Routine):
 
             
             
-        stime = 142050
-        etime = 142080
-        pixels = np.asarray([668, 667, 411, 412, 539, 795, 155, 796])
+        stime = 209657
+        etime = 209663
+        pixels = np.asarray([213, 22, 403, 341, 597, 596, 81, 85, 531, 787, 594, 598, 469, 726, 722])
         plotter(pixels,stime,etime)
 
 
