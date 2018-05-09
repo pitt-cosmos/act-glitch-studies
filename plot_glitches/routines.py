@@ -1,5 +1,6 @@
 import matplotlib
 matplotlib.use("TKAgg")
+import pandas as pd
 import matplotlib.pyplot as plt
 from eventloop.routines import Routine
 from eventloop.utils.pixels import PixelReader
@@ -45,11 +46,15 @@ class PlotGlitches(Routine):
             d3 -= np.mean(d3[start_time:end_time])
             d4 -= np.mean(d4[start_time:end_time])
             
-            # plot the running average over 5 points
-            d1 = [np.sum(d1[i:i+5]/5) for i in range(len(d1)-5)]
-            d2 = [np.sum(d2[i:i+5]/5) for i in range(len(d2)-5)]
-            d3 = [np.sum(d3[i:i+5]/5) for i in range(len(d3)-5)]
-            d4 = [np.sum(d4[i:i+5]/5) for i in range(len(d4)-5)]
+            # plot the running average over 5 points to smooth data
+            smooth_data = lambda data, n=5: pd.rolling_mean(data,n)
+            d1_avg = smooth_data(d1[start_time:end_time])
+            d2_avg = smooth_data(d2[start_time:end_time]) 
+            d3_avg = smooth_data(d3[start_time:end_time])
+            d4_avg = smooth_data(d4[start_time:end_time])
+
+
+
             
             time = tod_data.ctime - tod_data.ctime[0]
             time = time[start_time:end_time]
