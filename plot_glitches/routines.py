@@ -10,8 +10,10 @@ from eventloop.utils.cuts import pixels_affected
 
 class PlotGlitches(Routine):
     """A routine that plot glitches"""
-    def __init__(self, cosig_key, tod_key):
+    def __init__(self, cosig_key, tod_key, pixel, cut_num):
         Routine.__init__(self)
+        self._pixel = pixel
+        self._cut_num = cut_num
         self._cosig_key = cosig_key
         self._tod_key = tod_key
         self._pr = None
@@ -77,6 +79,4 @@ class PlotGlitches(Routine):
         etime = 209663
         pixels = np.asarray([213, 22, 403, 341, 597, 596, 81, 85, 531, 787, 594, 598, 469, 726, 722])
         plotter(pixels,stime,etime)
-
-
 
