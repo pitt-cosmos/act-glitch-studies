@@ -2,10 +2,10 @@ import matplotlib
 matplotlib.use("TKAgg")
 import pandas as pd
 import matplotlib.pyplot as plt
-from eventloop.routines import Routine
-from eventloop.utils.pixels import PixelReader
+from todloop.routines import Routine
+from todloop.utils.pixels import PixelReader
 import numpy as np
-from eventloop.utils.cuts import pixels_affected, pixels_affected_in_event
+from todloop.utils.cuts import pixels_affected, pixels_affected_in_event
 
 
 class PlotGlitches(Routine):

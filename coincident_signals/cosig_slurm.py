@@ -1,5 +1,5 @@
-from eventloop.base import EventLoop, DataLoader
-from eventloop.routines import Logger, SaveData
+from todloop.base import EventLoop, DataLoader
+from todloop.routines import Logger, SaveData
 from routines import RemoveMCE, TrimEdges, FindCosigs, FindEvents
 import sys
 

@@ -1,6 +1,6 @@
-from eventloop.tod import TODLoader, TODInfoLoader
-from eventloop.base import EventLoop
-from eventloop.routines import Logger
+from todloop.tod import TODLoader, TODInfoLoader
+from todloop.base import EventLoop
+from todloop.routines import Logger
 from routines import CompileCuts
 
 loop = EventLoop()

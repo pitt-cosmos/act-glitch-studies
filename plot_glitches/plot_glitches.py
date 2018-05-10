@@ -1,6 +1,6 @@
-from eventloop.base import DataLoader
-from eventloop.tod import TODLoader, TODInfoLoader
-from eventloop.base import EventLoop
+from todloop.base import DataLoader
+from todloop.tod import TODLoader, TODInfoLoader
+from todloop.base import EventLoop
 from routines import PlotGlitches
 
 

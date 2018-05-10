@@ -1,7 +1,7 @@
-from eventloop.base import Routine
+from todloop.base import Routine
 import numpy as np
 import matplotlib
-from eventloop.utils.hist import Hist1D
+from todloop.utils.hist import Hist1D
 matplotlib.use("TKAgg")
 from matplotlib import pyplot as plt
 

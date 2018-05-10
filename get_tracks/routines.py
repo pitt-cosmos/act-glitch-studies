@@ -2,10 +2,10 @@ import os
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 import numpy as np
-from eventloop.utils.pixels import PixelReader
-from eventloop.base import Routine
-from eventloop.utils.cuts import *
-from eventloop.routines import OutputRoutine
+from todloop.utils.pixels import PixelReader
+from todloop.base import Routine
+from todloop.utils.cuts import *
+from todloop.routines import OutputRoutine
 mpl.use('Agg')
 
 

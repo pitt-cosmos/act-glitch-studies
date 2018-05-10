@@ -1,5 +1,5 @@
-from eventloop.tod import TODLoader
-from eventloop.base import EventLoop
+from todloop.tod import TODLoader
+from todloop.base import EventLoop
 from routines import CompileCuts
 import sys
 

@@ -1,6 +1,6 @@
-from eventloop.base import Routine
-from eventloop.utils.cuts import remove_overlap_tod, trim_edge_cuts, merge_cuts, common_cuts
-from eventloop.utils.pixels import PixelReader
+from todloop.base import Routine
+from todloop.utils.cuts import remove_overlap_tod, trim_edge_cuts, merge_cuts, common_cuts
+from todloop.utils.pixels import PixelReader
 import numpy as np
 
 

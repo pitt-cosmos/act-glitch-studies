@@ -1,5 +1,5 @@
-from eventloop.base import EventLoop, DataLoader
-from eventloop.filters import DurationFilter, PixelFilter, SpreadFilter
+from todloop.base import EventLoop, DataLoader
+from todloop.filters import DurationFilter, PixelFilter, SpreadFilter
 from routines import GetTracks, PlotTracks
 
 loop = EventLoop()

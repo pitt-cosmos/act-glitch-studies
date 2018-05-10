@@ -31,9 +31,8 @@ This data is exported for each TOD and serves as the starting point for physics 
 A recently compiled outputs for this step is located at (on feynman cluster)
 
 ```
-/mnt/act3/users/yilun/act-glitch-studies/outputs/coincident_signals_subset
+/mnt/act7/users/yilun/act-glitch-studies/outputs/coincident_signals_subset
 ```
-
 
 #### 3. Study of events (EventLoop)
 An analysis framework called **EventLoop** is developed to facilitate the study of events (temporally correlated coincident signals). 
@@ -46,16 +45,16 @@ It serves as a pipeline of different routines that can be applied to the data. R
 
 ## List of Routines
 Here is a list of written routines and their whereabouts
-- `eventloop.base.DataLoader`: useful for loading data. Retrieve the data in a folder and save it to a key.
-- `eventloop.tod.TODLoader`: useful for loading TOD data. TOD data will be saved in a given key. 
-- `eventloop.tod.TODInfoLoader`: useful for retrieving tod info such as hour, PWV, field, etc.
-- `eventloop.routines.SaveData`: useful for saving data. Take the data in a key and save it in a folder.
-- `eventloop.routines.Logger`: useful for debugging, simply print the variable inside a given key. 
-- `eventloop.filters.DurationFilter`: useful for filtering glitches by their duration.
-- `eventloop.filters.PixelFilter`: useful for filtering glitches by the number of pixels affected
-- `eventloop.filters.SpreadFilter`: filter tracks by their spreads.
-- `eventloop.filters.NCosigFilter`: filter TODs by the number of coincident signals seen. 
-- `eventloop.filters.TrackLengthFilter`: filter tracks by their lengths. 
+- `todloop.base.DataLoader`: useful for loading data. Retrieve the data in a folder and save it to a key.
+- `todloop.tod.TODLoader`: useful for loading TOD data. TOD data will be saved in a given key. 
+- `todloop.tod.TODInfoLoader`: useful for retrieving tod info such as hour, PWV, field, etc.
+- `todloop.routines.SaveData`: useful for saving data. Take the data in a key and save it in a folder.
+- `todloop.routines.Logger`: useful for debugging, simply print the variable inside a given key. 
+- `todloop.filters.DurationFilter`: useful for filtering glitches by their duration.
+- `todloop.filters.PixelFilter`: useful for filtering glitches by the number of pixels affected
+- `todloop.filters.SpreadFilter`: filter tracks by their spreads.
+- `todloop.filters.NCosigFilter`: filter TODs by the number of coincident signals seen. 
+- `todloop.filters.TrackLengthFilter`: filter tracks by their lengths. 
 - `compile_glitch_cuts.routines.CompileCuts`: compile cuts given a TOD. 
 - `get_tracks.routines.GetTracks`: compile all tracks of a TOD and save to a key.
 - `get_tracks.routines.PlotTracks`: plot the tracks and save the plot in a folder. 
@@ -65,8 +64,8 @@ Here is a list of written routines and their whereabouts
 - `coincident_signals.routines.FindEvents`: find peaks in cosigs which correspond to physical events.
 
 ## List of Utility Functions
-- `eventloop.utils.pixels`: contains useful functions for accessing pixels.
-- `eventloop.utils.cuts`: contains useful function when working with cuts.
+- `todloop.utils.pixels`: contains useful functions for accessing pixels.
+- `todloop.utils.cuts`: contains useful function when working with cuts.
 ## Development Guidelines
 1. Class name use camel case like `GetTrackWithSpread`. 
 2. Method name use lowercase with underscores like `get_tod_id`. 

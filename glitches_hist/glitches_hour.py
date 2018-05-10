@@ -1,7 +1,7 @@
-from eventloop.base import EventLoop
-from eventloop.tod import TODInfoLoader
-from eventloop.base import DataLoader
-from eventloop.filters import PixelFilter, DurationFilter
+from todloop.base import EventLoop
+from todloop.tod import TODInfoLoader
+from todloop.base import DataLoader
+from todloop.filters import PixelFilter, DurationFilter
 from routines import GlitchHourStudy, GlitchPWVStudy, GlitchAzStudy
 
 
