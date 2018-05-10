@@ -1,8 +1,8 @@
 # ACT Glitch Studies
-ACT Glitch studies to characterize all glitches and find FRBs hopefully!
+ACT Glitch studies to characterize all glitches and find FRBs hopefully! 
 
 ## Overview
-There are three major components in the analysis code that are applied in a more-or-less consecutive order.
+The project is based on a framework called TODLoop. For a more detailed introduction to the framework please refer to [here](https://github.com/pitt-cosmos/act-wiki/wiki/Introduction-to-TODLoop-Framework). There are three major components in the analysis code that are applied in a more-or-less consecutive order.
 
 #### 1. Compile glitch cuts
 Taking the existing glitch finder written by Loic, we first compile all the glitch cuts from a list of TODs, and save the results.
