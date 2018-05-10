@@ -41,7 +41,7 @@ class TODInfoLoader(Routine):
         self._output_key = output_key
 
     def initialize(self):
-        self._tod_info = pd.read_csv('data/s16_pa3_tod_info.csv', header=None)
+        self._tod_info = pd.read_csv('../data/s16_pa3_tod_info.csv', header=None)
         self._tod_info.columns = ['TOD', 'hour', 'altitude', 'azimuth', 'PWV', 'cut_status', 'field']
 
     def execute(self):

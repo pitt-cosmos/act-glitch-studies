@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from eventloop.routines import Routine
 from eventloop.utils.pixels import PixelReader
 import numpy as np
-from eventloop.utils.cuts import pixels_affected
+from eventloop.utils.cuts import pixels_affected, pixels_affected_in_event
 
 
 class PlotGlitches(Routine):
@@ -27,8 +27,10 @@ class PlotGlitches(Routine):
         cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
         # moby2.tod.remove_mean(tod_data)
         print ('[INFO] cuts: ', cuts)
-        pixels = pixels_affected(cuts['coincident_signals'], 142065)
+        pixels = pixels_affected(cuts['coincident_signals'], 209660)
         print('[INFO] pixels affected: ',pixels)
+        peaks = cuts['peaks']
+        print('[INFO] peaks: ', peaks)
 
         def timeseries(pixel_id, s_time,e_time, buffer=10):
 
@@ -73,10 +75,15 @@ class PlotGlitches(Routine):
                plt.plot(timeseries(pid,start_time,end_time)[0],timeseries(pid,start_time,end_time)[1],'.-')
             plt.show()
 
-            
-            
-        stime = 142050
-        etime = 142080
-        pixels = np.asarray([668, 667, 411, 412, 539, 795, 155, 796])
-        plotter(pixels,stime,etime)
-
+        #from peaks, find cs, then use cs to find all pixels affected
+        cs = cuts['coincident_signals']
+        #event = [44851, 44895, 44, 23]
+        peaks = [p for p in peaks if p[3]>1]
+        for event in peaks:
+            all_pixels = pixels_affected_in_event(cs,event)
+            plotter(all_pixels, event[0], event[1])
+        #stime = 209657
+        #etime = 209663
+        #pixels = np.asarray([213, 22, 403, 341, 597, 596, 81, 85, 531, 787, 594, 598, 469, 726, 722])
+        #plotter(pixels,stime,etime)
+        
