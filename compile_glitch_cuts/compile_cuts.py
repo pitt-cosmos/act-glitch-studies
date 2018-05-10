@@ -1,9 +1,9 @@
 from todloop.tod import TODLoader, TODInfoLoader
-from todloop.base import EventLoop
+from todloop.base import TODLoop
 from todloop.routines import Logger
 from routines import CompileCuts
 
-loop = EventLoop()
+loop = TODLoop()
 loop.add_tod_list("data/s16_pa3_list.txt")
 
 glitchp = {

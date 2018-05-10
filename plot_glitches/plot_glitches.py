@@ -1,10 +1,10 @@
 from todloop.base import DataLoader
 from todloop.tod import TODLoader, TODInfoLoader
-from todloop.base import EventLoop
+from todloop.base import TODLoop
 from routines import PlotGlitches
 
 
-loop = EventLoop()
+loop = TODLoop()
 loop.add_tod_list("../data/s16_pa3_list.txt")
 
 #will load the data stored in the folder specified one by one

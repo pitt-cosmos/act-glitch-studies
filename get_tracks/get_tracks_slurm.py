@@ -1,9 +1,9 @@
-from todloop.base import EventLoop, DataLoader
+from todloop.base import TODLoop, DataLoader
 from todloop.filters import DurationFilter, PixelFilter, SpreadFilter
 from routines import GetTracks, PlotTracks
 import sys
 
-loop = EventLoop()
+loop = TODLoop()
 loop.add_tod_list("data/s17_pa4_sublist.txt")
 
 # add sample handler

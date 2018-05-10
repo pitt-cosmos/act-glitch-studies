@@ -3,7 +3,7 @@ import glob
 import os
 
 
-class EventLoop:
+class TODLoop:
     """Main driving class for looping through coincident signals of different TODs"""
     def __init__(self):
         self._routines = []

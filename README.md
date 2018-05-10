@@ -34,8 +34,8 @@ A recently compiled outputs for this step is located at (on feynman cluster)
 /mnt/act7/users/yilun/act-glitch-studies/outputs/coincident_signals_subset
 ```
 
-#### 3. Study of events (EventLoop)
-An analysis framework called **EventLoop** is developed to facilitate the study of events (temporally correlated coincident signals). 
+#### 3. Study of events (TODLoop)
+An analysis framework called **TODLoop** is developed to facilitate the study of events (temporally correlated coincident signals). 
 
 It serves as a pipeline of different routines that can be applied to the data. Routines can be event filters, data saving, plotting etc. See `get_tracks/get_tracks.py` for an example usage. 
 

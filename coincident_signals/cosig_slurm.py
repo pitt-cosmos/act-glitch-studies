@@ -1,9 +1,9 @@
-from todloop.base import EventLoop, DataLoader
+from todloop.base import TODLoop, DataLoader
 from todloop.routines import Logger, SaveData
 from routines import RemoveMCE, TrimEdges, FindCosigs, FindEvents
 import sys
 
-loop = EventLoop()
+loop = TODLoop()
 loop.add_tod_list("data/s17_pa4_sublist.txt")
 loop.add_routine(DataLoader(input_dir="outputs/s17_pa4_sublist/", output_key="cut"))
 loop.add_routine(RemoveMCE(input_key="cut", output_key="cut"))
