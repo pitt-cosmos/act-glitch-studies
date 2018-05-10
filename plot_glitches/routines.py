@@ -26,12 +26,12 @@ class PlotGlitches(Routine):
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data
         cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
         # moby2.tod.remove_mean(tod_data)
-        print ('[INFO] cuts: ', cuts)
-        pixels = pixels_affected(cuts['coincident_signals'], 209660)
+        #print ('[INFO] cuts: ', cuts)
+        pixels = pixels_affected(cuts['coincident_signals'], 38540)
         print('[INFO] pixels affected: ',pixels)
         peaks = cuts['peaks']
         print('[INFO] peaks: ', peaks)
-
+        
         def timeseries(pixel_id, s_time,e_time, buffer=10):
 
             start_time = s_time
@@ -61,29 +61,63 @@ class PlotGlitches(Routine):
 
             return time,d_1  
 
-            """
-            plt.plot(time,d1[start_time:end_time], '.-', label=str(a1) + ' 90 Hz')
-            plt.plot(time, d2[start_time:end_time], '.-', label=str(a2) + ' 90 Hz')
-            plt.plot(time, d3[start_time:end_time], '.-', label=str(b1) + ' 150 Hz')
-            plt.plot(time, d4[start_time:end_time], '.-', label=str(b2) + ' 150 Hz')
-            plt.legend(title='Detector UID')
-            plt.show()
-            """
-        #Plot all pixels affected given an array of pixel ids and a starting time and ending time
+        """
+        UNCOMMENT TO PLOT FOUR CORRESPONDING PIXELS WITH HI-LO FREQ
+        plt.plot(time,d_1, '.-', label=str(a1) + ' 90 GHz')
+        plt.plot(time, d_2, '.-', label=str(a2) + ' 90 GHz')
+        plt.plot(time, d_3, '.-', label=str(b1) + ' 150 GHz')
+        plt.plot(time, d_4, '.-', label=str(b2) + ' 150 GHz')
+        plt.legend(title='Detector UID')
+        plt.show()
+        """
+        """
+        PLOTTING FUNCTION
+        Plot all pixels affected given an array of pixel ids
+        and a starting time and ending time
+      
+        """
+        
         def plotter(pixels,start_time,end_time):
             for pid in pixels:
-               plt.plot(timeseries(pid,start_time,end_time)[0],timeseries(pid,start_time,end_time)[1],'.-')
+                plt.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
+                plt.xlabel('TOD track: 438') #CHANGE TOD TRACK NAME
+                plt.plot(timeseries(pid,start_time,end_time)[0],timeseries(pid,start_time,end_time)[1],'.-')
             plt.show()
-
-        #from peaks, find cs, then use cs to find all pixels affected
+        
+        """
+        ALL EVENTS
+        From peaks, find cs, then use cs to find all pixels affected
+        then plot all pixels affected in all events in peak one by one
+        """
+        
         cs = cuts['coincident_signals']
-        #event = [44851, 44895, 44, 23]
-        peaks = [p for p in peaks if p[3]>1]
+        """
         for event in peaks:
             all_pixels = pixels_affected_in_event(cs,event)
             plotter(all_pixels, event[0], event[1])
-        #stime = 209657
-        #etime = 209663
-        #pixels = np.asarray([213, 22, 403, 341, 597, 596, 81, 85, 531, 787, 594, 598, 469, 726, 722])
-        #plotter(pixels,stime,etime)
+        """
         
+        """
+        SPECIFIC EVENT
+        To plot specific event, copy event from peaks below 
+        """
+ #       """
+        event = [38536, 39559, 1023, 59]
+        stime = event[0]
+        etime = event[1]
+        pixels = pixels_affected_in_event(cs, event)
+        plotter(pixels,stime,etime)
+ #       """
+
+
+"""
+
+        print(self._pr.get_xy(24))
+        print(self._pr.get_xy(537))
+        print(self._pr.get_xy(712))
+
+        print(self._pr.get_xy(199))
+        print(self._pr.get_xy(64))
+        print(self._pr.get_xy(462))
+        print(self._pr.get_xy(322))
+"""
