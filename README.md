@@ -6,7 +6,7 @@ The project is based on a framework called TODLoop. For a more detailed introduc
 
 #### 1. Compile glitch cuts
 Taking the existing glitch finder written by Loic, we first compile all the glitch cuts from a list of TODs, and save the results.
-The codes for this step are stored in the folder `compile_glitch_cuts`. The outputs are saved in the output folder.
+The codes for this step are stored in the folder `compile_cuts`. The outputs are saved in the output folder.
 
 #### 2. Find coincident signals
 Coincident signals (sometimes called "cosig" in codes) refer to glitches that occur in both frequencies (90GHz and 150GHz) in a given pixel. 
@@ -55,7 +55,7 @@ Here is a list of written routines and their whereabouts
 - `todloop.filters.SpreadFilter`: filter tracks by their spreads.
 - `todloop.filters.NCosigFilter`: filter TODs by the number of coincident signals seen. 
 - `todloop.filters.TrackLengthFilter`: filter tracks by their lengths. 
-- `compile_glitch_cuts.routines.CompileCuts`: compile cuts given a TOD. 
+- `compile_cuts.routines.CompileCuts`: compile cuts given a TOD. 
 - `get_tracks.routines.GetTracks`: compile all tracks of a TOD and save to a key.
 - `get_tracks.routines.PlotTracks`: plot the tracks and save the plot in a folder. 
 - `coincident_signals.routines.RemoveMCE`: remove mce cuts from glitch cuts.
