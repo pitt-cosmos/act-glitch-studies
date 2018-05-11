@@ -1,11 +1,10 @@
 import matplotlib
 matplotlib.use("TKAgg")
-import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 from todloop.routines import Routine
 from todloop.utils.pixels import PixelReader
-import numpy as np
-from todloop.utils.cuts import pixels_affected, pixels_affected_in_event
+from todloop.utils.cuts import pixels_affected_in_event
 
 
 class PlotGlitches(Routine):
@@ -25,20 +24,15 @@ class PlotGlitches(Routine):
         print '[INFO] Plotting glitches ...'
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data
         cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
-        # moby2.tod.remove_mean(tod_data)
-        #print ('[INFO] cuts: ', cuts)
-        pixels = pixels_affected(cuts['coincident_signals'], 38540)
-        print('[INFO] pixels affected: ',pixels)
+        # pixels = pixels_affected(cuts['coincident_signals'], 38540)
+        # print('[INFO] pixels affected: ',pixels)
         peaks = cuts['peaks']
         print('[INFO] peaks: ', peaks)
         
-        def timeseries(pixel_id, s_time,e_time, buffer=10):
+        def timeseries(pixel_id, s_time, e_time, buffer=10):
 
-            start_time = s_time
-            start_time -= buffer
-
-            end_time = e_time
-            end_time += buffer
+            start_time = s_time - buffer
+            end_time = e_time + buffer
 
             a1, a2 = self._pr.get_f1(pixel_id)
             b1, b2 = self._pr.get_f2(pixel_id)
@@ -59,28 +53,29 @@ class PlotGlitches(Routine):
             d_3 = d3[start_time:end_time]
             d_4 = d4[start_time:end_time]
 
-            return time,d_1  
+            """
+            UNCOMMENT TO PLOT FOUR CORRESPONDING PIXELS WITH HI-LO FREQ
+            plt.plot(time,d_1, '.-', label=str(a1) + ' 90 GHz')
+            plt.plot(time, d_2, '.-', label=str(a2) + ' 90 GHz')
+            plt.plot(time, d_3, '.-', label=str(b1) + ' 150 GHz')
+            plt.plot(time, d_4, '.-', label=str(b2) + ' 150 GHz')
+            plt.legend(title='Detector UID')
+            plt.show()
+            """
 
-        """
-        UNCOMMENT TO PLOT FOUR CORRESPONDING PIXELS WITH HI-LO FREQ
-        plt.plot(time,d_1, '.-', label=str(a1) + ' 90 GHz')
-        plt.plot(time, d_2, '.-', label=str(a2) + ' 90 GHz')
-        plt.plot(time, d_3, '.-', label=str(b1) + ' 150 GHz')
-        plt.plot(time, d_4, '.-', label=str(b2) + ' 150 GHz')
-        plt.legend(title='Detector UID')
-        plt.show()
-        """
+            return time, d_1
+
+
         """
         PLOTTING FUNCTION
         Plot all pixels affected given an array of pixel ids
         and a starting time and ending time
       
         """
-        
         def plotter(pixels,start_time,end_time):
             for pid in pixels:
                 plt.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
-                plt.xlabel('TOD track: 438') #CHANGE TOD TRACK NAME
+                plt.xlabel('TOD track: 438')  # CHANGE TOD TRACK NAME
                 plt.plot(timeseries(pid,start_time,end_time)[0],timeseries(pid,start_time,end_time)[1],'.-')
             plt.show()
         
@@ -106,12 +101,11 @@ class PlotGlitches(Routine):
         stime = event[0]
         etime = event[1]
         pixels = pixels_affected_in_event(cs, event)
-        plotter(pixels,stime,etime)
+        plotter(pixels, stime, etime)
  #       """
 
 
 """
-
         print(self._pr.get_xy(24))
         print(self._pr.get_xy(537))
         print(self._pr.get_xy(712))
