@@ -9,10 +9,8 @@ from todloop.utils.cuts import pixels_affected_in_event
 
 class PlotGlitches(Routine):
     """A routine that plot glitches"""
-    def __init__(self, cosig_key, tod_key, pixel, cut_num):
+    def __init__(self, cosig_key, tod_key):
         Routine.__init__(self)
-        self._pixel = pixel
-        self._cut_num = cut_num
         self._cosig_key = cosig_key
         self._tod_key = tod_key
         self._pr = None
