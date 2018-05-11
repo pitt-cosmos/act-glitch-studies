@@ -62,6 +62,7 @@ Here is a list of written routines and their whereabouts
 - `coincident_signals.routines.TrimEdge`: remove glitch cuts at the edges of each TOD.
 - `coincident_signals.routines.FindCosigs`: find coincident signals (cosigs) based on cuts.
 - `coincident_signals.routines.FindEvents`: find peaks in cosigs which correspond to physical events.
+- `calibration.routines.FixOpticalSign`: fix the optical sign of a tod.
 
 ## List of Utility Functions
 - `todloop.utils.pixels`: contains useful functions for accessing pixels.
