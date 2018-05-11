@@ -4,7 +4,7 @@ from routines import CompileCuts
 import sys
 
 loop = TODLoop()
-loop.add_tod_list("data/s17_pa4_sublist.txt")
+loop.add_tod_list("data/s16_pa3_list.txt")
 
 glitchp = {
     'nSig': 10,
@@ -16,7 +16,7 @@ glitchp = {
 }
 
 loop.add_routine(TODLoader(output_key="tod_data"))
-loop.add_routine(CompileCuts(input_key="tod_data", glitchp=glitchp, output_dir="outputs/s17_pa4_sublist/"))
+loop.add_routine(CompileCuts(input_key="tod_data", glitchp=glitchp, output_dir="outputs/s16_pa3_list/cuts/"))
 
 start = int(sys.argv[1])
 end = int(sys.argv[2])
