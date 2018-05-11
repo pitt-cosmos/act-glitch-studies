@@ -13,5 +13,5 @@ class FixOpticalSign(Routine):
         tod_data = self.get_store().get(self._input_key)  # retrieve TOD
         optical_signs = tod_data.info.array_data['optical_sign']
         tod_data.data = tod_data.data*optical_signs[:, np.newaxis]
-        self.get_store().set(self._output_key)
+        self.get_store().set(self._output_key, tod_data)
 
