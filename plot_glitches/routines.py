@@ -73,7 +73,7 @@ class PlotGlitches(Routine):
         def plotter(pixels,start_time,end_time):
             for pid in pixels:
                 plt.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
-                plt.xlabel('TOD track: 438')  # CHANGE TOD TRACK NAME
+                plt.xlabel('TOD track: 10000')  # CHANGE TOD TRACK NAME
                 plt.plot(timeseries(pid,start_time,end_time)[0],timeseries(pid,start_time,end_time)[1],'.-')
             plt.show()
         
@@ -95,7 +95,7 @@ class PlotGlitches(Routine):
         To plot specific event, copy event from peaks below 
         """
  #       """
-        event = [38536, 39559, 1023, 59]
+        event = [209657, 209663, 6, 15]
         stime = event[0]
         etime = event[1]
         pixels = pixels_affected_in_event(cs, event)
