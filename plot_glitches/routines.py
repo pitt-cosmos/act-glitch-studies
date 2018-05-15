@@ -108,7 +108,7 @@ class PlotGlitches(Routine):
         To plot specific event, copy event from peaks below 
         """
         #"""
-        event = [356, 362, 6, 4]
+        event = [128345,128350,5,2]
         stime = event[0]
         etime = event[1]
         pixels = pixels_affected_in_event(cs, event)
