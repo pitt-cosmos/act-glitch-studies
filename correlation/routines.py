@@ -1,7 +1,6 @@
 import matplotlib
 matplotlib.use("TKAgg")
 import numpy as np
-import scipy.stats as ss
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 from todloop.routines import Routine
@@ -23,8 +22,6 @@ class Correlation(Routine):
         print '[INFO] Checking for correlation ...'
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data
         cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
-        # pixels = pixels_affected(cuts['coincident_signals'], 38540)
-        # print('[INFO] pixels affected: ',pixels)
         peaks = cuts['peaks']
         print('[INFO] peaks: ', peaks)
         
@@ -83,19 +80,20 @@ class Correlation(Routine):
             y2new = f2(x2new)
             
             m_coeff = np.corrcoef(y1new,y2new)[0][1]
-            sp_coeff = ss.spearmanr(y1new,y2new)[0]
 
-            print('[INFO] Correlation matrix, coefficient: ', m_coeff) #correlation matrix for two arrays
-            print('[INFO] Spearman correlation: ',sp_coeff) #spearman correlation for two arrays
+#            print '[INFO] Correlation matrix, coefficient: ', m_coeff 
+            return m_coeff
+
+            """
             plt.subplot(211)
             plt.plot( x1new,y1new,'g--')
             plt.title('Two Signals to Check for Correlation')
-            plt.xlabel('Spearman Cor. Coeff: ' + str( sp_coeff))
             plt.subplot(212)
             plt.plot(x2new,y2new,'r--')
             plt.xlabel('Cor. Matrix Coeff: ' + str(m_coeff))
             plt.show()
-
+            """
+            
         """
         CHECK CORRELATION BETWEEN SIGNALS FROM TWO EVENTS
         Find avgerage signal from an event, copy events from peaks data below
@@ -104,17 +102,46 @@ class Correlation(Routine):
 
         cs = cuts['coincident_signals']
 
-        event1 = [209657, 209663, 6, 15]
+        """
+        FOR TWO SPECIFIC EVENTS
+        """
+        """
+        event1 = [62401,62449,48,29]
         stime1 = event1[0]
         etime1 = event1[1]
         pixels1 = pixels_affected_in_event(cs, event1)
         avg_x1, avg_y1 = avg_signal(pixels1, stime1, etime1)
 
-        event2 = [205344, 205375, 31, 35]
+
+#        event2 = [205344, 205375, 31, 35]
+        event2 = [9300,9303,3,2]
         stime2 = event2[0]
         etime2 = event2[1]
         pixels2 = pixels_affected_in_event(cs, event2)
         avg_x2, avg_y2 = avg_signal(pixels2, stime2, etime2)
-
-
+        
         correlation(avg_x1,avg_x2, avg_y1, avg_y2)
+        """
+
+
+        """
+        TEMPLATE FRB AS EVENT 1
+        """
+        data = np.genfromtxt('frb_template.txt')
+        avg_x1, avg_y1 = data[0],data[1]
+
+
+        """
+        ALL EVENTS
+        To compare all events in track to template, 
+        initiate this loop
+        """
+
+        for event in peaks:
+            all_pixels = pixels_affected_in_event(cs,event)
+            avg_x2,avg_y2 = avg_signal(all_pixels,event[0],event[1])
+            coeff = correlation(avg_x1,avg_x2, avg_y1, avg_y2)
+            if 0.6 <= coeff < 0.8:
+                print '[INFO]: Possible FRB', event,'Coeff = ', coeff
+            elif coeff >= 0.8:
+                print '[INFO]: Highly Likely FRB', event, 'Coeff = ', coeff
