@@ -80,7 +80,7 @@ class PlotGlitches(Routine):
                 y = timeseries(pid,start_time,end_time)[1]
 
                 plt.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
-                plt.xlabel('TOD track: 10000')  # CHANGE TOD TRACK NAME
+                plt.xlabel('TOD track: 1942')  # CHANGE TOD TRACK NAME
                 plt.plot(x,y,'.-')
             
             plt.show()
@@ -108,7 +108,7 @@ class PlotGlitches(Routine):
         To plot specific event, copy event from peaks below 
         """
  #       """
-        event = [209657, 209663, 6, 15]
+        event = [80920, 80935, 15, 20]
         stime = event[0]
         etime = event[1]
         pixels = pixels_affected_in_event(cs, event)

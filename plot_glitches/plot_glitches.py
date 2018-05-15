@@ -13,6 +13,6 @@ loop.add_routine(DataLoader(input_dir="../outputs/s16_pa3_list/cosig/", output_k
 loop.add_routine(TODLoader(output_key="tod_data"))
 loop.add_routine(FixOpticalSign(input_key="tod_data", output_key="tod_data"))
 loop.add_routine(PlotGlitches(tod_key="tod_data", cosig_key="cuts"))
-loop.run(10000, 10001)
+loop.run(1942, 1943)
 
 
