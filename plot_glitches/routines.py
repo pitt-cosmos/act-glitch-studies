@@ -85,48 +85,10 @@ class PlotGlitches(Routine):
             
             plt.show()
 
-        def avg_signal(pixels,start_time,end_time):
-           
-            for pid in pixels:
-
-                x = timeseries(pid,start_time,end_time)[0]
-                y = timeseries(pid,start_time,end_time)[1]
-
-                avg_y = np.zeros(len(y))
-
-                avg_x = x
-                avg_y += y
-
-            x = avg_x
-            y = avg_y/len(avg_y)
-            return x, y 
 
 
-        def correlation(x1,x2,y1,y2):
-            f1 = interp1d(x1,y1)
-            f2 = interp1d(x2,y2)
-            
-            points = 100
-            
-            x1new = np.linspace( min(x1),max(x1),points)
-            x2new = np.linspace( min(x2), max(x2), points)
 
-            y1new = f1(x1new)
-            y2new = f2(x2new)
-            
-            m_coeff = np.corrcoef(y1new,y2new)[0][1]
-            sp_coeff = ss.spearmanr(y1new,y2new)[0]
 
-            print('[INFO] Correlation matrix, coefficient: ', m_coeff) #correlation matrix for two arrays
-            print('[INFO] Spearman correlation: ',sp_coeff) #spearman correlation for two arrays
-            plt.subplot(211)
-            plt.plot( x1new,y1new,'g--')
-            plt.title('Two Signals to Check for Correlation')
-            plt.xlabel('Spearman Cor. Coeff: ' + str( sp_coeff))
-            plt.subplot(212)
-            plt.plot(x2new,y2new,'r--')
-            plt.xlabel('Cor. Matrix Coeff: ' + str(m_coeff))
-            plt.show()
             
         """
         ALL EVENTS
@@ -144,32 +106,14 @@ class PlotGlitches(Routine):
         """
         SPECIFIC EVENT
         To plot specific event, copy event from peaks below 
-        To check correlation, initiate event 2 and copy a second peak 
         """
  #       """
-        event1 = [209657, 209663, 6, 15]
-        stime1 = event1[0]
-        etime1 = event1[1]
-        pixels1 = pixels_affected_in_event(cs, event1)
-        avg_x1, avg_y1 = avg_signal(pixels1, stime1, etime1)
-        
-
-        event2 = [205344, 205375, 31, 35]
-        stime2 = event2[0]
-        etime2 = event2[1]
-        pixels2 = pixels_affected_in_event(cs, event2)
-        avg_x2, avg_y2 = avg_signal(pixels2, stime2, etime2)
-        
-        #for event 1 
-#        plt.plot(avg_x1,avg_y1)
-        plotter(pixels1, stime1, etime1)
+        event = [209657, 209663, 6, 15]
+        stime = event[0]
+        etime = event[1]
+        pixels = pixels_affected_in_event(cs, event)
+        plotter(pixels, stime, etime)
  
-        #for event 2
-#        plt.plot(avg_x2, avg_y2,'k')
-        plotter(pixels2,stime2,etime2)
-
-
-        correlation(avg_x1,avg_x2, avg_y1, avg_y2)
  #       """
 
 
