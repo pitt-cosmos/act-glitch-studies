@@ -2,7 +2,7 @@ from todloop.base import DataLoader
 from todloop.tod import TODLoader, TODInfoLoader
 from todloop.base import TODLoop
 from routines import PlotGlitches
-from calibration.routines import FixOpticalSign
+from calibration.routines import FixOpticalSign, CalibrateTOD
 
 loop = TODLoop()
 loop.add_tod_list("../data/s16_pa3_list.txt")
@@ -12,6 +12,7 @@ loop.add_tod_list("../data/s16_pa3_list.txt")
 loop.add_routine(DataLoader(input_dir="../outputs/s16_pa3_list/cosig/", output_key="cuts"))
 loop.add_routine(TODLoader(output_key="tod_data"))
 loop.add_routine(FixOpticalSign(input_key="tod_data", output_key="tod_data"))
+loop.add_routine(CalibrateTOD(input_key="tod_data",output_key="tod_data"))
 loop.add_routine(PlotGlitches(tod_key="tod_data", cosig_key="cuts"))
 loop.run(1942, 1943)
 
