@@ -17,11 +17,11 @@ timeseries(73,13)
 
 
 [29870, 29916, 46, 21]
-TOD (340) - FRB 
+TOD (340) - Possible FRB 
 
 [62401, 62449, 48, 29]
-TOD (1654) - FRB
+TOD (1654) - Possible  FRB
 
-
-
+[80920, 80935, 15, 20]
+TOD (1942) - Possible FRB
 
