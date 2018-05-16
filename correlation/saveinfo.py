@@ -9,11 +9,13 @@ from todloop.utils.cuts import pixels_affected_in_event
 
 class Correlation(Routine):
     """A routine that checks for correlation between two signals"""
-    def __init__(self, cosig_key, tod_key):
+    def __init__(self, cosig_key, tod_key,frb_tod, coeff = 0.8):
         Routine.__init__(self)
         self._cosig_key = cosig_key
         self._tod_key = tod_key
         self._pr = None
+        self._frb_tod = frb_tod 
+        self._coeff = coeff
 
     def initialize(self):
         self._pr = PixelReader()
@@ -140,16 +142,28 @@ class Correlation(Routine):
         initiate this loop
         """
 
+        #Save outputs to a dictionary, here we initialize an empty dictionary
+        tods = []
+        lower_threshold = 0.6
+        upper_threshold = self._coeff
+
         for event in peaks:
-            all_pixels = pixels_affected_in_event(cs,event)
+
             avg_x2,avg_y2 = avg_signal(all_pixels,event[0],event[1])
             coeff = correlation(avg_x1,avg_x2, avg_y1, avg_y2)
-
-            lower_threshold = 0.6
-            upper_threshold = 0.8
-
-            if lower_threshold  <= coeff < upper_threshold:
+       
+            
+            if lower_threshold <= coeff < upper_threshold:
                 print '[INFO]: Possible FRB or CR', event,'Coeff = ', coeff
             elif coeff >= upper_threshold:
                 print '[INFO]: Highly Likely FRB or CR', event, 'Coeff = ', coeff
-            
+                tod = {}
+                tod['Start'] = event[0]
+                tod['End'] = event[1]
+                tod['Duration'] = event[2]
+                tod['Number_of_Pixels'] = event[3]
+                tod['Pixels_Affected'] = all_pixels
+                tod['Coefficient'] = coeff
+                tods.append(tod)
+    
+            self.get_store().set(self._frb_tod, tods)
