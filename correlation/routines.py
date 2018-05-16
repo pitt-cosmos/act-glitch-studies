@@ -142,6 +142,6 @@ class Correlation(Routine):
             avg_x2,avg_y2 = avg_signal(all_pixels,event[0],event[1])
             coeff = correlation(avg_x1,avg_x2, avg_y1, avg_y2)
             if 0.6 <= coeff < 0.8:
-                print '[INFO]: Possible FRB', event,'Coeff = ', coeff
+                print '[INFO]: Possible FRB or CR', event,'Coeff = ', coeff
             elif coeff >= 0.8:
-                print '[INFO]: Highly Likely FRB', event, 'Coeff = ', coeff
+                print '[INFO]: Highly Likely FRB or CR', event, 'Coeff = ', coeff
