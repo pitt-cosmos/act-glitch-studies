@@ -106,13 +106,14 @@ class Correlation(Routine):
         FOR TWO SPECIFIC EVENTS
         """
         """
-        event1 = [62401,62449,48,29]
+        event1 = [101980, 101985, 5, 2]
         stime1 = event1[0]
         etime1 = event1[1]
         pixels1 = pixels_affected_in_event(cs, event1)
         avg_x1, avg_y1 = avg_signal(pixels1, stime1, etime1)
+        np.savetxt('frb_template.txt',(avg_x1,avg_y1))
 
-
+        
 #        event2 = [205344, 205375, 31, 35]
         event2 = [9300,9303,3,2]
         stime2 = event2[0]
@@ -125,7 +126,9 @@ class Correlation(Routine):
 
 
         """
-        TEMPLATE FRB AS EVENT 1
+        TEMPLATE FRB or CR  AS EVENT 1
+        change name of .txt file to frb_template or cr_template 
+        to check correlation for either signal 
         """
         data = np.genfromtxt('frb_template.txt')
         avg_x1, avg_y1 = data[0],data[1]

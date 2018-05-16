@@ -20,7 +20,7 @@ loop.add_routine(Correlation(tod_key="tod_data", cosig_key="cuts"))
 loop.add_routine(PlotGlitches(tod_key="tod_data", cosig_key="cuts"))
 
 
-loop.run(9917,9918)
+loop.run(2632,2633)
 
 
 
