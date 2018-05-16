@@ -22,7 +22,7 @@ loop.add_routine(CR_Correlation_Filter(tod_key="tod_data", cosig_key="cuts", out
 loop.add_routine(PlotGlitches(tod_key="tod_data", cosig_key="cuts"))
 
 
-loop.run(10319,10320)
+loop.run(10000,10001)
 
 
 
