@@ -21,7 +21,7 @@ class PlotGlitches(Routine):
         self._pr = PixelReader()
 
     def execute(self):
-        print '[INFO] Plotting glitch ...'
+        print '[INFO]: Plotting glitch ...'
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data
         cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
         peaks = cuts['peaks']
@@ -79,7 +79,7 @@ class PlotGlitches(Routine):
         """
         cs = cuts['coincident_signals']
 
-        event = [210816, 210869, 53, 23]
+        event = [163865, 163898, 33, 16]
         stime = event[0]
         etime = event[1]
         pixels = pixels_affected_in_event(cs, event)
