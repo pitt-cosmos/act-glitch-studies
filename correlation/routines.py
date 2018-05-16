@@ -158,12 +158,12 @@ class Correlation(Routine):
             elif coeff >= upper_threshold:
                 print '[INFO]: Highly Likely FRB or CR', event, 'Coeff = ', coeff
                 tod = {}
-                tod['Start'] = event[0]
-                tod['End'] = event[1]
-                tod['Duration'] = event[2]
-                tod['Number_of_Pixels'] = event[3]
-                tod['Pixels_Affected'] = all_pixels
-                tod['Coefficient'] = coeff
+                tod['start'] = event[0]
+                tod['end'] = event[1]
+                tod['duration'] = event[2]
+                tod['number_of_pixels'] = event[3]
+                tod['pixels_affected'] = all_pixels
+                tod['coefficient'] = coeff
                 tods.append(tod)
     
             self.get_store().set(self._output_key, tods)
