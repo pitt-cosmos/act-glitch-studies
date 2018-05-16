@@ -23,7 +23,7 @@ class Correlation(Routine):
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data
         cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
         peaks = cuts['peaks']
-        print('[INFO] peaks: ', peaks)
+        #print('[INFO] peaks: ', peaks)
         
         def timeseries(pixel_id, s_time, e_time, buffer=10):
 
