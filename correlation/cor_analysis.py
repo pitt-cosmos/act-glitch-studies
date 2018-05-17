@@ -38,7 +38,7 @@ MODIFICATION FOR SMALL LOOPS
 '''
 '''
 for i in range (10):
-	print ('TOD #', 1700+i,'RUNING' )
+	print ('TOD #', 1700+i,'RUNNING' )
 	loop.run(1700+i, 1701+1)
 
 '''
