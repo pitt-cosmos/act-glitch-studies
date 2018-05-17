@@ -1,9 +1,29 @@
 from todloop.base import Routine
-import numpy as np
 import matplotlib
 from todloop.utils.hist import Hist1D
 matplotlib.use("TKAgg")
 from matplotlib import pyplot as plt
+
+
+class NPixelHist(Routine):
+    def __init__(self, event_key="events"):
+        Routine.__init__(self)
+        self._event_key = event_key
+        self._hist = None
+
+    def initialize(self):
+        self._hist = Hist1D(0, 200, 50)
+
+    def execute(self):
+        events = self.get_store().get(self._event_key)
+        if not events:  # sometimes there is no events
+            return  # do nothing
+        for event in events:
+            self._hist.fill(event['pixels_affected'])
+
+    def finalize(self):
+        plt.step(*self._hist.data)
+        plt.show()
 
 
 class CRHourStudy(Routine):
