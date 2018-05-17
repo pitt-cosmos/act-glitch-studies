@@ -177,6 +177,7 @@ class DataLoader(Routine):
                 print '[INFO] Fetched: %s' % filepath
         else:
             print '[WARNING] Not found: %s' % filepath
+            self.veto()
 
     def load_metadata(self):
         """Load metadata if there is one"""
