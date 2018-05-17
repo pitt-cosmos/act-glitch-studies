@@ -147,20 +147,21 @@ class Slow_Correlation_Filter(Routine):
             all_pixels = pixels_affected_in_event(cs,event)
             avg_x2,avg_y2 = avg_signal(all_pixels,event[0],event[1])
             coeff = correlation(avg_x1,avg_x2, avg_y1, avg_y2)
-       
             
-            if lower_threshold <= coeff < upper_threshold:
-                print '[INFO]: Possible Slow Decay', event,'Coeff = ', coeff
-            elif coeff >= upper_threshold:
-                print '[INFO]: Highly Likely Slow Decay', event, 'Coeff = ', coeff
-                tod = {}
-                tod['start'] = event[0]
-                tod['end'] = event[1]
-                tod['duration'] = event[2]
-                tod['number_of_pixels'] = event[3]
-                tod['pixels_affected'] = all_pixels
-                tod['coefficient'] = coeff
-                tods.append(tod)
+            if event[2]>=50: #for slow decays, duration must be at least 50 (??) 
+            
+                if lower_threshold <= coeff < upper_threshold:
+                    print '[INFO]: Possible Slow Decay', event,'Coeff = ', coeff
+                elif coeff >= upper_threshold:
+                    print '[INFO]: Highly Likely Slow Decay', event, 'Coeff = ', coeff
+                    tod = {}
+                    tod['start'] = event[0]
+                    tod['end'] = event[1]
+                    tod['duration'] = event[2]
+                    tod['number_of_pixels'] = event[3]
+                    tod['pixels_affected'] = all_pixels
+                    tod['coefficient'] = coeff
+                    tods.append(tod)
     
-            self.get_store().set(self._output_key, tods)
+                self.get_store().set(self._output_key, tods)
 
