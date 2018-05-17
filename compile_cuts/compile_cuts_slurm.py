@@ -16,7 +16,7 @@ glitchp = {
 }
 
 loop.add_routine(TODLoader(output_key="tod_data"))
-loop.add_routine(CompileCuts(input_key="tod_data", glitchp=glitchp, output_dir="outputs/s16_pa3_list/cuts/"))
+loop.add_routine(CompileCuts(input_key="tod_data", glitchp=glitchp, output_dir="outputs/s16_pa3_list/cuts_new/"))
 
 start = int(sys.argv[1])
 end = int(sys.argv[2])

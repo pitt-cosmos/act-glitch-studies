@@ -9,7 +9,7 @@ slurm_template='''#!/bin/sh
 #SBATCH -N 1                               # nodes=1 
 #SBATCH --ntasks-per-node=1                # ppn=6 
 #SBATCH -J {{ name }}                      # job name 
-#SBATCH -t 90:00:00                        # 90 hours walltime
+#SBATCH -t 12:00:00                        # 90 hours walltime
 #SBATCH --mem=8000MB                       # memory in MB 
 #SBATCH --output={{ logfile }}            # file for STDOUT 
 
