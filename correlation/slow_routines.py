@@ -129,7 +129,7 @@ class Slow_Correlation_Filter(Routine):
         change name of .txt file to frb_template or cr_template 
         to check correlation for either signal 
         """
-        data = np.genfromtxt('slow_decay_template.txt')
+        data = np.genfromtxt('slow_template.txt')
         avg_x1, avg_y1 = data[0],data[1]
 
         """
