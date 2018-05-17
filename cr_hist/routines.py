@@ -1,5 +1,4 @@
 from todloop.base import Routine
-import numpy as np
 import matplotlib
 from todloop.utils.hist import Hist1D
 matplotlib.use("TKAgg")

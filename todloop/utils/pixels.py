@@ -107,10 +107,15 @@ class PixelReader:
             plt.plot(self._array_data['array_x'][pixels], self._array_data['array_y'][pixels], 'b.')
 
     def get_xy(self, pixel):
-        return [self._array_data['array_x'][pixel], self._array_data['array_y'][pixel]]
+        return np.array([self._array_data['array_x'][pixel], self._array_data['array_y'][pixel]])
 
     def get_x(self, pixel):
         return self._array_data['array_x'][pixel]
 
     def get_y(self, pixel):
         return self._array_data['array_y'][pixel]
+
+    def get_xy_array(self):
+        """Get the xy of the entire array for plotting"""
+        return np.array(self._array_data['array_x'], self._array_data['array_y'])
+
