@@ -1,7 +1,8 @@
 from todloop.base import DataLoader
 from todloop.tod import TODLoader, TODInfoLoader
 from todloop.base import TODLoop
-from routines import Correlation
+from frb_routines import FRB_Correlation_Filter
+from cr_routines import CR_Correlation_Filter
 from calibration.routines import FixOpticalSign, CalibrateTOD
 from plotter import PlotGlitches
 
@@ -15,12 +16,13 @@ loop.add_routine(TODLoader(output_key="tod_data"))
 loop.add_routine(FixOpticalSign(input_key="tod_data", output_key="tod_data"))
 loop.add_routine(CalibrateTOD(input_key="tod_data",output_key="tod_data"))
 
-loop.add_routine(Correlation(tod_key="tod_data", cosig_key="cuts", output_key ="events"))
+loop.add_routine(FRB_Correlation_Filter(tod_key="tod_data", cosig_key="cuts", output_key ="frb_events"))
+loop.add_routine(CR_Correlation_Filter(tod_key="tod_data", cosig_key="cuts", output_key= "cr_events"))
 
 loop.add_routine(PlotGlitches(tod_key="tod_data", cosig_key="cuts"))
 
 
-loop.run(10319,10320)
+loop.run(10000,10001)
 
 
 

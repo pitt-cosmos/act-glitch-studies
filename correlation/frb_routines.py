@@ -7,7 +7,7 @@ from todloop.routines import Routine
 from todloop.utils.pixels import PixelReader
 from todloop.utils.cuts import pixels_affected_in_event
 
-class Correlation(Routine):
+class FRB_Correlation_Filter(Routine):
     """A routine that checks for correlation between two signals"""
     def __init__(self, cosig_key, tod_key, output_key, coeff = 0.8):
         Routine.__init__(self)
@@ -154,9 +154,9 @@ class Correlation(Routine):
        
             
             if lower_threshold <= coeff < upper_threshold:
-                print '[INFO]: Possible FRB or CR', event,'Coeff = ', coeff
+                print '[INFO]: Possible FRB', event,'Coeff = ', coeff
             elif coeff >= upper_threshold:
-                print '[INFO]: Highly Likely FRB or CR', event, 'Coeff = ', coeff
+                print '[INFO]: Highly Likely FRB', event, 'Coeff = ', coeff
                 tod = {}
                 tod['start'] = event[0]
                 tod['end'] = event[1]
