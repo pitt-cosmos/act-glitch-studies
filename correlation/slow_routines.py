@@ -7,7 +7,7 @@ from todloop.routines import Routine
 from todloop.utils.pixels import PixelReader
 from todloop.utils.cuts import pixels_affected_in_event
 
-class FRB_Correlation_Filter(Routine):
+class Slow_Correlation_Filter(Routine):
     """A routine that checks for correlation between two signals"""
     def __init__(self, cosig_key, tod_key, output_key, coeff = 0.8):
         Routine.__init__(self)
@@ -115,8 +115,6 @@ class FRB_Correlation_Filter(Routine):
         avg_x1, avg_y1 = avg_signal(pixels1, stime1, etime1)
         np.savetxt('slow_decay_template.txt',(avg_x1,avg_y1))
 
-        
-#        event2 = [205344, 205375, 31, 35]
         event2 = [9300,9303,3,2]
         stime2 = event2[0]
         etime2 = event2[1]
@@ -131,7 +129,7 @@ class FRB_Correlation_Filter(Routine):
         change name of .txt file to frb_template or cr_template 
         to check correlation for either signal 
         """
-        data = np.genfromtxt('frb_template.txt')
+        data = np.genfromtxt('slow_decay_template.txt')
         avg_x1, avg_y1 = data[0],data[1]
 
         """
@@ -152,9 +150,9 @@ class FRB_Correlation_Filter(Routine):
        
             
             if lower_threshold <= coeff < upper_threshold:
-                print '[INFO]: Possible FRB', event,'Coeff = ', coeff
+                print '[INFO]: Possible Slow Decay', event,'Coeff = ', coeff
             elif coeff >= upper_threshold:
-                print '[INFO]: Highly Likely FRB', event, 'Coeff = ', coeff
+                print '[INFO]: Highly Likely Slow Decay', event, 'Coeff = ', coeff
                 tod = {}
                 tod['start'] = event[0]
                 tod['end'] = event[1]
