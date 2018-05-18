@@ -33,10 +33,10 @@ class PlotEvents(Routine):
             d3, d4 = tod_data.data[b1], tod_data.data[b2]
 
             # try to remove the mean from start_time to end_time
-            d1 -= np.mean(d1[start_time:end_time])
-            d2 -= np.mean(d2[start_time:end_time])
-            d3 -= np.mean(d3[start_time:end_time])
-            d4 -= np.mean(d4[start_time:end_time])
+            #d1 -= np.mean(d1[start_time:end_time])
+            #d2 -= np.mean(d2[start_time:end_time])
+            #d3 -= np.mean(d3[start_time:end_time])
+            #d4 -= np.mean(d4[start_time:end_time])
             
             time = tod_data.ctime - tod_data.ctime[0]
             time = time[start_time:end_time]
@@ -73,7 +73,7 @@ class PlotEvents(Routine):
                 y = timeseries(pid,start_time,end_time)[1]
 
                 plt.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
-                plt.xlabel('TOD_ID: %d\t TOD_NAME: %s' % (self.get_id(), self.get_name()))  # CHANGE TOD TRACK NAME
+                plt.xlabel('TOD_ID: %d   TOD_NAME: %s' % (self.get_id(), self.get_name()))  # CHANGE TOD TRACK NAME
                 plt.plot(x,y,'.-')
             
             plt.show()
@@ -88,6 +88,7 @@ class PlotEvents(Routine):
             pixels_affected = event['pixels_affected']
             start_time = event['start']
             end_time = event['end']
+            print '[INFO] Number of pixels affected: %d' % event['number_of_pixels']
             plotter(pixels_affected, start_time, end_time)
 
 
