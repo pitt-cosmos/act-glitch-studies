@@ -108,15 +108,13 @@ class FRB_Correlation_Filter(Routine):
         FOR TWO SPECIFIC EVENTS
         """
         """
-        event1 = [218306, 218449, 143, 37]
+        event1 = [133034, 133273, 239, 8]
         stime1 = event1[0]
         etime1 = event1[1]
         pixels1 = pixels_affected_in_event(cs, event1)
         avg_x1, avg_y1 = avg_signal(pixels1, stime1, etime1)
         np.savetxt('slow_decay_template.txt',(avg_x1,avg_y1))
-
         
-#        event2 = [205344, 205375, 31, 35]
         event2 = [9300,9303,3,2]
         stime2 = event2[0]
         etime2 = event2[1]
@@ -139,7 +137,7 @@ class FRB_Correlation_Filter(Routine):
         To compare all events in track to template, 
         initiate this loop
         """
-
+        
         #Save outputs to a dictionary, here we initialize an empty dictionary
         tods = []
         lower_threshold = 0.6
@@ -150,19 +148,22 @@ class FRB_Correlation_Filter(Routine):
             avg_x2,avg_y2 = avg_signal(all_pixels,event[0],event[1])
             coeff = correlation(avg_x1,avg_x2, avg_y1, avg_y2)
        
-            
-            if lower_threshold <= coeff < upper_threshold:
-                print '[INFO]: Possible FRB', event,'Coeff = ', coeff
-            elif coeff >= upper_threshold:
-                print '[INFO]: Highly Likely FRB', event, 'Coeff = ', coeff
-                tod = {}
-                tod['start'] = event[0]
-                tod['end'] = event[1]
-                tod['duration'] = event[2]
-                tod['number_of_pixels'] = event[3]
-                tod['pixels_affected'] = all_pixels
-                tod['coefficient'] = coeff
-                tods.append(tod)
-    
-            self.get_store().set(self._output_key, tods)
+            if event[2]<=10:
 
+                if lower_threshold <= coeff < upper_threshold:
+                    print '[INFO]: Possible FRB', event,'Coeff = ', coeff
+                elif coeff >= upper_threshold:
+                    print '[INFO]: Highly Likely FRB', event, 'Coeff = ', coeff
+                    tod = {}
+                    tod['start'] = event[0]
+                    tod['end'] = event[1]
+                    tod['duration'] = event[2]
+                    tod['number_of_pixels'] = event[3]
+                    tod['pixels_affected'] = all_pixels
+                    tod['coefficient'] = coeff
+                    tods.append(tod)
+    
+                self.get_store().set(self._output_key, tods)
+
+
+        
