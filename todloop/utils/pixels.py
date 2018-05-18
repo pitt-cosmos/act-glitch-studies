@@ -115,6 +115,14 @@ class PixelReader:
     def get_y(self, pixel):
         return self._array_data['array_y'][pixel]
 
+    def get_row_col(self, pixel):
+        """Return row and col of pixels
+        :param
+            pixel:  int or [int]
+        :return
+            row, col"""
+        return self._array_data['row'][pixel], self._array_data['col'][pixel]
+
     def get_xy_array(self):
         """Get the xy of the entire array for plotting"""
         return self._array_data['array_x'], self._array_data['array_y']
