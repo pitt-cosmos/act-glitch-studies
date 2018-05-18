@@ -173,10 +173,15 @@ class DataLoader(Routine):
         filepath = "%s%s.%s" % (self._input_dir, i, self._postfix)
         if os.path.isfile(filepath):
             with open(filepath, "r") as f:
-                self.get_store().set(self._output_key, cPickle.load(f))
+                data = cPickle.load(f)
                 print '[INFO] Fetched: %s' % filepath
+                if data:  # check if data is None
+                    self.get_store().set(self._output_key, data)
+                else:  # data is None
+                    print '[WARNING] Data is None, skipping ...'
+                    self.veto()  # skipping 
         else:
-            print '[WARNING] Not found: %s' % filepath
+            print '[WARNING] Not found: %s, skipping ...' % filepath
             self.veto()
 
     def load_metadata(self):

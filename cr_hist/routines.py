@@ -5,21 +5,19 @@ matplotlib.use("TKAgg")
 from matplotlib import pyplot as plt
 
 
-class NPixelHist(Routine):
+class NPixelStudy(Routine):
     def __init__(self, event_key="events"):
         Routine.__init__(self)
         self._event_key = event_key
         self._hist = None
 
     def initialize(self):
-        self._hist = Hist1D(0, 200, 50)
+        self._hist = Hist1D(1, 50, 48)
 
     def execute(self):
         events = self.get_store().get(self._event_key)
-        if not events:  # sometimes there is no events
-            return  # do nothing
         for event in events:
-            self._hist.fill(event['pixels_affected'])
+            self._hist.fill(event['number_of_pixels'])
 
     def finalize(self):
         plt.step(*self._hist.data)
@@ -43,9 +41,7 @@ class CRHourStudy(Routine):
         # get tod info and coincident signals
         tod_info = self.get_store().get(self._tod_info_key)
         events = self.get_store().get(self._event_key)
-        if not events:
-            print '[WARNING] Events empty'
-            return
+
         # get the total number of glitches
         n_glitches = len(events)
 
@@ -83,8 +79,6 @@ class CRPWVStudy(Routine):
         # get tod info and coincident signals
         tod_info = self.get_store().get(self._tod_info_key)
         events = self.get_store().get(self._event_key)
-        if not events:
-            return
 
         # get the total number of glitches
         n_glitches = len(events)
@@ -106,35 +100,4 @@ class CRPWVStudy(Routine):
         plt.show()
 
 
-class GlitchAzStudy(Routine):
-    """A study of glitches vs AZ"""
-    def __init__(self):
-        Routine.__init__(self)
-        self._glitches_hist = None
-        self._tods_hist = None
-
-    def initialize(self):
-        self._glitches_hist = Hist1D(0, 360, 360)
-        self._tods_hist = Hist1D(0, 360, 360)
-        
-    def execute(self):
-        # get tod info and coincident signals
-        tod_info = self.get_store().get("tod_info")
-        cosig = self.get_store().get("cosig")
-
-        # get the total number of glitches
-        n_glitches = len(cosig['peaks'])
-
-        self._glitches_hist.fill(float(tod_info['azimuth']), n_glitches)
-        self._tods_hist.fill(float(tod_info['azimuth']))
-
-    def finalize(self):
-        plt.subplot(131)
-        plt.step(*self._glitches_hist.data)
-        plt.subplot(132)
-        plt.step(*self._tods_hist.data)
-        plt.subplot(133)
-        plt.step(self._glitches_hist.data[0], self._glitches_hist.data[1]/self._tods_hist.data[1])
-        plt.tight_layout()
-        plt.show()
 
