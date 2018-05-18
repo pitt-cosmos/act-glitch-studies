@@ -33,10 +33,10 @@ class PlotEvents(Routine):
             d3, d4 = tod_data.data[b1], tod_data.data[b2]
 
             # try to remove the mean from start_time to end_time
-            #d1 -= np.mean(d1[start_time:end_time])
-            #d2 -= np.mean(d2[start_time:end_time])
-            #d3 -= np.mean(d3[start_time:end_time])
-            #d4 -= np.mean(d4[start_time:end_time])
+            d1 -= np.mean(d1[start_time:end_time])
+            d2 -= np.mean(d2[start_time:end_time])
+            d3 -= np.mean(d3[start_time:end_time])
+            d4 -= np.mean(d4[start_time:end_time])
             
             time = tod_data.ctime - tod_data.ctime[0]
             time = time[start_time:end_time]
