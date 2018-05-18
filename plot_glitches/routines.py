@@ -119,12 +119,12 @@ class PlotGlitches(Routine):
 
 
 """
-        print(self._pr.get_xy(24))
-        print(self._pr.get_xy(537))
-        print(self._pr.get_xy(712))
+        print(self._pr.get_x_y(24))
+        print(self._pr.get_x_y(537))
+        print(self._pr.get_x_y(712))
 
-        print(self._pr.get_xy(199))
-        print(self._pr.get_xy(64))
-        print(self._pr.get_xy(462))
-        print(self._pr.get_xy(322))
+        print(self._pr.get_x_y(199))
+        print(self._pr.get_x_y(64))
+        print(self._pr.get_x_y(462))
+        print(self._pr.get_x_y(322))
 """
