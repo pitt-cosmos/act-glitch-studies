@@ -106,7 +106,7 @@ class PixelReader:
         if pixels:
             plt.plot(self._array_data['array_x'][pixels], self._array_data['array_y'][pixels], 'b.')
 
-    def get_xy(self, pixel):
+    def get_x_y(self, pixel):
         return self._array_data['array_x'][pixel], self._array_data['array_y'][pixel]
 
     def get_x(self, pixel):
@@ -117,11 +117,31 @@ class PixelReader:
 
     def get_row_col(self, pixel):
         """Return row and col of pixels
-        :param
+        :param:
             pixel:  int or [int]
-        :return
+        :return:
             row, col"""
         return self._array_data['row'][pixel], self._array_data['col'][pixel]
+
+    def get_row(self, pixel):
+        """Return row of pixel(s)
+        :param: int or [int]
+        :return: int or [int]"""
+        return self._array_data['row'][pixel]
+
+    def get_col(self, pixel):
+        """Return col of pixel(s)
+        :param: int or [int]
+        :return: int or [int]"""
+        return self._array_data['row'][pixel]
+
+    def get_row_col_array(self):
+        """Return row and col of all pixels (array)
+        :param:
+            pixel:  int or [int]
+        :return:
+            [row], [col]"""
+        return self._array_data['row'], self._array_data['col']
 
     def get_xy_array(self):
         """Get the xy of the entire array for plotting"""
