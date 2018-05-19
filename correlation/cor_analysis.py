@@ -1,8 +1,7 @@
 from todloop.routines import Logger, DataLoader
 from todloop.tod import TODLoader, TODInfoLoader
 from todloop.base import TODLoop
-from correlation.routines import FRBCorrelationFilter, SlowCorrelationFilter
-from routines import CRCorrelationFilter
+from routines import CRCorrelationFilter, FRBCorrelationFilter, SlowCorrelationFilter
 from calibration.routines import FixOpticalSign, CalibrateTOD
 from plotter import PlotGlitches
 from histogram import PlotHistogram 
@@ -33,7 +32,6 @@ loop.add_routine(CalibrateTOD(input_key="tod_data",output_key="tod_data"))
 loop.add_routine(PlotGlitches(tod_key="tod_data", cosig_key="cuts"))
 
 loop.run(10000,10001)
-
 
 
 
