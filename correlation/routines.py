@@ -1,8 +1,8 @@
-import matplotlib
-matplotlib.use("TKAgg")
+# import matplotlib
+# matplotlib.use("TKAgg")
 import numpy as np
 from scipy.interpolate import interp1d
-from todloop.routines import Routine
+from todloop.base import Routine
 from todloop.utils.pixels import PixelReader
 from todloop.utils.cuts import pixels_affected_in_event
 

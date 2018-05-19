@@ -1,8 +1,6 @@
 import matplotlib
 matplotlib.use("TKAgg")
 import numpy as np
-import scipy.stats as ss
-from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 from todloop.routines import Routine
 from todloop.utils.pixels import PixelReader
