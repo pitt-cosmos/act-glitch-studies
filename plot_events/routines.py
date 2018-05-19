@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from todloop.routines import Routine
 from todloop.utils.pixels import PixelReader
 import moby2
-import moby2.scripting.products as products
+# import moby2.scripting.products as products
 
 
 

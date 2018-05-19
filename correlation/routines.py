@@ -156,7 +156,7 @@ class CorrelationFilter(Routine):
             if lower_threshold <= coeff < upper_threshold:
                 print '[INFO] Possible %s' % self._tag, peak, 'Coeff = ', coeff
             elif coeff >= upper_threshold:
-                print '[INFO] Highly Likely %' % self._tag, peak, 'Coeff = ', coeff
+                print '[INFO] Highly Likely %s' % self._tag, peak, 'Coeff = ', coeff
                 start = peak[0]
                 end = peak[1]
                 duration = peak[2]
