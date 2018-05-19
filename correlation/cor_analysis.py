@@ -1,5 +1,4 @@
-from todloop.base import DataLoader
-from todloop.routines import Logger
+from todloop.routines import Logger, DataLoader
 from todloop.tod import TODLoader, TODInfoLoader
 from todloop.base import TODLoop
 from frb_routines import FRB_Correlation_Filter

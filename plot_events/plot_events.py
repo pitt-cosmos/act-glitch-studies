@@ -1,7 +1,6 @@
 from todloop.base import TODLoop
 from todloop.tod import TODLoader
-from todloop.routines import Logger
-from todloop.base import DataLoader
+from todloop.routines import Logger, DataLoader
 from routines import PlotEvents, NPixelFilter, LoadRaDec
 from calibration.routines import FixOpticalSign, CalibrateTOD
 

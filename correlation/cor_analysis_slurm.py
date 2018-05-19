@@ -1,7 +1,6 @@
-from todloop.base import DataLoader
 from todloop.tod import TODLoader, TODInfoLoader
 from todloop.base import TODLoop
-from todloop.routines import SaveData
+from todloop.routines import SaveData, DataLoader
 from routines import Correlation
 from calibration.routines import FixOpticalSign, CalibrateTOD
 from plotter import PlotGlitches

@@ -1,8 +1,3 @@
-import cPickle
-import glob
-import os
-
-
 class TODLoop:
     """Main driving class for looping through coincident signals of different TODs"""
     def __init__(self):
@@ -151,52 +146,6 @@ class Routine:
         return self.get_context().get_name()
 
 
-class DataLoader(Routine):
-    """A routine that load the saved coincident signals"""
-    def __init__(self, input_dir=None, postfix="pickle", output_key="data"):
-        """
-        :param input_dir:  string
-        :param postfix:    string - file extension
-        :param output_key: string - key used to store loaded data
-        """
-        self._input_dir = input_dir
-        self._postfix = postfix
-        self._output_key = output_key
-        self._metadata = None
-
-    def initialize(self):
-        self.load_metadata()
-
-    def execute(self):
-        """A function that fetch a batch of files in order"""
-        i = self.get_id()
-        filepath = "%s%s.%s" % (self._input_dir, i, self._postfix)
-        if os.path.isfile(filepath):
-            with open(filepath, "r") as f:
-                data = cPickle.load(f)
-                print '[INFO] Fetched: %s' % filepath
-                if data:  # check if data is None
-                    self.get_store().set(self._output_key, data)
-                else:  # data is None
-                    print '[WARNING] Data is None, skipping ...'
-                    self.veto()  # skipping 
-        else:
-            print '[WARNING] Not found: %s, skipping ...' % filepath
-            self.veto()
-
-    def load_metadata(self):
-        """Load metadata if there is one"""
-        metadata_path = self._input_dir + ".metadata"
-        if os.path.isfile(metadata_path):
-            print '[INFO] Metadata found!'
-            with open(self._input_dir + ".metadata", "r") as meta:
-                self._metadata = cPickle.load(meta)
-                print '[INFO] Metadata loaded!'
-
-    def get_metadata(self):
-        return self._metadata
-
-    
 class DataStore:
     """Cache class for event loop"""
     def __init__(self):

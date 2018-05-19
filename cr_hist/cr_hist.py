@@ -1,6 +1,6 @@
 from todloop.base import TODLoop
 from todloop.tod import TODInfoLoader
-from todloop.base import DataLoader
+from todloop.routines import DataLoader
 from routines import NPixelStudy, CRHourStudy, CRPWVStudy
 from plot_events.routines import NPixelFilter
 
