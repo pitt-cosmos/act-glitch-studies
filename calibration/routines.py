@@ -2,6 +2,7 @@ from todloop.base import Routine
 import numpy as np
 import moby2
 
+
 class FixOpticalSign(Routine):
     """A routine that corrects for optical sign"""
     def __init__(self, input_key="tod_data", output_key="tod_data"):
@@ -16,11 +17,8 @@ class FixOpticalSign(Routine):
         self.get_store().set(self._output_key, tod_data)
 
 
-
 class CalibrateTOD(Routine):
-
     """A routine that calibrates from DAQ to W"""
-
     def __init__(self, input_key="tod_data", output_key="tod_data"):
         Routine.__init__(self)
         self._input_key = input_key

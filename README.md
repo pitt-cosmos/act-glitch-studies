@@ -63,8 +63,8 @@ Here is a list of written routines and their whereabouts
 - `coincident_signals.routines.FindCosigs`: find coincident signals (cosigs) based on cuts.
 - `coincident_signals.routines.FindEvents`: find peaks in cosigs which correspond to physical events.
 - `calibration.routines.FixOpticalSign`: fix the optical sign of a tod.
-- `correlation.frb_routines.FRB_Correlation_Filter`: finds correlation coefficient between glitch events and FRB signal
-- `correlation.cr_routines.CR_Correlation_Filter`: finds correlation coefficient between glitch events and cosmic ray signal
+- `correlation.frb_routines.FRBCorrelationFilter`: finds correlation coefficient between glitch events and FRB signal
+- `correlation.cr_routines.CRCorrelationFilter`: finds correlation coefficient between glitch events and cosmic ray signal
 
 ## List of Utility Functions
 - `todloop.utils.pixels`: contains useful functions for accessing pixels.
