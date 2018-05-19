@@ -17,7 +17,7 @@ loop.add_routine(TODLoader(output_key="tod_data"))
 loop.add_routine(FixOpticalSign(input_key="tod_data", output_key="tod_data"))
 loop.add_routine(CalibrateTOD(input_key="tod_data",output_key="tod_data"))
 loop.add_routine(FRBCorrelationFilter(tod_key="tod_data", cosig_key="cuts", output_key ="events"))
-loop.add_routine(SaveData(input_key="events", output_dir="../outputs/s16_pa3_list/events/"))
+loop.add_routine(SaveData(input_key="events", output_dir="../outputs/s16_pa3_list/events_v2/"))
 
 start = int(sys.argv[1])
 end = int(sys.argv[2])

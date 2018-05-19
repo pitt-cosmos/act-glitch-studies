@@ -171,11 +171,11 @@ class CorrelationFilter(Routine):
                     'alt': tod_data.alt[ref_index],  # ref alt
                     'az': tod_data.az[ref_index],  # ref az
                     'number_of_pixels': number_of_pixels,
+                    'pixels_affected': all_pixels,
                     'coefficient': coeff,
                     'tag': self._tag
                 }
                 events.append(event)
-                event_counter += 1
 
         print '[INFO] Total events: %d' % len(events)
         self.get_store().set(self._output_key, events)
