@@ -4,6 +4,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from todloop.routines import Routine
 from todloop.utils.pixels import PixelReader
+import moby2
+import moby2.scripting.products as products
+
 
 
 class PlotEvents(Routine):
@@ -73,7 +76,7 @@ class PlotEvents(Routine):
                 y = timeseries(pid,start_time,end_time)[1]
 
                 plt.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
-                plt.xlabel('TOD_ID: %d   TOD_NAME: %s' % (self.get_id(), self.get_name()))  # CHANGE TOD TRACK NAME
+                plt.xlabel('TOD_ID: %d    TOD_NAME: %s' % (self.get_id(), self.get_name()))  # CHANGE TOD TRACK NAME
                 plt.plot(x,y,'.-')
             
             plt.show()
@@ -90,6 +93,7 @@ class PlotEvents(Routine):
             end_time = event['end']
             print '[INFO] Number of pixels affected: %d' % event['number_of_pixels']
             plotter(pixels_affected, start_time, end_time)
+
 
 
 class NPixelFilter(Routine):
@@ -114,3 +118,39 @@ class NPixelFilter(Routine):
             print '[INFO] Found %d events' % len(events_filtered)
             self.get_store().set(self._output_key, events_filtered)
         
+
+class LoadRaDec(Routine):
+    """A routine that loads the information about RA and DEC for each events"""
+    def __init__(self, event_key="events", tod_key="tod_data", output_key="events"):
+        Routine.__init__(self)
+        self._event_key = event_key
+        self._tod_key = tod_key
+        self._output_key = output_key
+
+    def initialize(self):
+        """Scripts that run before processing the first TOD"""
+        user_config = moby2.util.get_user_config()
+        moby2.pointing.set_bulletin_A(params=user_config.get('bulletin_A_settings'))
+
+    def execute(self):
+        """Scripts that run for each TOD"""
+        events = self.get_store().get(self._event_key)
+        tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data
+
+        # get focal plane (removed as no need such precision now)
+        # fp_file = "/mnt/act3/users/mhasse/depots/shared/RelativeOffsets/template_ar3_s16_170131.txt"  # TODO: Adapt to more seasons
+        # focal_plane = products.get_focal_plane({'source': 'fp_file', \
+        #                                         'filename': fp_file}, 
+        #                                        tod_data.info)
+        
+        new_events = []
+        for event in events:  # loop over each event
+            start = event['start']
+            end = event['end']
+            # ra, dec = moby2.pointing.get_coords(tod_data.ctime[start:end], tod_data.az[start:end], tod_data.alt[start:end], focal_plane=focal_plane)
+            ra, dec = moby2.pointing.get_coords(tod_data.ctime[start:end], tod_data.az[start:end], tod_data.alt[start:end])
+            ref_index = int(len(ra)/2)  # use the middle index as a reference
+            event['ra'] = ra[ref_index]
+            event['dec'] = dec[ref_index]
+            new_events.append(event)
+        self.get_store().set(self._output_key, new_events)
