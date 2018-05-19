@@ -147,7 +147,6 @@ class CorrelationFilter(Routine):
         lower_threshold = 0.6
         upper_threshold = self._coeff
 
-        event_counter = 0
         for peak in peaks:
             all_pixels = pixels_affected_in_event(cs, peak)
             avg_x2, avg_y2 = avg_signal(all_pixels, peak[0], peak[1])
@@ -162,7 +161,7 @@ class CorrelationFilter(Routine):
                 duration = peak[2]
                 number_of_pixels = peak[3]
                 ref_index = int((start + end)/2)  # use as reference point
-                id = "%d.%d" % (self.get_id(), event_counter)
+                id = "%d.%d" % (self.get_id(), start)
                 event = {
                     'id': id,
                     'start': start,  # start index
@@ -178,7 +177,7 @@ class CorrelationFilter(Routine):
                 events.append(event)
                 event_counter += 1
 
-        print '[INFO] Total events: %d' % event_counter
+        print '[INFO] Total events: %d' % len(events)
         self.get_store().set(self._output_key, events)
 
 
