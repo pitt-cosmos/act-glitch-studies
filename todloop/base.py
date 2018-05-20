@@ -8,6 +8,7 @@ class TODLoop:
         self._tod_list = None
         self._tod_id = None
         self._tod_name = None
+        self._skip_list = []
 
     def add_routine(self, routine):
         """Add a routine to the event loop"""
@@ -22,6 +23,9 @@ class TODLoop:
         with open(tod_list_dir, "r") as f:
             self._tod_list = [line.split('\n')[0] for line in f.readlines()]
             self._metadata['list'] = self._tod_list
+
+    def add_skip(self, skip_list):
+        self._skip_list = skip_list
 
     def get_store(self):
         """Access the shared data storage"""
@@ -55,6 +59,9 @@ class TODLoop:
 
         self.initialize()
         for tod_id in range(start, end):
+            if tod_id in self._skip_list:
+                print '[INFO] tod: %d in the skip_list, skipping ...' % tod_id
+                continue  # skip if in skip list
             self._tod_id = tod_id
             self._tod_name = self._tod_list[tod_id]
             self.execute()

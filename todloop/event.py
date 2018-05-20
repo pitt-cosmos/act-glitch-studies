@@ -11,12 +11,16 @@ class NPixelFilter(Routine):
         self._max_pixels = max_pixels
         self._input_key = input_key
         self._output_key = output_key
+        self._events_passed = 0
+        self._events_processed = 0
 
     def execute(self):
         """Scripts that run for each TOD"""
         events = self.get_store().get(self._input_key)
         events_filtered = [event for event in events if self._min_pixels <= event['number_of_pixels'] < self._max_pixels]
-
+        self._events_passed += len(events_filtered)
+        self._events_processed += len(events)
+        
         # if no events left, skip TOD
         if len(events_filtered) == 0:
             self.veto()  # skip subsequent routines
@@ -24,6 +28,11 @@ class NPixelFilter(Routine):
         else:
             print '[INFO] Events passed %d / %d' % (len(events_filtered), len(events))
             self.get_store().set(self._output_key, events_filtered)
+    
+    def finalize(self):
+        print '[INFO] Total events processed: %d' % self._events_processed
+        print '[INFO] Total events passed: %d' % self._events_passed
+        
 
 
 class CoeffFilter(Routine):
@@ -34,11 +43,15 @@ class CoeffFilter(Routine):
         self._max_coeff = max_coeff
         self._input_key = input_key
         self._output_key = output_key
+        self._events_passed = 0
+        self._events_processed = 0
 
     def execute(self):
         """Scripts that run for each TOD"""
         events = self.get_store().get(self._input_key)
         events_filtered = [event for event in events if self._min_coeff <= event['coefficient'] < self._max_coeff]
+        self._events_passed += len(events_filtered)
+        self._events_processed += len(events)
 
         # if no events left, skip TOD
         if len(events_filtered) == 0:
@@ -47,6 +60,10 @@ class CoeffFilter(Routine):
         else:
             print '[INFO] Events passed: %d / %d' % (len(events_filtered), len(events))
             self.get_store().set(self._output_key, events_filtered)
+            
+    def finalize(self):
+        print '[INFO] Total events processed: %d' % self._events_processed
+        print '[INFO] Total events passed: %d' % self._events_passed
 
 
 class LoadRaDec(Routine):
