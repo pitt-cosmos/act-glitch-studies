@@ -58,8 +58,9 @@ class CorrelationFilter(Routine):
 
             for pid in pixels:
 
-                x = timeseries(pid,start_time,end_time)[0]
-                y = timeseries(pid,start_time,end_time)[1]
+                # x = timeseries(pid,start_time,end_time)[0]
+                # y = timeseries(pid,start_time,end_time)[1]
+                x, y = timeseries(pid,start_time,end_time)
 
                 avg_y = np.zeros(len(y))
 
@@ -75,6 +76,7 @@ class CorrelationFilter(Routine):
             f2 = interp1d(x2,y2)
 
             points = 100
+            # points = 2*max(len(x1), len(x2))  # double precision
 
             x1new = np.linspace(min(x1), max(x1), points)
             x2new = np.linspace(min(x2), max(x2), points)
@@ -177,14 +179,14 @@ class CorrelationFilter(Routine):
                 }
                 events.append(event)
 
-        print '[INFO] Total events: %d' % len(events)
+        print '[INFO] Events passed: %d / %d' % (len(events), len(peaks))
         self.get_store().set(self._output_key, events)
 
 
 class CRCorrelationFilter(CorrelationFilter):
     """A routine that checks for correlation between two signals"""
     def __init__(self, cosig_key, tod_key, output_key, coeff=0.8):
-        CRCorrelationFilter.__init__(self, cosig_key, tod_key, output_key, coeff)
+        CorrelationFilter.__init__(self, cosig_key, tod_key, output_key, coeff)
         self._template = np.genfromtxt('cr_template.txt')
         self._tag = "CR"
 
