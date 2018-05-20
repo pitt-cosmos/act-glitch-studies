@@ -1,6 +1,7 @@
 import os
 from todloop.base import Routine
 import cPickle
+import pprint
 
 
 class OutputRoutine(Routine):
@@ -49,9 +50,14 @@ class Logger(Routine):
         Routine.__init__(self)
         self._input_key = input_key
 
+    def initialize(self):
+        self._pp = pprint.PrettyPrinter(indent=1)
+        
     def execute(self):
         data = self.get_store().get(self._input_key)
-        print '[INFO] Logger: %s = %s' % (self._input_key, data)
+        print '[INFO] Logger: %s = ' % self._input_key
+        self._pp.pprint(data)
+
 
 
 class DataLoader(Routine):
