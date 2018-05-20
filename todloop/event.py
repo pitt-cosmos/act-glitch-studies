@@ -3,7 +3,6 @@ import moby2
 # import moby2.scripting.products as products
 
 
-
 class NPixelFilter(Routine):
     def __init__(self, min_pixels=0, max_pixels=100, input_key="events", output_key="events"):
         """Scripts that run during initialization of the routine"""
@@ -52,10 +51,9 @@ class CoeffFilter(Routine):
 
 class LoadRaDec(Routine):
     """A routine that loads the information about RA and DEC for each events"""
-    def __init__(self, event_key="events", tod_key="tod_data", output_key="events"):
+    def __init__(self, input_key="events", output_key="events"):
         Routine.__init__(self)
-        self._event_key = event_key
-        self._tod_key = tod_key
+        self._event_key = input_key
         self._output_key = output_key
 
     def initialize(self):

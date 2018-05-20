@@ -6,8 +6,6 @@ from todloop.routines import Routine
 from todloop.utils.pixels import PixelReader
 
 
-
-
 class PlotEvents(Routine):
     """A routine that plot events"""
     def __init__(self, event_key, tod_key):
