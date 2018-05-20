@@ -55,6 +55,9 @@ Here is a list of written routines and their whereabouts
 - `todloop.filters.SpreadFilter`: filter tracks by their spreads.
 - `todloop.filters.NCosigFilter`: filter TODs by the number of coincident signals seen. 
 - `todloop.filters.TrackLengthFilter`: filter tracks by their lengths. 
+- `todloop.event.NPixelFilter`: filter events based on the number of pixels affected.
+- `todloop.event.CoeffFilter`: filter events based on correlation coefficients.
+- `todloop.event.LoadRaDec`: load RA and DEC into each events. 
 - `compile_cuts.routines.CompileCuts`: compile cuts given a TOD. 
 - `get_tracks.routines.GetTracks`: compile all tracks of a TOD and save to a key.
 - `get_tracks.routines.PlotTracks`: plot the tracks and save the plot in a folder. 

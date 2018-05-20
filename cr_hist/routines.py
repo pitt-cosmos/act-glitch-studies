@@ -70,7 +70,6 @@ class CRPWVStudy(Routine):
         self._tod_info_key = tod_info_key
         self._event_key = event_key
 
-
     def initialize(self):
         self._glitches_pwv_hist = Hist1D(0, 7, 6)
         self._tods_pwv_hist = Hist1D(0, 7, 6)

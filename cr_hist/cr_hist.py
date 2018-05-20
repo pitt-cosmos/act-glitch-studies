@@ -2,8 +2,7 @@ from todloop.base import TODLoop
 from todloop.tod import TODInfoLoader
 from todloop.routines import DataLoader
 from routines import NPixelStudy, CRHourStudy, CRPWVStudy
-from plot_events.routines import NPixelFilter, CoeffFilter
-
+from todloop.event import NPixelFilter, CoeffFilter
 
 loop = TODLoop()
 loop.add_tod_list("../data/s16_pa3_list.txt")
