@@ -89,7 +89,7 @@ class PlotGlitches(Routine):
         plotter(pixels, stime, etime)
 	self._pr.plot(pixels)
 	for pix in pixels:
-		print('Pixel #', pix, 'at', self._pr.get_row_col(pix))
+            print('Pixel #', pix, 'at', self._pr.get_row_col(pix))
         plt.show() 
 
 

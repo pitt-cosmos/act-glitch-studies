@@ -3,6 +3,7 @@ import matplotlib
 from todloop.utils.hist import Hist1D
 matplotlib.use("TKAgg")
 from matplotlib import pyplot as plt
+from todloop.utils.pixels import PixelReader
 
 
 class NPixelStudy(Routine):
@@ -120,4 +121,38 @@ class RaDecStudy(Routine):
         plt.scatter(self._ras, self._decs, alpha=0.2)
         plt.xlabel("RA")
         plt.ylabel("DEC")
+        plt.show()
+
+        
+class SpatialStudy(Routine):
+    def __init__(self, input_key):
+        """Study the spatial histogram for events"""
+        Routine.__init__(self)
+        self._input_key = input_key
+        self._rows = []
+        self._cols = []
+
+    def initialize(self):
+        self._pr = PixelReader()
+
+    def execute(self):
+        """Scripts that run for each TOD"""
+        events = self.get_store().get(self._input_key)  # get events
+        for event in events:
+            # find the pixels affected
+            pixels_affected = event['pixels_affected']
+            rows, cols = self._pr.get_row_col(pixels_affected)
+
+            # store row / col 
+            self._rows.extend(rows)  
+            self._cols.extend(cols)
+
+
+    def finalize(self):
+        """Scripts that run after processing all TODs"""
+        all_rows, all_cols = self._pr.get_row_col_array()
+        # plt.plot(all_rows, all_cols, 'r.')  # plot all rows as background
+        plt.plot(self._rows, self._cols, 'b.', alpha=0.1)  # plot affected row / col
+        plt.xlabel("Row")
+        plt.ylabel("Col")
         plt.show()
