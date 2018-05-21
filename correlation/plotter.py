@@ -74,6 +74,7 @@ class PlotGlitches(Routine):
                 plt.plot(x,y,'.-')
             
             plt.show()
+            return 
 
         """
         SPECIFIC EVENT
@@ -82,16 +83,20 @@ class PlotGlitches(Routine):
         cs = cuts['coincident_signals']
 
 
-        event = [62401,62449,48,29]
+        event = [219067, 219072, 5, 2]
         stime = event[0]
         etime = event[1]
         pixels = pixels_affected_in_event(cs, event)
         plotter(pixels, stime, etime)
 	self._pr.plot(pixels)
         print '[INFO] Pixel Location in Row and Col Space:'
-	for pix in pixels:
-            print '[INFO] Pixel #', pix, 'at', self._pr.get_row_col(pix)
-        plt.show()
+	for pid in pixels:
+            print '[INFO] Pixel #', pid, 'at', self._pr.get_row_col(pid)
+            print 'event max amp?',  y[pid]
+    #SET YOUR MAX AS MAX of PIX MAXES(NEEDS to be max of each pixel's data and max of each pix max)
+    #After this all other alphas can be found by taking them as fraction of the Max of maxes
+    #plt.plot(x,y, 'b.',alpha=MAX, markersize=50)    
+    plt.show()
 
 
 
