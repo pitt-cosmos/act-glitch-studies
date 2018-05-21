@@ -6,7 +6,7 @@ from todloop.event import NPixelFilter, CoeffFilter
 
 loop = TODLoop()
 loop.add_tod_list("../data/s16_pa3_list.txt")
-loop.add_routine(DataLoader(input_dir="../outputs/s16_pa3_list/events_v2/", output_key="events"))
+loop.add_routine(DataLoader(input_dir="../outputs/s16_pa3_list/events/", output_key="events"))
 
 # loop.add_routine(NPixelFilter(min_pixels=30, max_pixels=100, input_key="events", output_key="events"))
 loop.add_routine(CoeffFilter(min_coeff=0.9, input_key="events", output_key="events"))
