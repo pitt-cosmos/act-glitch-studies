@@ -73,8 +73,7 @@ class PlotGlitches(Routine):
 
                 plt.plot(x,y,'.-')
             
-            plt.show()
-            #return 
+            plt.show() 
 
         """
         SPECIFIC EVENT
@@ -88,16 +87,27 @@ class PlotGlitches(Routine):
         etime = event[1]
         pixels = pixels_affected_in_event(cs, event)
         plotter(pixels, stime, etime)
-        self._pr.plot(pixels)
+        #self._pr.plot(pixels)
         print '[INFO] Pixel Location in Row and Col Space:'
-        pix_max_arrays = []
+        pix_max_amps = []
+        pix_max_x = []
+        pix_max_y = []
+        x, y = self._pr.get_x_y_array()
+        plt.plot(x,y,'r.')
+        
         for pid in pixels:
             print '[INFO] Pixel #', pid, 'at', self._pr.get_row_col(pid)
-            pixel_max = np.amax(timeseries(pid,stime,etime)[1])
-            print '[INFO] Maximum Amplitude of Pixel #', pid, 'is', pixel_max
-            pix_max_arrays.append(pixel_max)
-               
-        max_alpha = np.amax(pix_max_arrays)
+            pixel_max_amp = np.amax(timeseries(pid,stime,etime)[1])
+            print '[INFO] Maximum Amplitude of Pixel #', pid, 'is', pixel_max_amp
+            x, y = self._pr.get_x_y(pid)
+            pix_max_amps.append(pixel_max_amp)
+            pix_max_x.append(x)
+            pix_max_y.append(y)   
+        
+        max_alpha = np.amax(pix_max_amps)
+        
+        for n in np.arange(0,len(pix_max_amps)):
+            plt.plot(pix_max_x[n],pix_max_y[n], 'b.', alpha=(pix_max_amps[n]/max_alpha), markersize=50)     
+        plt.figure(figsize=[10,10])
+        
         plt.show()
-
-
