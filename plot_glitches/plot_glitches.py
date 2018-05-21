@@ -14,6 +14,6 @@ loop.add_routine(TODLoader(output_key="tod_data"))
 loop.add_routine(FixOpticalSign(input_key="tod_data", output_key="tod_data"))
 loop.add_routine(CalibrateTOD(input_key="tod_data",output_key="tod_data"))
 loop.add_routine(PlotGlitches(tod_key="tod_data", cosig_key="cuts"))
-loop.run(13959, 13960)
+loop.run(1641, 1642)
 
 
