@@ -90,12 +90,14 @@ class PlotGlitches(Routine):
         plotter(pixels, stime, etime)
         self._pr.plot(pixels)
         print '[INFO] Pixel Location in Row and Col Space:'
+        pix_max_arrays = []
         for pid in pixels:
             print '[INFO] Pixel #', pid, 'at', self._pr.get_row_col(pid)
-            print 'event max amp?'#,  y(pid)
-            #SET YOUR MAX AS MAX of PIX MAXES(NEEDS to be max of each pixel's data and max of each pix max)
-            #After this all other alphas can be found by taking them as fraction of the Max of maxes
-            #plt.plot(x,y, 'b.',alpha=MAX, markersize=50)    
+            pixel_max = np.amax(timeseries(pid,stime,etime)[1])
+            print '[INFO] Maximum Amplitude of Pixel #', pid, 'is', pixel_max
+            pix_max_arrays.append(pixel_max)
+               
+        max_alpha = np.amax(pix_max_arrays)
         plt.show()
 
 
