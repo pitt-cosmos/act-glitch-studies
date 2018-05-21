@@ -55,6 +55,9 @@ Here is a list of written routines and their whereabouts
 - `todloop.filters.SpreadFilter`: filter tracks by their spreads.
 - `todloop.filters.NCosigFilter`: filter TODs by the number of coincident signals seen. 
 - `todloop.filters.TrackLengthFilter`: filter tracks by their lengths. 
+- `todloop.event.NPixelFilter`: filter events based on the number of pixels affected.
+- `todloop.event.CoeffFilter`: filter events based on correlation coefficients.
+- `todloop.event.LoadRaDec`: load RA and DEC into each events. 
 - `compile_cuts.routines.CompileCuts`: compile cuts given a TOD. 
 - `get_tracks.routines.GetTracks`: compile all tracks of a TOD and save to a key.
 - `get_tracks.routines.PlotTracks`: plot the tracks and save the plot in a folder. 
@@ -63,8 +66,10 @@ Here is a list of written routines and their whereabouts
 - `coincident_signals.routines.FindCosigs`: find coincident signals (cosigs) based on cuts.
 - `coincident_signals.routines.FindEvents`: find peaks in cosigs which correspond to physical events.
 - `calibration.routines.FixOpticalSign`: fix the optical sign of a tod.
-- `correlation.frb_routines.FRB_Correlation_Filter`: finds correlation coefficient between glitch events and FRB signal
-- `correlation.cr_routines.CR_Correlation_Filter`: finds correlation coefficient between glitch events and cosmic ray signal
+- `calibration.routines.CalibrateTOD`: calibrate TOD based on IV curve.
+- `correlation.routines.FRBCorrelationFilter`: finds correlation coefficient between glitch events and FRB signal
+- `correlation.routines.CRCorrelationFilter`: finds correlation coefficient between glitch events and cosmic ray signal
+- `correlation.routines.SlowCorrelationFilter`: finds correlation coefficient between glitch events and cosmic ray signal
 
 ## List of Utility Functions
 - `todloop.utils.pixels`: contains useful functions for accessing pixels.

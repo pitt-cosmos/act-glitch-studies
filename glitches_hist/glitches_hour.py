@@ -1,6 +1,6 @@
 from todloop.base import TODLoop
 from todloop.tod import TODInfoLoader
-from todloop.base import DataLoader
+from todloop.routines import DataLoader
 from todloop.filters import PixelFilter, DurationFilter
 from routines import GlitchHourStudy, GlitchPWVStudy, GlitchAzStudy
 

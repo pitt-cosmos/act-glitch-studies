@@ -73,7 +73,7 @@ class PlotEvents(Routine):
                 y = timeseries(pid,start_time,end_time)[1]
 
                 plt.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
-                plt.xlabel('TOD_ID: %d   TOD_NAME: %s' % (self.get_id(), self.get_name()))  # CHANGE TOD TRACK NAME
+                plt.xlabel('TOD_ID: %d    TOD_NAME: %s' % (self.get_id(), self.get_name()))  # CHANGE TOD TRACK NAME
                 plt.plot(x,y,'.-')
             
             plt.show()
@@ -92,25 +92,4 @@ class PlotEvents(Routine):
             plotter(pixels_affected, start_time, end_time)
 
 
-class NPixelFilter(Routine):
-    def __init__(self, min_pixels=0, max_pixels=100, input_key="events", output_key="events"):
-        """Scripts that run during initialization of the routine"""
-        Routine.__init__(self)
-        self._min_pixels = min_pixels
-        self._max_pixels = max_pixels
-        self._input_key = input_key
-        self._output_key = output_key
 
-    def execute(self):
-        """Scripts that run for each TOD"""
-        events = self.get_store().get(self._input_key)
-        events_filtered = [event for event in events if self._min_pixels <= event['number_of_pixels'] < self._max_pixels]
-        
-        # if no events left, skip TOD
-        if len(events_filtered) == 0:
-            self.veto()  # skip subsequent routines
-            return
-        else:
-            print '[INFO] Found %d events' % len(events_filtered)
-            self.get_store().set(self._output_key, events_filtered)
-        

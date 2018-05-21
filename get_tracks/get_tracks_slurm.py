@@ -1,4 +1,5 @@
-from todloop.base import TODLoop, DataLoader
+from todloop.base import TODLoop
+from todloop.routines import DataLoader
 from todloop.filters import DurationFilter, PixelFilter, SpreadFilter
 from routines import GetTracks, PlotTracks
 import sys

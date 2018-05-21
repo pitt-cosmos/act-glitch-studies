@@ -1,4 +1,4 @@
-from todloop.base import DataLoader
+from todloop.routines import DataLoader
 from todloop.tod import TODLoader, TODInfoLoader
 from todloop.base import TODLoop
 from routines import PlotGlitches

@@ -1,10 +1,7 @@
-from todloop.base import DataLoader
-from todloop.routines import Logger
+from todloop.routines import Logger, DataLoader
 from todloop.tod import TODLoader, TODInfoLoader
 from todloop.base import TODLoop
-from frb_routines import FRB_Correlation_Filter
-from cr_routines import CR_Correlation_Filter
-from slow_routines import Slow_Correlation_Filter
+from routines import CRCorrelationFilter, FRBCorrelationFilter, SlowCorrelationFilter
 from calibration.routines import FixOpticalSign, CalibrateTOD
 from plotter import PlotGlitches
 from histogram import PlotHistogram 
@@ -26,16 +23,15 @@ loop.add_routine(TODLoader(output_key="tod_data"))
 loop.add_routine(FixOpticalSign(input_key="tod_data", output_key="tod_data"))
 loop.add_routine(CalibrateTOD(input_key="tod_data",output_key="tod_data"))
 
-#FILTER ROUTINES (frb_routines.py, cr_routines.py, slow_routines.py)
-#loop.add_routine(FRB_Correlation_Filter(tod_key="tod_data", cosig_key="cuts", output_key ="frb_events"))
-#loop.add_routine(CR_Correlation_Filter(tod_key="tod_data", cosig_key="cuts", output_key= "cr_events"))
-#loop.add_routine(Slow_Correlation_Filter(tod_key="tod_data", cosig_key="cuts", output_key= "slow_events"))
+#FILTER ROUTINES (frb_routines.py, routines.py, slow_routines.py)
+#loop.add_routine(FRBCorrelationFilter(tod_key="tod_data", cosig_key="cuts", output_key ="frb_events"))
+#loop.add_routine(CRCorrelationFilter(tod_key="tod_data", cosig_key="cuts", output_key= "cr_events"))
+#loop.add_routine(SlowCorrelationFilter(tod_key="tod_data", cosig_key="cuts", output_key= "slow_events"))
 
 #PLOT A GLITCH (modify plotter.py to plot the specific event)
 loop.add_routine(PlotGlitches(tod_key="tod_data", cosig_key="cuts"))
 
 loop.run(10000,10001)
-
 
 
 

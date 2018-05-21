@@ -70,7 +70,6 @@ class CRPWVStudy(Routine):
         self._tod_info_key = tod_info_key
         self._event_key = event_key
 
-
     def initialize(self):
         self._glitches_pwv_hist = Hist1D(0, 7, 6)
         self._tods_pwv_hist = Hist1D(0, 7, 6)
@@ -100,4 +99,25 @@ class CRPWVStudy(Routine):
         plt.show()
 
 
+class RaDecStudy(Routine):
+    def __init__(self, input_key):
+        """Scripts that run during initialization of the routine"""
+        Routine.__init__(self)
+        self._input_key = input_key
+        self._ras = []
+        self._decs = []
 
+    def execute(self):
+        """Scripts that run for each TOD"""
+        events = self.get_store().get(self._input_key)
+        for event in events:
+            self._ras.append(event['ra'])
+            self._decs.append(event['dec'])
+        
+
+    def finalize(self):
+        """Scripts that run after processing all TODs"""
+        plt.scatter(self._ras, self._decs, alpha=0.2)
+        plt.xlabel("RA")
+        plt.ylabel("DEC")
+        plt.show()

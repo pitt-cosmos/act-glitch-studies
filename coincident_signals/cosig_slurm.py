@@ -1,5 +1,5 @@
-from todloop.base import TODLoop, DataLoader
-from todloop.routines import Logger, SaveData
+from todloop.base import TODLoop
+from todloop.routines import Logger, SaveData, DataLoader
 from routines import RemoveMCE, TrimEdges, FindCosigs, FindEvents
 import sys
 
