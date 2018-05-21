@@ -27,6 +27,20 @@ class DurationFilter(Filter):
         print '[INFO] After: n_tracks = %d' % len(cosig['peaks'])
         self.get_context().get_store().set(self._output_key, cosig)
 
+class PixelFilter(Filter):
+    """An event filter based on the number of pixels affected (set max n_pixels)"""
+    def __init__(self, max_pixels=5, input_key='data', output_key='data'):
+        Filter.__init__(self, input_key, output_key)
+        self._max_pixels = max_pixels
+        
+    def execute(self):
+        cosig = self.get_context().get_store().get(self._input_key)
+        peaks = cosig['peaks']
+        print '[INFO] Before: n_tracks = %d' % len(cosig['peaks'])
+        peaks_filtered = [peak for peak in peaks if peak[3] < self._max_pixels]
+        cosig['peaks'] = peaks_filtered
+        print '[INFO] After: n_tracks = %d' % len(cosig['peaks'])
+        self.get_context().get_store().set(self._output_key, cosig)
 
 class CorrelationFilter(Routine):
     """A base routine for correlation filter"""
