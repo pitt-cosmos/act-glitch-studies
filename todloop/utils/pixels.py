@@ -143,7 +143,7 @@ class PixelReader:
             [row], [col]"""
         return self._array_data['row'], self._array_data['col']
 
-    def get_xy_array(self):
+    def get_x_y_array(self):
         """Get the xy of the entire array for plotting"""
         return self._array_data['array_x'], self._array_data['array_y']
 
