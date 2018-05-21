@@ -1,7 +1,7 @@
 from todloop.routines import Logger, DataLoader
 from todloop.tod import TODLoader, TODInfoLoader
 from todloop.base import TODLoop
-from routines import CRCorrelationFilter, FRBCorrelationFilter, SlowCorrelationFilter
+from routines import CRCorrelationFilter, FRBCorrelationFilter, SlowCorrelationFilter, DurationFilter
 from calibration.routines import FixOpticalSign, CalibrateTOD
 from plotter import PlotGlitches
 from histogram import PlotHistogram 
@@ -26,7 +26,9 @@ loop.add_routine(CalibrateTOD(input_key="tod_data",output_key="tod_data"))
 #FILTER ROUTINES (frb_routines.py, routines.py, slow_routines.py)
 #loop.add_routine(FRBCorrelationFilter(tod_key="tod_data", cosig_key="cuts", output_key ="frb_events"))
 #loop.add_routine(CRCorrelationFilter(tod_key="tod_data", cosig_key="cuts", output_key= "cr_events"))
-#loop.add_routine(SlowCorrelationFilter(tod_key="tod_data", cosig_key="cuts", output_key= "slow_events"))
+
+loop.add_routine(DurationFilter(input_key ="cuts",output_key="slow_cuts"))
+loop.add_routine(SlowCorrelationFilter(tod_key="tod_data", cosig_key="slow_cuts", output_key= "slow_events"))
 
 #PLOT A GLITCH (modify plotter.py to plot the specific event)
 loop.add_routine(PlotGlitches(tod_key="tod_data", cosig_key="cuts"))
