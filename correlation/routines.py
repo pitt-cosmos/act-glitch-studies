@@ -1,5 +1,5 @@
-# import matplotlib
-# matplotlib.use("TKAgg")
+import matplotlib
+matplotlib.use("TKAgg")
 import numpy as np
 from scipy.interpolate import interp1d
 from todloop.base import Routine
