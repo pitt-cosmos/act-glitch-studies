@@ -83,7 +83,7 @@ class PlotGlitches(Routine):
 
 
 
-        event = [179062, 179065, 3, 3]
+        event = [225956, 225959, 3, 2]
         stime = event[0]
         etime = event[1]
         pixels = pixels_affected_in_event(cs, event)
