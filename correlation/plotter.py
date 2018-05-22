@@ -69,7 +69,7 @@ class PlotGlitches(Routine):
 
                 plt.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
 
-                plt.xlabel('TOD track: 1956')  # CHANGE TOD TRACK NAME
+                plt.xlabel('TOD track: 4025')  # CHANGE TOD TRACK NAME
 
                 plt.plot(x,y,'.-')
             
@@ -81,7 +81,7 @@ class PlotGlitches(Routine):
         """
         cs = cuts['coincident_signals']
 
-        event = [175821, 176428, 607, 19]
+        event = [89761, 89765, 4, 3]
         stime = event[0]
         etime = event[1]
         pixels = pixels_affected_in_event(cs, event)
@@ -92,7 +92,7 @@ class PlotGlitches(Routine):
         pix_max_x = []
         pix_max_y = []
         x, y = self._pr.get_x_y_array()
-        plt.figure(figsize=(10,10))
+        plt.figure(figsize=(8,8))
         plt.plot(x,y,'r.')
         
         for pid in pixels:
@@ -107,6 +107,6 @@ class PlotGlitches(Routine):
         max_alpha = np.amax(pix_max_amps)
         
         for n in np.arange(0,len(pix_max_amps)):
-            plt.plot(pix_max_x[n],pix_max_y[n], 'b.', alpha=0.8*(pix_max_amps[n]/max_alpha), markersize=50)     
-        
+            plt.plot(pix_max_x[n],pix_max_y[n], 'b.', alpha=0.8*(pix_max_amps[n]/max_alpha), markersize=40)     
+              
         plt.show()
