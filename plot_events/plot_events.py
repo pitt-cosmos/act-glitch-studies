@@ -15,4 +15,4 @@ loop.add_routine(FixOpticalSign(input_key="tod_data", output_key="tod_data"))
 loop.add_routine(CalibrateTOD(input_key="tod_data", output_key="tod_data"))
 loop.add_routine(PlotEvents(tod_key="tod_data", event_key="events"))
 
-loop.run(1000,3000)
+loop.run(0,5000)

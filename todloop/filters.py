@@ -22,6 +22,8 @@ class DurationFilter(Filter):
         peaks_filtered = [peak for peak in peaks if peak[2] < self._max_duration]
         cosig['peaks'] = peaks_filtered
         print '[INFO] After: n_tracks = %d' % len(cosig['peaks'])
+        if len(cosig['peaks']) == 0:
+            self.veto()  # stop subsequent routines
         self.get_context().get_store().set(self._output_key, cosig)
         
         
