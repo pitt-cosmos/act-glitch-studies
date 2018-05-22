@@ -21,7 +21,7 @@ class PlotGlitches(Routine):
         self._pr = PixelReader()
 
     def execute(self):
-        print '[INFO]: Plotting glitch ...'
+        print '[INFO] Plotting glitch ...'
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data
         cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
         peaks = cuts['peaks']
@@ -69,11 +69,11 @@ class PlotGlitches(Routine):
 
                 plt.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
 
-                plt.xlabel('TOD track: 1711')  # CHANGE TOD TRACK NAME
+                plt.xlabel('TOD track: 1956')  # CHANGE TOD TRACK NAME
 
                 plt.plot(x,y,'.-')
             
-            plt.show()
+            plt.show() 
 
         """
         SPECIFIC EVENT
@@ -81,16 +81,32 @@ class PlotGlitches(Routine):
         """
         cs = cuts['coincident_signals']
 
-
-        event = [21777, 21784, 7, 7]
+        event = [258815, 258817, 2, 2]
         stime = event[0]
         etime = event[1]
         pixels = pixels_affected_in_event(cs, event)
         plotter(pixels, stime, etime)
-	self._pr.plot(pixels)
-	for pix in pixels:
-            print('Pixel #', pix, 'at', self._pr.get_row_col(pix))
-        plt.show() 
+        print '[INFO] Pixel Location in Row and Col Space:'
 
-
-
+        pix_max_amps = []
+        pix_max_x = []
+        pix_max_y = []
+        x, y = self._pr.get_x_y_array()
+        plt.figure(figsize=(10,10))
+        plt.plot(x,y,'r.')
+        
+        for pid in pixels:
+            print '[INFO] Pixel #', pid, 'at', self._pr.get_row_col(pid)
+            pixel_max_amp = np.amax(timeseries(pid,stime,etime)[1])
+            print '[INFO] Maximum Amplitude of Pixel #', pid, 'is', pixel_max_amp
+            x, y = self._pr.get_x_y(pid)
+            pix_max_amps.append(pixel_max_amp)
+            pix_max_x.append(x)
+            pix_max_y.append(y)   
+        
+        max_alpha = np.amax(pix_max_amps)
+        
+        for n in np.arange(0,len(pix_max_amps)):
+            plt.plot(pix_max_x[n],pix_max_y[n], 'b.', alpha=0.8*(pix_max_amps[n]/max_alpha), markersize=50)     
+        
+        plt.show()
