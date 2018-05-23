@@ -18,14 +18,15 @@ loop.add_routine(DataLoader(input_dir="../outputs/s16_pa3_list/cosig/", output_k
 #loop.add_routine(Logger(input_key="events"))
 #loop.add_routine(PlotHistogram(events_key="events"))
 
-#LOAD TOD  DATA 
+#LOAD TOD DATA 
 loop.add_routine(TODLoader(output_key="tod_data"))
 loop.add_routine(FixOpticalSign(input_key="tod_data", output_key="tod_data"))
 loop.add_routine(CalibrateTOD(input_key="tod_data",output_key="tod_data"))
 
 #FILTER ROUTINES (frb_routines.py, routines.py, slow_routines.py)
-loop.add_routine(PixelFilter(input_key="cuts",output_key="frb_cuts"))
-loop.add_routine(FRBCorrelationFilter(tod_key="tod_data", cosig_key="frb_cuts", output_key ="frb_events"))
+
+#loop.add_routine(PixelFilter(input_key="cuts",output_key="frb_cuts"))
+#loop.add_routine(FRBCorrelationFilter(tod_key="tod_data", cosig_key="frb_cuts", output_key ="frb_events"))
 
 #loop.add_routine(CRCorrelationFilter(tod_key="tod_data", cosig_key="cuts", output_key= "cr_events"))
 
@@ -35,7 +36,7 @@ loop.add_routine(FRBCorrelationFilter(tod_key="tod_data", cosig_key="frb_cuts", 
 #PLOT A GLITCH (modify plotter.py to plot the specific event)
 loop.add_routine(PlotGlitches(tod_key="tod_data", cosig_key="cuts"))
 
-loop.run(1956, 1957)
+loop.run(3731, 3732)
 
 
 
