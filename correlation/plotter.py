@@ -82,7 +82,7 @@ class PlotGlitches(Routine):
         """
         cs = cuts['coincident_signals']
 
-        event =  [253309, 253314, 5, 3]            
+        event = [80451, 80458, 7, 4]  
 
         stime = event[0]
         etime = event[1]

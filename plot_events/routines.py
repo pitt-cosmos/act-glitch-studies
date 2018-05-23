@@ -68,6 +68,7 @@ class PlotEvents(Routine):
         """
 
         plt.figure(figsize=(8,8))
+
         gridspec.GridSpec(11,11)
 
         def plotter(pixels, start_time, end_time):
@@ -80,6 +81,7 @@ class PlotEvents(Routine):
                 plt.xlabel('TOD_ID: %d    TOD_NAME: %s' % (self.get_id(), self.get_name()))  # CHANGE TOD TRACK NAME
                 plt.plot(x,y,'.-')
             
+#            plt.show()
 
             
         """
