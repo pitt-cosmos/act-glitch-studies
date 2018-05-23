@@ -118,7 +118,7 @@ class PlotGlitches(Routine):
         
         
         plt.subplot2grid((11,11), (6,8), colspan=4, rowspan=4)
-        plt.plot(pix_location_col,pix_location_row, 'b.', alpha = 0.8, markersize=20)
+        plt.plot(pix_location_col,pix_location_row, 'b.', alpha = 1, markersize=20)
         plt.title('Loctaion of Affected Pixels',fontsize=10)
         plt.xticks(np.arange(min(pix_location_col)-1, max(pix_location_col)+2, 1.0))
         plt.xlabel('Column', fontsize=8)
