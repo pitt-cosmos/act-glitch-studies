@@ -120,7 +120,7 @@ class PlotEvents(Routine):
             max_alpha = np.amax(pix_max_amps)
 
             for n in np.arange(0, len(pix_max_amps)):
-                plt.plot(pix_max_x[n], pix_max_y[n], 'b.', alpha=0.8 * (pix_max_amps[n] / max_alpha), markersize=20)
+                plt.plot(pix_max_x[n], pix_max_y[n], 'b.', alpha=0.8 * (pix_max_amps[n] / max_alpha), markersize=40)
 
             plt.subplot2grid((11, 11), (6, 8), colspan=4, rowspan=4)
             plt.plot(pix_location_col, pix_location_row, 'b.', alpha=0.8, markersize=20)

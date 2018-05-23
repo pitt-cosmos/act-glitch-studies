@@ -17,7 +17,7 @@ class NPixelFilter(Routine):
     def execute(self):
         """Scripts that run for each TOD"""
         events = self.get_store().get(self._input_key)
-        events_filtered = [event for event in events if self._min_pixels <= event['number_of_pixels'] < self._max_pixels]
+        events_filtered = [event for event in events if self._min_pixels <= len(event['pixels_affected']) < self._max_pixels]
         self._events_passed += len(events_filtered)
         self._events_processed += len(events)
         
