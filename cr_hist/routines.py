@@ -31,7 +31,7 @@ class DurationStudy(Routine):
         self._hist = None
 
     def initialize(self):
-        self._hist = Hist1D(1, 100, 98
+        self._hist = Hist1D(1, 20, 18)
 
     def execute(self):
         events = self.get_store().get(self._event_key)

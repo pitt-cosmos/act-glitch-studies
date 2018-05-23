@@ -32,8 +32,38 @@ class NPixelFilter(Routine):
     def finalize(self):
         print '[INFO] Total events processed: %d' % self._events_processed
         print '[INFO] Total events passed: %d' % self._events_passed
-        
 
+        
+class DurationFilter(Routine):
+    def __init__(self, min_duration=1, max_duration=100, input_key="events", output_key="events"):
+        """Scripts that run during initialization of the routine"""
+        Routine.__init__(self)
+        self._min_duration = min_duration
+        self._max_duration = max_duration
+        self._input_key = input_key
+        self._output_key = output_key
+        self._events_passed = 0
+        self._events_processed = 0
+
+    def execute(self):
+        """Scripts that run for each TOD"""
+        events = self.get_store().get(self._input_key)
+        events_filtered = [event for event in events if self._min_duration <= event['duration'] < self._max_duration]
+        self._events_passed += len(events_filtered)
+        self._events_processed += len(events)
+        
+        # if no events left, skip TOD
+        if len(events_filtered) == 0:
+            self.veto()  # skip subsequent routines
+            return
+        else:
+            print '[INFO] Events passed %d / %d' % (len(events_filtered), len(events))
+            self.get_store().set(self._output_key, events_filtered)
+    
+    def finalize(self):
+        print '[INFO] Total events processed: %d' % self._events_processed
+        print '[INFO] Total events passed: %d' % self._events_passed
+        
 
 class CoeffFilter(Routine):
     def __init__(self, min_coeff=0.8, max_coeff=1, input_key="events", output_key="events"):
