@@ -81,7 +81,7 @@ class PlotGlitches(Routine):
         """
         cs = cuts['coincident_signals']
 
-        event = [258815, 258817, 2, 2]
+        event = [204918, 204922, 4, 1]
         stime = event[0]
         etime = event[1]
         pixels = pixels_affected_in_event(cs, event)
@@ -98,7 +98,7 @@ class PlotGlitches(Routine):
         for pid in pixels:
             print '[INFO] Pixel #', pid, 'at', self._pr.get_row_col(pid)
             pixel_max_amp = np.amax(timeseries(pid,stime,etime)[1])
-            print '[INFO] Maximum Amplitude of Pixel #', pid, 'is', pixel_max_amp
+            #print '[INFO] Maximum Amplitude of Pixel #', pid, 'is', pixel_max_amp
             x, y = self._pr.get_x_y(pid)
             pix_max_amps.append(pixel_max_amp)
             pix_max_x.append(x)

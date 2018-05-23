@@ -90,6 +90,6 @@ class PlotEvents(Routine):
             end_time = event['end']
             print '[INFO] Number of pixels affected: %d' % event['number_of_pixels']
             plotter(pixels_affected, start_time, end_time)
-
+            plt.show()
 
 
