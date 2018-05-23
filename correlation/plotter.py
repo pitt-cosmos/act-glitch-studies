@@ -97,7 +97,6 @@ class PlotGlitches(Routine):
         pix_location_col = []
         x, y = self._pr.get_x_y_array()
         plt.subplot2grid((11,11), (4,0), colspan=7, rowspan=7)
-        plt.title('Detector',fontsize=10)
         plt.plot(x,y,'r.')
         
         for pid in pixels:
@@ -108,8 +107,18 @@ class PlotGlitches(Routine):
             pix_max_amps.append(pixel_max_amp)
             pix_max_x.append(x)
             pix_max_y.append(y)
-            pix_location_row.append(self._pr.get_row_col(pid)[0]) 
-            pix_location_col.append(self._pr.get_row_col(pid)[1])
+            a1, a2 = self._pr.get_f1(pid)
+            b1, b2 = self._pr.get_f2(pid)    
+            pix_location_row.append(self._pr.get_row_col(a1)[0]) 
+            pix_location_col.append(self._pr.get_row_col(a1)[1])
+            pix_location_row.append(self._pr.get_row_col(a2)[0])             
+            pix_location_col.append(self._pr.get_row_col(a2)[1])
+            pix_location_row.append(self._pr.get_row_col(b1)[0])             
+            pix_location_col.append(self._pr.get_row_col(b1)[1])
+            pix_location_row.append(self._pr.get_row_col(b2)[0])             
+            pix_location_col.append(self._pr.get_row_col(b2)[1])
+
+
 
         max_alpha = np.amax(pix_max_amps)
         
@@ -118,13 +127,13 @@ class PlotGlitches(Routine):
         
         
         plt.subplot2grid((11,11), (6,8), colspan=4, rowspan=4)
-        plt.plot(pix_location_col,pix_location_row, 'b.', alpha = 1, markersize=20)
+        plt.plot(pix_location_col,pix_location_row, 'b.', alpha = 1, markersize=10)
         plt.title('Loctaion of Affected Pixels',fontsize=10)
         plt.xticks(np.arange(min(pix_location_col)-1, max(pix_location_col)+2, 1.0))
         plt.xlabel('Column', fontsize=8)
         plt.yticks(np.arange(min(pix_location_row)-1, max(pix_location_row)+2, 1.0))
         plt.ylabel('Row', fontsize=8)
-        plt.xticks(fontsize=6)
-        plt.yticks(fontsize=6)
-        plt.grid(color='k', linewidth=2)
-        plt.show()
+        plt.xticks(fontsize=5)
+        plt.yticks(fontsize=5)
+        plt.grid(color='k', linewidth=1)
+        plt.show() 
