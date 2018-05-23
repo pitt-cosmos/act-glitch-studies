@@ -68,6 +68,7 @@ class PlotEvents(Routine):
         """
 
         plt.figure(figsize=(8,8))
+
         gridspec.GridSpec(11,11)
 
         def plotter(pixels, start_time, end_time):
@@ -80,7 +81,7 @@ class PlotEvents(Routine):
                 plt.xlabel('TOD_ID: %d    TOD_NAME: %s' % (self.get_id(), self.get_name()))  # CHANGE TOD TRACK NAME
                 plt.plot(x,y,'.-')
             
-            plt.show()
+#            plt.show()
 
             
         """
@@ -103,7 +104,6 @@ class PlotEvents(Routine):
             pix_location_col = []
             x, y = self._pr.get_x_y_array()
             plt.subplot2grid((11, 11), (4, 0), colspan=7, rowspan=7)
-            plt.title('Detector', fontsize=10)
             plt.plot(x, y, 'r.')
 
             for pid in pixels_affected:
