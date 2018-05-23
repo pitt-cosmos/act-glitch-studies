@@ -2,6 +2,7 @@ import matplotlib
 matplotlib.use("TKAgg")
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 from todloop.routines import Routine
 from todloop.utils.pixels import PixelReader
 
@@ -65,14 +66,17 @@ class PlotEvents(Routine):
         and a starting time and ending time
       
         """
-        def plotter(axes, pixels,start_time,end_time):
-                        
+
+        plt.figure(figsize=(8,8))
+        gridspec.GridSpec(11,11)
+
+        def plotter(pixels, start_time, end_time):
+            plt.subplot2grid((11,11), (0,0), colspan=11, rowspan=3)
             for pid in pixels:
-               
                 x = timeseries(pid,start_time,end_time)[0]
                 y = timeseries(pid,start_time,end_time)[1]
 
-                fig.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
+                plt.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
                 plt.xlabel('TOD_ID: %d    TOD_NAME: %s' % (self.get_id(), self.get_name()))  # CHANGE TOD TRACK NAME
                 plt.plot(x,y,'.-')
             
