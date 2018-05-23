@@ -157,7 +157,6 @@ class CorrelationFilter(Routine):
 
             m_coeff = np.corrcoef(y1new,y2new)[0][1]
 
-#            print '[INFO] Correlation matrix, coefficient: ', m_coeff
             return m_coeff
 
             """
@@ -306,26 +305,8 @@ class ScatterPlot(Routine):
         slow_coeff = self.get_store().get(self._slow_input_key)
         slow_coeff = slow_coeff[:5]
         self._slow_coeff.append(slow_coeff)
-        #FRB VS CR
-        """
-        plt.scatter(frb_coeff, cr_coeff,alpha=0.7)
-        plt.xlabel('FRB Coefficients')
-        plt.ylabel('CR Coefficients')
-        plt.title('FRB vs. CR Correlation Coeff')
-        plt.show()
 
-        plt.scatter(frb_coeff, slow_coeff,alpha=0.7)
-        plt.xlabel('FRB Coefficients')
-        plt.ylabel('Slow Coefficients')
-        plt.title('FRB vs. Slow Decay Correlation Coeff')
-        plt.show()
 
-        plt.scatter(slow_coeff, cr_coeff,alpha=0.7)
-        plt.xlabel('Slow Coefficients')
-        plt.ylabel('CR Coefficients')
-        plt.title('Slow Decay  vs. CR Correlation Coeff')
-        plt.show()
-        """
     def finalize(self):
         plt.scatter(self._frb_coeff, self._cr_coeff,alpha=0.7)
         plt.xlabel('FRB Coefficients')

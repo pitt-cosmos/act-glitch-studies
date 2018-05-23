@@ -65,14 +65,14 @@ class PlotEvents(Routine):
         and a starting time and ending time
       
         """
-        def plotter(pixels,start_time,end_time):
+        def plotter(axes, pixels,start_time,end_time):
                         
             for pid in pixels:
                
                 x = timeseries(pid,start_time,end_time)[0]
                 y = timeseries(pid,start_time,end_time)[1]
 
-                plt.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
+                fig.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
                 plt.xlabel('TOD_ID: %d    TOD_NAME: %s' % (self.get_id(), self.get_name()))  # CHANGE TOD TRACK NAME
                 plt.plot(x,y,'.-')
             
@@ -83,13 +83,51 @@ class PlotEvents(Routine):
         ALL EVENTS
         Plot all pixels affected in a event one by one for all events
         """
-        
+
+        # old
         for event in events:
             pixels_affected = event['pixels_affected']
             start_time = event['start']
             end_time = event['end']
+            
+            plt.subplot(121)
             print '[INFO] Number of pixels affected: %d' % event['number_of_pixels']
-            plotter(pixels_affected, start_time, end_time)
+            for pid in pixels_affected:
+               
+                x = timeseries(pid,start_time,end_time)[0]
+                y = timeseries(pid,start_time,end_time)[1]
+
+                plt.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
+                plt.xlabel('TOD_ID: %d    TOD_NAME: %s' % (self.get_id(), self.get_name()))  # CHANGE TOD TRACK NAME
+                plt.plot(x,y,'.-')
+            
+            # plt.show()
+            plt.subplot(122)
+            # new
+            print '[INFO] Pixel Location in Row and Col Space:'
+            pix_max_amps = []
+            pix_max_x = []
+            pix_max_y = []
+            x, y = self._pr.get_x_y_array()
+            plt.plot(x, y, 'r.')
+
+            for pid in pixels_affected:
+                print '[INFO] Pixel #', pid, 'at', self._pr.get_row_col(pid)
+                pixel_max_amp = np.amax(timeseries(pid, start_time, end_time)[1])
+                # print '[INFO] Maximum Amplitude of Pixel #', pid, 'is', pixel_max_amp
+                x, y = self._pr.get_x_y(pid)
+                pix_max_amps.append(pixel_max_amp)
+                pix_max_x.append(x)
+                pix_max_y.append(y)
+
+            max_alpha = np.amax(pix_max_amps)
+            
+
+            for n in np.arange(0, len(pix_max_amps)):
+                plt.plot(pix_max_x[n], pix_max_y[n], 'b.', alpha=0.8 * (pix_max_amps[n] / max_alpha), markersize=40)
+
             plt.show()
+
+
 
 

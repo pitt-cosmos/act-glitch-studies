@@ -5,7 +5,6 @@ matplotlib.use("TKAgg")
 from matplotlib import pyplot as plt
 from todloop.utils.pixels import PixelReader
 
-
 class NPixelStudy(Routine):
     def __init__(self, event_key="events"):
         Routine.__init__(self)
@@ -24,7 +23,26 @@ class NPixelStudy(Routine):
         plt.step(*self._hist.data)
         plt.show()
 
+        
+class DurationStudy(Routine):
+    def __init__(self, event_key="events"):
+        Routine.__init__(self)
+        self._event_key = event_key
+        self._hist = None
 
+    def initialize(self):
+        self._hist = Hist1D(1, 20, 18)
+
+    def execute(self):
+        events = self.get_store().get(self._event_key)
+        for event in events:
+            self._hist.fill(event['duration'])
+
+    def finalize(self):
+        plt.step(*self._hist.data)
+        plt.show()
+
+        
 class CRHourStudy(Routine):
     """A study of glitches vs hour"""
     def __init__(self, tod_info_key="tod_info", event_key="events"):

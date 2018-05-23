@@ -18,10 +18,11 @@ loop.add_routine(DataLoader(input_dir="../outputs/s16_pa3_list/cosig/", output_k
 #loop.add_routine(Logger(input_key="events"))
 #loop.add_routine(PlotHistogram(events_key="events"))
 
-#LOAD TOD  DATA 
+#LOAD TOD DATA 
 loop.add_routine(TODLoader(output_key="tod_data"))
 loop.add_routine(FixOpticalSign(input_key="tod_data", output_key="tod_data"))
 loop.add_routine(CalibrateTOD(input_key="tod_data",output_key="tod_data"))
+
 
 #FILTER ROUTINES 
 #loop.add_routine(PixelFilter(input_key="cuts",output_key="frb_cuts"))
@@ -38,6 +39,9 @@ loop.add_routine(ScatterPlot(frb_input_key="frb_coeff",cr_input_key="cr_coeff",s
 #loop.add_routine(PlotGlitches(tod_key="tod_data", cosig_key="cuts"))
 
 loop.run(10000, 10001)
+
+
+
 
 
 
