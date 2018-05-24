@@ -94,6 +94,7 @@ class PlotGlitches(Routine):
         pix_max_y = []
         pix_location_row = []
         pix_location_col = []
+        pix_all_amps = []
         x, y = self._pr.get_x_y_array()
         plt.subplot2grid((11,11), (4,0), colspan=7, rowspan=7)
         plt.plot(x,y,'r.')
@@ -116,9 +117,12 @@ class PlotGlitches(Routine):
             pix_location_col.append(self._pr.get_row_col(b1)[1])
             pix_location_row.append(self._pr.get_row_col(b2)[0])             
             pix_location_col.append(self._pr.get_row_col(b2)[1])
-
-
-
+            pix_all_amps.append(timeseries(pid,stime,etime)[1])
+           
+#            print '[INFO] Pixel #', pid, 'has amplitude sum', np.sum(timeseries(pid,stime,etime)[1])
+    
+        #print '[INFO] Sum of all detector amplitudes from ', stime, '-', etime, 'is', np.sum(pix_all_amps)
+       
         max_alpha = np.amax(pix_max_amps)
         
         for n in np.arange(0,len(pix_max_amps)):
