@@ -126,21 +126,17 @@ class CorrelationFilter(Routine):
             NUMPY CORRELATION ROUTINE
             """
             #m_coeff = np.corrcoef(y1new,y2new)[0][1]
-           
-            #"""
-            py1 = pd.DataFrame(y1new)
-            py2 = pd.DataFrame(y2new)
-            cor = pd.rolling_corr(py1,py2,10,center=True)
-            coeff = np.array(cor)
-            coeff = coeff[np.logical_not(np.isnan(coeff))]
-            coeff = abs(coeff)
-            if len(coeff)>0:
-                m_coeff = sum(coeff)/len(coeff)
-            else:
-                m_coeff = 0.01
+
+            a = y1new
+            b = y2new
+            a = (a - np.mean(a)) / (np.std(a) * len(a))
+            b = (b - np.mean(b)) / (np.std(b))
+            c = np.correlate(a, b, 'full')
+            m_coeff = np.max(abs(c))
+            
             return m_coeff
-               
-       
+
+            
             """
             plt.subplot(211)
             plt.plot( x1new,y1new,'g--')
@@ -187,8 +183,7 @@ class CorrelationFilter(Routine):
         to check correlation for either signal 
         """
         avg_x1, avg_y1 = self._template[0], self._template[1]
-
-
+        
         """
         ALL EVENTS
         To compare all events in track to template, 
