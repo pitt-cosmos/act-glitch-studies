@@ -6,6 +6,7 @@ from todloop.base import Routine
 from todloop.utils.pixels import PixelReader
 from todloop.utils.cuts import pixels_affected_in_event
 
+
 class Filter(Routine):
     def __init__(self, input_key, output_key):
         Routine.__init__(self)
@@ -37,21 +38,20 @@ class PixelFilter(Filter):
         cosig = self.get_context().get_store().get(self._input_key)
         peaks = cosig['peaks']
         print '[INFO] Before: n_tracks = %d' % len(cosig['peaks'])
-        peaks_filtered = [peak for peak in peaks if peak[3] < self._max_pixels]
+        peaks_filtered = [peak for peak in peaks if peak[3] <= self._max_pixels]
         cosig['peaks'] = peaks_filtered
         print '[INFO] After: n_tracks = %d' % len(cosig['peaks'])
         self.get_context().get_store().set(self._output_key, cosig)
 
 class CorrelationFilter(Routine):
     """A base routine for correlation filter"""
-    def __init__(self, cosig_key, tod_key, output_key, all_coeff_output_key,coeff=0.8):
+    def __init__(self, cosig_key, tod_key, output_key, coeff=0.8):
         Routine.__init__(self)
         self._cosig_key = cosig_key
         self._tod_key = tod_key
         self._pr = None
         self._template = None
         self._output_key = output_key
-        self._all_coeff_output_key = all_coeff_output_key
         self._coeff = coeff
         self._tag = None
 
@@ -122,6 +122,7 @@ class CorrelationFilter(Routine):
 
             m_coeff = np.corrcoef(y1new,y2new)[0][1]
 
+#            print '[INFO] Correlation matrix, coefficient: ', m_coeff
             return m_coeff
 
             """
@@ -180,7 +181,6 @@ class CorrelationFilter(Routine):
 
         # Save outputs to a dictionary, here we initialize an empty dictionary
         events = []
-        all_coeffs = []
         lower_threshold = 0.6
         upper_threshold = self._coeff
 
@@ -191,10 +191,8 @@ class CorrelationFilter(Routine):
 
             if lower_threshold <= coeff < upper_threshold:
                 print '[INFO] Possible %s' % self._tag, peak, 'Coeff = ', coeff
-                all_coeffs.append(coeff)
             elif coeff >= upper_threshold:
                 print '[INFO] Highly Likely %s' % self._tag, peak, 'Coeff = ', coeff
-                all_coeffs.append(coeff)
                 start = peak[0]
                 end = peak[1]
                 duration = peak[2]
@@ -218,74 +216,28 @@ class CorrelationFilter(Routine):
 
         print '[INFO] Events passed: %d / %d' % (len(events), len(peaks))
         self.get_store().set(self._output_key, events)
-        self.get_store().set(self._all_coeff_output_key,all_coeffs)
-        
+
 
 class CRCorrelationFilter(CorrelationFilter):
     """A routine that checks for correlation between two signals"""
-    def __init__(self, cosig_key, tod_key, output_key, all_coeff_output_key, coeff=0.8):
-        CorrelationFilter.__init__(self, cosig_key, tod_key, output_key, all_coeff_output_key,coeff)
+    def __init__(self, cosig_key, tod_key, output_key, coeff=0.8):
+        CorrelationFilter.__init__(self, cosig_key, tod_key, output_key, coeff)
         self._template = np.genfromtxt('cr_template.txt')
         self._tag = "CR"
 
 
 class FRBCorrelationFilter(CorrelationFilter):
     """A routine that checks for correlation between two signals"""
-    def __init__(self, cosig_key, tod_key, output_key, all_coeff_output_key, coeff=0.8):
-        CorrelationFilter.__init__(self, cosig_key, tod_key, output_key, all_coeff_output_key, coeff)
+    def __init__(self, cosig_key, tod_key, output_key, coeff=0.8):
+        CorrelationFilter.__init__(self, cosig_key, tod_key, output_key, coeff)
         self._template = np.genfromtxt('frb_template.txt')
         self._tag = "FRB"
 
 
 class SlowCorrelationFilter(CorrelationFilter):
     """A routine that checks for correlation between two signals"""
-    def __init__(self, cosig_key, tod_key, output_key, all_coeff_output_key, coeff=0.8):
-        CorrelationFilter.__init__(self, cosig_key, tod_key, output_key, all_coeff_output_key, coeff)
+    def __init__(self, cosig_key, tod_key, output_key, coeff=0.8):
+        CorrelationFilter.__init__(self, cosig_key, tod_key, output_key, coeff)
         self._template = np.genfromtxt('slow_template.txt')
         self._tag = "SLOW_DECAY"
 
-class ScatterPlot(Routine):
-    
-    def __init__(self,frb_input_key, cr_input_key, slow_input_key):
-        Routine.__init__(self)
-        self._frb_input_key = frb_input_key
-        self._cr_input_key = cr_input_key
-        self._slow_input_key = slow_input_key
-        self._frb_coeff = []
-        self._cr_coeff = []
-        self._slow_coeff = []
-
-    def execute(self):
-        print '[INFO] Plotting scatter plots...'
-        
-        frb_coeff = self.get_store().get(self._frb_input_key)
-        frb_coeff = frb_coeff[:5]
-        self._frb_coeff.append(frb_coeff)
-
-        cr_coeff = self.get_store().get(self._cr_input_key)
-        cr_coeff = cr_coeff[:5]        
-        self._cr_coeff.append(cr_coeff)
-
-        slow_coeff = self.get_store().get(self._slow_input_key)
-        slow_coeff = slow_coeff[:5]
-        self._slow_coeff.append(slow_coeff)
-
-
-    def finalize(self):
-        plt.scatter(self._frb_coeff, self._cr_coeff,alpha=0.7)
-        plt.xlabel('FRB Coefficients')
-        plt.ylabel('CR Coefficients')
-        plt.title('FRB vs. CR Coefficients')
-        plt.show()
-
-        plt.scatter(self._frb_coeff, self._slow_coeff, alpha = 0.7)
-        plt.xlabel('FRB Coefficients')
-        plt.ylabel('Slow Coefficients')
-        plt.title('FRB vs Slow Correlation Coeff')
-        plt.show()
-
-        plt.scatter(self._slow_coeff, self._cr_coeff, alpha = 0.7)
-        plt.xlabel('Slow Coefficients')
-        plt.ylabel('CR Coefficients')
-        plt.title('Slow Decay vs CR Correlation Coeff')
-        plt.show()
