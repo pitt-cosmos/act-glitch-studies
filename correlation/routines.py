@@ -1,6 +1,8 @@
 import matplotlib
 matplotlib.use("TKAgg")
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from scipy.interpolate import interp1d
 from todloop.base import Routine
 from todloop.utils.pixels import PixelReader
@@ -37,7 +39,7 @@ class PixelFilter(Filter):
         cosig = self.get_context().get_store().get(self._input_key)
         peaks = cosig['peaks']
         print '[INFO] Before: n_tracks = %d' % len(cosig['peaks'])
-        peaks_filtered = [peak for peak in peaks if peak[3] < self._max_pixels]
+        peaks_filtered = [peak for peak in peaks if peak[3] <= self._max_pixels]
         cosig['peaks'] = peaks_filtered
         print '[INFO] After: n_tracks = %d' % len(cosig['peaks'])
         self.get_context().get_store().set(self._output_key, cosig)
@@ -108,6 +110,7 @@ class CorrelationFilter(Routine):
             return x, y
 
         def correlation(x1,x2,y1,y2):
+            
             f1 = interp1d(x1,y1)
             f2 = interp1d(x2,y2)
 
@@ -119,11 +122,25 @@ class CorrelationFilter(Routine):
 
             y1new = f1(x1new)
             y2new = f2(x2new)
-
-            m_coeff = np.corrcoef(y1new,y2new)[0][1]
-
+            """
+            NUMPY CORRELATION ROUTINE
+            """
+            #m_coeff = np.corrcoef(y1new,y2new)[0][1]
+           
+            #"""
+            py1 = pd.DataFrame(y1new)
+            py2 = pd.DataFrame(y2new)
+            cor = pd.rolling_corr(py1,py2,10,center=True)
+            coeff = np.array(cor)
+            coeff = coeff[np.logical_not(np.isnan(coeff))]
+            coeff = abs(coeff)
+            if len(coeff)>0:
+                m_coeff = sum(coeff)/len(coeff)
+            else:
+                m_coeff = 0.01
             return m_coeff
-
+               
+       
             """
             plt.subplot(211)
             plt.plot( x1new,y1new,'g--')
@@ -255,19 +272,19 @@ class ScatterPlot(Routine):
         self._cr_coeff = []
         self._slow_coeff = []
 
-    def execute(self):
+    def execute(self,num=10):
         print '[INFO] Plotting scatter plots...'
         
         frb_coeff = self.get_store().get(self._frb_input_key)
-        frb_coeff = frb_coeff[:5]
+        frb_coeff = frb_coeff[:num]
         self._frb_coeff.append(frb_coeff)
 
         cr_coeff = self.get_store().get(self._cr_input_key)
-        cr_coeff = cr_coeff[:5]        
+        cr_coeff = cr_coeff[:num]        
         self._cr_coeff.append(cr_coeff)
 
         slow_coeff = self.get_store().get(self._slow_input_key)
-        slow_coeff = slow_coeff[:5]
+        slow_coeff = slow_coeff[:num]
         self._slow_coeff.append(slow_coeff)
 
 
