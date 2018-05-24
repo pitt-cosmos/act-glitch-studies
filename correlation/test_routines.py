@@ -1,5 +1,6 @@
 import matplotlib
 matplotlib.use("TKAgg")
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.interpolate import interp1d
 from todloop.base import Routine
@@ -44,7 +45,7 @@ class PixelFilter(Filter):
 
 class CorrelationFilter(Routine):
     """A base routine for correlation filter"""
-    def __init__(self, cosig_key, tod_key, output_key, all_coeff_output_key,coeff=0.8):
+    def __init__(self, cosig_key, tod_key, output_key,all_coeff_output_key, coeff=0.8):
         Routine.__init__(self)
         self._cosig_key = cosig_key
         self._tod_key = tod_key
@@ -87,29 +88,66 @@ class CorrelationFilter(Routine):
             d_2 = d2[start_time:end_time]
             d_3 = d3[start_time:end_time]
             d_4 = d4[start_time:end_time]
-
+            
             return time, d_1
+
+        """                                                                     
+        TEMPLATE FRB or CR  AS EVENT 1                                          
+        change name of .txt file to frb_template or cr_template                 
+        to check correlation for either signal                                  
+        """
+        avg_x1, avg_y1 = self._template[0], self._template[1]
+        temp_time = len(avg_x1)
 
         def avg_signal(pixels, start_time, end_time):
 
             for pid in pixels:
 
-                # x = timeseries(pid,start_time,end_time)[0]
-                # y = timeseries(pid,start_time,end_time)[1]
-                x, y = timeseries(pid,start_time,end_time)
+                x = timeseries(pid,start_time,end_time)[0]
+                y = timeseries(pid,start_time,end_time)[1]
 
-                avg_y = np.zeros(len(y))
+                if len(x) < temp_time:
+                    buff = int(temp_time - len(x))/2
+                    x, y = timeseries(pid,start_time,end_time,buff)
+                    avg_y = np.zeros(len(y))
+                    avg_x = x 
+                    avg_y += y 
+                    x1 = avg_x1
+                    y1 = avg_y1
+                else:
+                    buff = int(len(x)-temp_time)/2
+                    pad = [0]*buff
+                    x, y = timeseries(pid,start_time,end_time)
+                    avg_y = np.zeros(len(y))
+                    avg_x = x
+                    avg_y += y
+                    x1,y1 =[],[]
+                    x1.extend(pad)
+                    x1.extend(avg_x1)
+                    x1.extend(pad)
+                    y1.extend(pad)
+                    y1.extend(avg_y1)
+                    y1.extend(pad)
 
-                avg_x = x
-                avg_y += y
 
-            x = avg_x
-            y = avg_y/len(avg_y)
-            return x, y
+            x2 = avg_x
+            y2 = avg_y/len(avg_y)
+            
+            return x1,y1,x2,y2
 
+       
         def correlation(x1,x2,y1,y2):
-            f1 = interp1d(x1,y1)
-            f2 = interp1d(x2,y2)
+          
+            #NORMALIZE THE SIGNAL BEFORE CORRELATING
+            min_y1,max_y1= np.min(y1), np.max(y1)
+            min_y2,max_y2 = np.min(y2), np.max(y2)
+            
+            norm_y1 = (y1 - min_y1)/(max_y1 - min_y1)
+            norm_y2 = (y2 - min_y2)/(max_y2 - min_y2)
+          
+            
+            f1 = interp1d(x1,norm_y1)
+            f2 = interp1d(x2,norm_y2)
 
             points = 100
             # points = 2*max(len(x1), len(x2))  # double precision
@@ -152,6 +190,7 @@ class CorrelationFilter(Routine):
         pixels1 = pixels_affected_in_event(cs, event1)
         avg_x1, avg_y1 = avg_signal(pixels1, stime1, etime1)
         np.savetxt('frb_template.txt',(avg_x1,avg_y1))
+
         
 #        event2 = [205344, 205375, 31, 35]
         event2 = [9300,9303,3,2]
@@ -162,15 +201,6 @@ class CorrelationFilter(Routine):
         
         correlation(avg_x1,avg_x2, avg_y1, avg_y2)
         """
-
-
-        """
-        TEMPLATE FRB or CR  AS EVENT 1
-        change name of .txt file to frb_template or cr_template 
-        to check correlation for either signal 
-        """
-        avg_x1, avg_y1 = self._template[0], self._template[1]
-
 
         """
         ALL EVENTS
@@ -186,15 +216,15 @@ class CorrelationFilter(Routine):
 
         for peak in peaks:
             all_pixels = pixels_affected_in_event(cs, peak)
-            avg_x2, avg_y2 = avg_signal(all_pixels, peak[0], peak[1])
+            avg_x1,avg_y1,avg_x2, avg_y2 = avg_signal(all_pixels, peak[0], peak[1])
             coeff = correlation(avg_x1, avg_x2, avg_y1, avg_y2)
 
             if lower_threshold <= coeff < upper_threshold:
                 print '[INFO] Possible %s' % self._tag, peak, 'Coeff = ', coeff
                 all_coeffs.append(coeff)
             elif coeff >= upper_threshold:
-                print '[INFO] Highly Likely %s' % self._tag, peak, 'Coeff = ', coeff
                 all_coeffs.append(coeff)
+                print '[INFO] Highly Likely %s' % self._tag, peak, 'Coeff = ', coeff
                 start = peak[0]
                 end = peak[1]
                 duration = peak[2]
@@ -219,12 +249,11 @@ class CorrelationFilter(Routine):
         print '[INFO] Events passed: %d / %d' % (len(events), len(peaks))
         self.get_store().set(self._output_key, events)
         self.get_store().set(self._all_coeff_output_key,all_coeffs)
-        
 
 class CRCorrelationFilter(CorrelationFilter):
     """A routine that checks for correlation between two signals"""
     def __init__(self, cosig_key, tod_key, output_key, all_coeff_output_key, coeff=0.8):
-        CorrelationFilter.__init__(self, cosig_key, tod_key, output_key, all_coeff_output_key,coeff)
+        CorrelationFilter.__init__(self, cosig_key, tod_key, output_key, all_coeff_output_key, coeff)
         self._template = np.genfromtxt('cr_template.txt')
         self._tag = "CR"
 
@@ -244,6 +273,7 @@ class SlowCorrelationFilter(CorrelationFilter):
         self._template = np.genfromtxt('slow_template.txt')
         self._tag = "SLOW_DECAY"
 
+
 class ScatterPlot(Routine):
     
     def __init__(self,frb_input_key, cr_input_key, slow_input_key):
@@ -256,22 +286,23 @@ class ScatterPlot(Routine):
         self._slow_coeff = []
 
     def execute(self):
-        print '[INFO] Plotting scatter plots...'
         
         frb_coeff = self.get_store().get(self._frb_input_key)
-        frb_coeff = frb_coeff[:5]
+        frb_coeff = frb_coeff[:2]
         self._frb_coeff.append(frb_coeff)
 
         cr_coeff = self.get_store().get(self._cr_input_key)
-        cr_coeff = cr_coeff[:5]        
+        cr_coeff = cr_coeff[:2]        
         self._cr_coeff.append(cr_coeff)
 
         slow_coeff = self.get_store().get(self._slow_input_key)
-        slow_coeff = slow_coeff[:5]
+        slow_coeff = slow_coeff[:2]
         self._slow_coeff.append(slow_coeff)
 
 
     def finalize(self):
+        print '[INFO] Plotting scatter plots...'
+
         plt.scatter(self._frb_coeff, self._cr_coeff,alpha=0.7)
         plt.xlabel('FRB Coefficients')
         plt.ylabel('CR Coefficients')
