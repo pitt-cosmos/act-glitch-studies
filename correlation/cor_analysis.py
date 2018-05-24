@@ -38,11 +38,7 @@ loop.add_routine(CalibrateTOD(input_key="tod_data",output_key="tod_data"))
 #PLOT A GLITCH (modify plotter.py to plot the specific event)
 loop.add_routine(PlotGlitches(tod_key="tod_data", cosig_key="cuts"))
 
-loop.run(3731,3732)
-
-
-
-
+loop.run(7140, 7141)
 
 
 
