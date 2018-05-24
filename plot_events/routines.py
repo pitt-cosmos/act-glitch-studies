@@ -2,6 +2,7 @@ import matplotlib
 matplotlib.use("TKAgg")
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 from todloop.routines import Routine
 from todloop.utils.pixels import PixelReader
 
@@ -65,18 +66,22 @@ class PlotEvents(Routine):
         and a starting time and ending time
       
         """
-        def plotter(axes, pixels,start_time,end_time):
-                        
+
+        plt.figure(figsize=(8,8))
+
+        gridspec.GridSpec(11,11)
+
+        def plotter(pixels, start_time, end_time):
+            plt.subplot2grid((11,11), (0,0), colspan=11, rowspan=3)
             for pid in pixels:
-               
                 x = timeseries(pid,start_time,end_time)[0]
                 y = timeseries(pid,start_time,end_time)[1]
 
-                fig.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
+                plt.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
                 plt.xlabel('TOD_ID: %d    TOD_NAME: %s' % (self.get_id(), self.get_name()))  # CHANGE TOD TRACK NAME
                 plt.plot(x,y,'.-')
             
-            plt.show()
+#            plt.show()
 
             
         """
@@ -89,45 +94,53 @@ class PlotEvents(Routine):
             pixels_affected = event['pixels_affected']
             start_time = event['start']
             end_time = event['end']
-            
-            plt.subplot(121)
-            print '[INFO] Number of pixels affected: %d' % event['number_of_pixels']
-            for pid in pixels_affected:
-               
-                x = timeseries(pid,start_time,end_time)[0]
-                y = timeseries(pid,start_time,end_time)[1]
-
-                plt.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
-                plt.xlabel('TOD_ID: %d    TOD_NAME: %s' % (self.get_id(), self.get_name()))  # CHANGE TOD TRACK NAME
-                plt.plot(x,y,'.-')
-            
-            # plt.show()
-            plt.subplot(122)
-            # new
+            plotter(pixels_affected, start_time, end_time)
             print '[INFO] Pixel Location in Row and Col Space:'
+
             pix_max_amps = []
             pix_max_x = []
             pix_max_y = []
+            pix_location_row = []
+            pix_location_col = []
             x, y = self._pr.get_x_y_array()
+            plt.subplot2grid((11, 11), (4, 0), colspan=7, rowspan=7)
             plt.plot(x, y, 'r.')
 
             for pid in pixels_affected:
-                print '[INFO] Pixel #', pid, 'at', self._pr.get_row_col(pid)
+                # print '[INFO] Pixel #', pid, 'at', self._pr.get_row_col(pid)
                 pixel_max_amp = np.amax(timeseries(pid, start_time, end_time)[1])
                 # print '[INFO] Maximum Amplitude of Pixel #', pid, 'is', pixel_max_amp
                 x, y = self._pr.get_x_y(pid)
                 pix_max_amps.append(pixel_max_amp)
                 pix_max_x.append(x)
                 pix_max_y.append(y)
-
-            max_alpha = np.amax(pix_max_amps)
+                a1, a2 = self._pr.get_f1(pid)
+                b1, b2 = self._pr.get_f2(pid)    
+                pix_location_row.append(self._pr.get_row_col(a1)[0]) 
+                pix_location_col.append(self._pr.get_row_col(a1)[1])
+                pix_location_row.append(self._pr.get_row_col(a2)[0])             
+                pix_location_col.append(self._pr.get_row_col(a2)[1])
+                pix_location_row.append(self._pr.get_row_col(b1)[0])             
+                pix_location_col.append(self._pr.get_row_col(b1)[1])
+                pix_location_row.append(self._pr.get_row_col(b2)[0])             
+                pix_location_col.append(self._pr.get_row_col(b2)[1])
             
+            max_alpha = np.amax(pix_max_amps)
 
             for n in np.arange(0, len(pix_max_amps)):
                 plt.plot(pix_max_x[n], pix_max_y[n], 'b.', alpha=0.8 * (pix_max_amps[n] / max_alpha), markersize=40)
 
+            plt.subplot2grid((11, 11), (6, 8), colspan=4, rowspan=4)
+            plt.plot(pix_location_col, pix_location_row, 'b.', alpha=1, markersize=10)
+            plt.title('Loctaion of Affected Pixels', fontsize=10)
+            plt.xticks(np.arange(min(pix_location_col) - 1, max(pix_location_col) + 2, 1.0))
+            plt.xlabel('Column', fontsize=8)
+            plt.yticks(np.arange(min(pix_location_row) - 1, max(pix_location_row) + 2, 1.0))
+            plt.ylabel('Row', fontsize=8)
+            plt.xticks(fontsize=5)
+            plt.yticks(fontsize=5)
+            plt.grid(color='k', linewidth=1)
             plt.show()
-
-
-
+            
+            
 

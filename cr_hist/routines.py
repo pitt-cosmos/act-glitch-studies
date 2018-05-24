@@ -23,7 +23,7 @@ class NPixelStudy(Routine):
         plt.step(*self._hist.data)
         plt.show()
 
-        
+
 class DurationStudy(Routine):
     def __init__(self, event_key="events"):
         Routine.__init__(self)
@@ -173,4 +173,37 @@ class SpatialStudy(Routine):
         plt.plot(self._rows, self._cols, 'b.', alpha=0.1)  # plot affected row / col
         plt.xlabel("Row")
         plt.ylabel("Col")
+        plt.show()
+
+
+class PixelDurationStudy(Routine):
+    def __init__(self, input_key):
+        """Study the pixel vs duration histogram"""
+        Routine.__init__(self)
+        self._input_key = input_key
+        self._npixels = []
+        self._durations = []
+
+    def initialize(self):
+        self._pr = PixelReader()
+
+    def execute(self):
+        """Scripts that run for each TOD"""
+        events = self.get_store().get(self._input_key)  # get events
+        for event in events:
+            # find the pixels affected
+            pixels_affected = event['pixels_affected']
+            self._npixels.append(event['number_of_pixels'])
+            self._durations.append(event['duration'])
+
+
+    def finalize(self):
+        """Scripts that run after processing all TODs"""
+        all_rows, all_cols = self._pr.get_row_col_array()
+        # plt.plot(all_rows, all_cols, 'r.')  # plot all rows as background
+        plt.plot(self._npixels, self._durations, 'b.', alpha=0.1)  # plot affected row / col
+        plt.xlim((0,40))
+        plt.ylim((0, 100))
+        plt.xlabel("Pixels")
+        plt.ylabel("Durations")
         plt.show()
