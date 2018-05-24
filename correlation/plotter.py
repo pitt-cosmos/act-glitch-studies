@@ -74,7 +74,7 @@ class PlotGlitches(Routine):
                 
                 plt.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
 
-                plt.xlabel('TOD track: 3731')  # CHANGE TOD TRACK NAME
+                plt.xlabel('TOD track: 7140')  # CHANGE TOD TRACK NAME
 
         """
         SPECIFIC EVENT
