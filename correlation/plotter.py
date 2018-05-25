@@ -64,10 +64,11 @@ class PlotGlitches(Routine):
             and a starting time and ending time
            
             """
-            plt.figure(figsize=(8,8))
-            gridspec.GridSpec(11,11)
+
             def plotter(pixels,start_time,end_time):
-                
+                plt.figure(figsize = (8,8))
+                gridspec.GridSpec(11,11)
+
                 plt.subplot2grid((11,11), (0,0), colspan=11, rowspan=3)                
                 for pid in pixels:
                
@@ -132,7 +133,7 @@ class PlotGlitches(Routine):
             To plot specific event, copy event from peaks below 
             """
             cs = cuts['coincident_signals']
-            e = raw_input('Please copy the event you would like to plot:')
+            e = raw_input('Please copy the event list you would like to plot:')
             event = json.loads(e)
             #event = [260584, 260589, 5, 2]
             stime = event[0]
@@ -146,12 +147,12 @@ class PlotGlitches(Routine):
             while y_n != 'n':
                 y_n = raw_input ("Would you like to plot another event? Enter y/n...")
                 if y_n == 'y':
-                    e= raw_input('Please copy the event you would like to plot:')
+                    e= raw_input('Please copy the event list you would like to plot:')
                     event = json.loads(e)
                     stime = event[0]
                     etime = event[1]
                     pixels = pixels_affected_in_event(cs, event)
-                    print '[INFO Plotting Glitch...'
+                    print '[INFO] Plotting Glitch...'
                     plotter(pixels, stime, etime)
         else:
             print 'No plot will be displayed!'
