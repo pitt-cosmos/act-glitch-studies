@@ -136,7 +136,10 @@ class CorrelationFilter(Routine):
             b = (b - np.mean(b)) / (np.std(b))
             c = np.correlate(a, b, 'full')
             m_coeff = np.max(abs(c))
+
+            return m_coeff
             """
+
             ts1 = y1
             ts2 = y2 
             l1 = len(ts1)
@@ -144,10 +147,12 @@ class CorrelationFilter(Routine):
             if l1 < l2:
                 n = l1
                 return max([np.corrcoef(ts1, ts2[i:n+i])[0][1] for i in range(0, l2-l1)])
-            else:
+            elif l2 < l1:
                 n = l2
                 return max([np.corrcoef(ts1[i:n+i], ts2)[0][1] for i in range(0, l1-l2)])
-            #return m_coeff
+            else:  # l1 == l2
+                return np.corrcoef(ts1[i:n+i], ts2)[0][1]
+
 
             
             """
