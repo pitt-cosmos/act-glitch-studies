@@ -34,11 +34,11 @@ loop.add_routine(CalibrateTOD(input_key="tod_data",output_key="tod_data"))
 FILTER ROUTINES 
 """
 
-loop.add_routine(PixelFilter(input_key="cuts",output_key="frb_cuts"))
-loop.add_routine(FRBCorrelationFilter(tod_key="tod_data", cosig_key="frb_cuts", output_key ="frb_events",all_coeff_output_key="frb_coeff"))
+#loop.add_routine(PixelFilter(input_key="cuts",output_key="frb_cuts"))
+#loop.add_routine(FRBCorrelationFilter(tod_key="tod_data", cosig_key="frb_cuts", output_key ="frb_events",all_coeff_output_key="frb_coeff"))
 
-#loop.add_routine(PixelFilter(max_pixels=10, input_key="cuts", output_key="cr_cuts"))
-#loop.add_routine(CRCorrelationFilter(tod_key="tod_data", cosig_key="cr_cuts", output_key= "cr_events",all_coeff_output_key="cr_coeff"))
+loop.add_routine(PixelFilter(min_pixels=5,max_pixels=10, input_key="cuts", output_key="cr_cuts"))
+loop.add_routine(CRCorrelationFilter(tod_key="tod_data", cosig_key="cr_cuts", output_key= "cr_events",all_coeff_output_key="cr_coeff"))
 
 #loop.add_routine(DurationFilter(input_key ="cuts",output_key="slow_cuts"))
 #loop.add_routine(SlowCorrelationFilter(tod_key="tod_data", cosig_key="slow_cuts", output_key= "slow_events",all_coeff_output_key="slow_coeff"))
@@ -53,7 +53,7 @@ PLOT A GLITCH
 """
 loop.add_routine(PlotGlitches(tod_key="tod_data", cosig_key="cuts"))
 
-loop.run(1705, 1706)
+loop.run(7572, 7573)
 
 
 
