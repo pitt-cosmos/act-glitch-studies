@@ -16,15 +16,16 @@ class Filter(Routine):
 
 class DurationFilter(Filter):
     """An event filter based on the duration of events (set max duration)"""
-    def __init__(self, min_duration=50, input_key='data', output_key='data'):
+    def __init__(self, min_duration=0,max_duration=10000, input_key='data', output_key='data'):
         Filter.__init__(self, input_key=input_key, output_key=output_key)
         self._min_duration = min_duration
-        
+        self._max_duration = max_duration
+
     def execute(self):
         cosig = self.get_context().get_store().get(self._input_key)
         peaks = cosig['peaks']
         print '[INFO] Before: n_tracks = %d' % len(cosig['peaks'])
-        peaks_filtered = [peak for peak in peaks if peak[2] > self._min_duration]
+        peaks_filtered = [peak for peak in peaks if self._min_duration < peak[2] <= self._max_duration]
         cosig['peaks'] = peaks_filtered
         print '[INFO] After: n_tracks = %d' % len(cosig['peaks'])
         self.get_context().get_store().set(self._output_key, cosig)
