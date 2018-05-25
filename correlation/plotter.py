@@ -138,7 +138,7 @@ class PlotGlitches(Routine):
             stime = event[0]
             etime = event[1]
             pixels = pixels_affected_in_event(cs, event)
-            print '[INFO Plotting Glitch...'
+            print '[INFO] Plotting Glitch...'
             plotter(pixels, stime, etime)
 
             y_n = ' '
