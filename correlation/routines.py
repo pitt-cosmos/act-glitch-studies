@@ -71,7 +71,7 @@ class CorrelationFilter(Routine):
         cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
         peaks = cuts['peaks']
 
-        def timeseries(pixel_id, s_time, e_time, buffer=0):
+        def timeseries(pixel_id, s_time, e_time, buffer=10):
 
             start_time = s_time - buffer
             end_time = e_time + buffer
@@ -257,7 +257,8 @@ class CRCorrelationFilter(CorrelationFilter):
     """A routine that checks for correlation between two signals"""
     def __init__(self, cosig_key, tod_key, output_key, all_coeff_output_key, coeff=0.8):
         CorrelationFilter.__init__(self, cosig_key, tod_key, output_key, all_coeff_output_key,coeff)
-        self._template = np.genfromtxt('cr_nobuff_template.txt')
+        #self._template = np.genfromtxt('cr_nobuff_template.txt')
+        self._template = np.genfromtxt('cr_template.txt')
         self._tag = "CR"
 
 
@@ -265,7 +266,8 @@ class FRBCorrelationFilter(CorrelationFilter):
     """A routine that checks for correlation between two signals"""
     def __init__(self, cosig_key, tod_key, output_key, all_coeff_output_key, coeff=0.8):
         CorrelationFilter.__init__(self, cosig_key, tod_key, output_key, all_coeff_output_key, coeff)
-        self._template = np.genfromtxt('frb_nobuff_template.txt')
+        #self._template = np.genfromtxt('frb_nobuff_template.txt')
+        self._template = np.genfromtxt('frb_template.txt')
         self._tag = "FRB"
 
 
@@ -273,7 +275,8 @@ class SlowCorrelationFilter(CorrelationFilter):
     """A routine that checks for correlation between two signals"""
     def __init__(self, cosig_key, tod_key, output_key, all_coeff_output_key, coeff=0.8):
         CorrelationFilter.__init__(self, cosig_key, tod_key, output_key, all_coeff_output_key, coeff)
-        self._template = np.genfromtxt('slow_nobuff_template.txt')
+        #self._template = np.genfromtxt('slow_nobuff_template.txt')
+        self._template = np.genfromtxt('slow_template.txt')
         self._tag = "SLOW_DECAY"
 
 class ScatterPlot(Routine):
