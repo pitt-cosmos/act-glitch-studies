@@ -31,7 +31,7 @@ class PlotGlitches(Routine):
             peaks = cuts['peaks']
             #print('[INFO] peaks: ', peaks)
         
-            def timeseries(pixel_id, s_time, e_time, buffer=10):
+            def timeseries(pixel_id, s_time, e_time, buffer=0):
 
                 start_time = s_time - buffer
                 end_time = e_time + buffer
@@ -66,6 +66,7 @@ class PlotGlitches(Routine):
             """
 
             def plotter(pixels,start_time,end_time):
+
                 plt.figure(figsize = (8,8))
                 gridspec.GridSpec(11,11)
 
