@@ -109,12 +109,12 @@ class PlotGlitches(Routine):
                     pix_location_col.append(np.float(self._pr.get_row_col(b1)[1]))
                     pix_location_row.append(np.float(self._pr.get_row_col(b2)[0]))             
                     pix_location_col.append(np.float(self._pr.get_row_col(b2)[1]))
-                    #pix_all_amps.append(timeseries(pid,stime,etime)[1])
+                    pix_all_amps.append(timeseries(pid,stime,etime)[1])
                     #print 'get row of a1 is', np.float(self._pr.get_row_col(a1)[0]),'Row - Cornell', np.floor(pid/32.)
                     #print 'get col of a1 is', np.float(self._pr.get_row_col(a1)[1]),'Col - Cornell method', pid - np.floor(pid/32.)*32. 
                 
                 max_alpha = np.amax(pix_max_amps)
-        
+                
                 for n in np.arange(0,len(pix_max_amps)):
                     plt.plot(pix_max_x[n],pix_max_y[n], 'b.', alpha=0.8*(pix_max_amps[n]/max_alpha), markersize=20)
                 
@@ -130,7 +130,8 @@ class PlotGlitches(Routine):
                 plt.grid(color='k', linewidth=1)
                 plt.show() 
                 
-
+                print 'Total Power of selected event is', np.sum(pix_all_amps)/10.**(-12.), 'picowatts'
+                #print 'Total Energy  of selected event is', (np.sum(pix_all_amps)*((etime-stime)*'step size'))/10.**(-12.), 'picoJoules'
             """
             SPECIFIC EVENT
             To plot specific event, copy event from peaks below 
