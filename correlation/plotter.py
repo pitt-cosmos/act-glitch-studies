@@ -141,7 +141,7 @@ class PlotGlitches(Routine):
                     for i in range(0,len(pix_all_amps)):
                         print '[INFO] Total Power of pixel', pix_id_lat[i], 'is', pWatts, 'picoWatts'
                         print '[INFO] Total Energy of pixel', pix_id_lat[i],' is',pWatts*(end_time-start_time), 'picoJoules'
-                  
+                 #redo energy for timeseries to recall pixels  but for all 4 detectors 
 
 
 
