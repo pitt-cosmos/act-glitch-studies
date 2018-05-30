@@ -131,7 +131,7 @@ class PlotGlitches(Routine):
                 plt.grid(color='k', linewidth=1)
                 plt.show() 
                 
-                print '[INFO] Total Power of selected event is', np.sum(pix_all_amps)/(10.**(-12.)), 'picowatts'
+                #print '[INFO] Total Power of selected event is', np.sum(pix_all_amps)/(400.*10.**(-12.)), 'picowatts'
                 print '[INFO] Total Energy  of selected event is', (np.sum(pix_all_amps)*((etime-stime)))/(400.*10.**(-12.)), 'picoJoules'
 
 
