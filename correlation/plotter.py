@@ -13,8 +13,9 @@ from todloop.utils.cuts import pixels_affected_in_event
 
 class PlotGlitches(Routine):
     """A routine that plot glitches"""
-    def __init__(self, cosig_key, tod_key):
+    def __init__(self, tag, cosig_key, tod_key):
         Routine.__init__(self)
+        self._tag = tag
         self._cosig_key = cosig_key
         self._tod_key = tod_key
         self._pr = None
@@ -78,7 +79,7 @@ class PlotGlitches(Routine):
                 
                     plt.plot(x,y,'.-')
                     plt.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
-                    plt.xlabel('TOD track: 7140')  # CHANGE TOD TRACK NAME
+                    plt.xlabel('TOD track:' + str(self._tag))  # CHANGE TOD TRACK NAME
 
                 pix_max_amps = []
                 pix_max_x = []
