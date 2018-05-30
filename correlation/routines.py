@@ -220,13 +220,13 @@ class CorrelationFilter(Routine):
             all_pixels = pixels_affected_in_event(cs, peak)
             avg_x2, avg_y2 = avg_signal(all_pixels, peak[0], peak[1])
             coeff = correlation(avg_x1, avg_x2, avg_y1, avg_y2)
-
+            all_coeffs.append(coeff)
             if lower_threshold <= coeff < upper_threshold:
                 print '[INFO] Possible %s' % self._tag, peak, 'Coeff = ', coeff
-                all_coeffs.append(coeff)
+                #all_coeffs.append(coeff)
             elif coeff >= upper_threshold:
                 print '[INFO] Highly Likely %s' % self._tag, peak, 'Coeff = ', coeff
-                all_coeffs.append(coeff)
+                #all_coeffs.append(coeff)
                 start = peak[0]
                 end = peak[1]
                 duration = peak[2]
@@ -290,7 +290,7 @@ class ScatterPlot(Routine):
         self._cr_coeff = []
         self._slow_coeff = []
 
-    def execute(self,num=8):
+    def execute(self,num=40):
         print '[INFO] Plotting scatter plots...'
         
         frb_coeff = self.get_store().get(self._frb_input_key)
