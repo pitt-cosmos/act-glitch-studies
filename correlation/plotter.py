@@ -86,7 +86,8 @@ class PlotGlitches(Routine):
                 pix_max_y = []
                 pix_location_row = []
                 pix_location_col = []
-                pix_all_amps = []
+                pix_id_lat = []
+                pix_all_amps = []                
                 x1, y1 = self._pr.get_x_y_array()
                 plt.subplot2grid((11,11), (4,0), colspan=7, rowspan=7)
                 plt.plot(x1,y1,'r.')
@@ -110,7 +111,9 @@ class PlotGlitches(Routine):
                     pix_location_col.append(np.float(self._pr.get_row_col(b1)[1]))
                     pix_location_row.append(np.float(self._pr.get_row_col(b2)[0]))             
                     pix_location_col.append(np.float(self._pr.get_row_col(b2)[1]))
-                    pix_all_amps.append(timeseries(pid,stime,etime)[1])
+                    pix_all_amps.append(timeseries(pid,stime,etime,buffer=0)[1])
+                    pix_id_lat.append(pid)
+ 
                     #print 'get row of a1 is', np.float(self._pr.get_row_col(a1)[0]),'Row - Cornell', np.floor(pid/32.)
                     #print 'get col of a1 is', np.float(self._pr.get_row_col(a1)[1]),'Col - Cornell method', pid - np.floor(pid/32.)*32. 
                 
@@ -130,10 +133,15 @@ class PlotGlitches(Routine):
                 plt.yticks(fontsize=5)
                 plt.grid(color='k', linewidth=1)
                 plt.show() 
-                
-                #print '[INFO] Total Power of selected event is', np.sum(pix_all_amps)/(400.*10.**(-12.)), 'picowatts'
-                print '[INFO] Total Energy  of selected event is', (np.sum(pix_all_amps)*((etime-stime)))/(400.*10.**(-12.)), 'picoJoules'
-
+              
+                for array in pix_all_amps:
+                    array_min = np.amin(array)
+                    new_pix_amps = array-array_min 
+                    pWatts = np.sum(new_pix_amps)*10**(12)/(400.)
+                    for i in range(0,len(pix_all_amps)):
+                        print '[INFO] Total Power of pixel', pix_id_lat[i], 'is', pWatts, 'picoWatts'
+                        print '[INFO] Total Energy of pixel', pix_id_lat[i],' is',pWatts*(end_time-start_time), 'picoJoules'
+                  
 
 
 
