@@ -131,8 +131,13 @@ class PlotGlitches(Routine):
                 plt.grid(color='k', linewidth=1)
                 plt.show() 
                 
-                print 'Total Power of selected event is', np.sum(pix_all_amps)/10.**(-12.), 'picowatts'
-                #print 'Total Energy  of selected event is', (np.sum(pix_all_amps)*((etime-stime)*'step size'))/10.**(-12.), 'picoJoules'
+                print 'Total Power of selected event is', np.sum(pix_all_amps)/(10.**(-12.)), 'picowatts'
+                print 'Total Energy  of selected event is', (np.sum(pix_all_amps)*((etime-stime)))/(400.*10.**(-12.)), 'picoJoules'
+
+
+
+
+
             """
             SPECIFIC EVENT
             To plot specific event, copy event from peaks below 
