@@ -95,7 +95,7 @@ class PlotGlitches(Routine):
                 for pid in pixels:
 
                     #print '[INFO] Pixel #', pid, 'at', self._pr.get_row_col(pid)
-                    pixel_max_amp = np.amax(timeseries(pid,stime,etime)[1])
+                    pixel_max_amp = np.amax(timeseries(pid,start_time,end_time)[1])
                     #print '[INFO] Maximum Amplitude of Pixel #', pid, 'is', pixel_max_amp
                     x, y = self._pr.get_x_y(pid)
                     pix_max_amps.append(pixel_max_amp)
@@ -134,6 +134,8 @@ class PlotGlitches(Routine):
                 plt.grid(color='k', linewidth=1)
                 plt.show() 
               
+
+
                 for array in pix_all_amps:
                     array_min = np.amin(array)
                     new_pix_amps = array-array_min 
