@@ -112,17 +112,17 @@ class PlotGlitches(Routine):
 
                 def total_energy(pid,start_time,end_time):
 
-                    pix_id_lat = []
+                    #pix_id_lat = []
                     pix_all_amps = []
-                    freq_list = []                
+                    #freq_list = []                
                                     
                     pix_all_amps.append(energyseries(pid,start_time,end_time,buffer=0)[1])
                     pix_all_amps.append(energyseries(pid,start_time,end_time,buffer=0)[2])
                     pix_all_amps.append(energyseries(pid,start_time,end_time,buffer=0)[3])
                     pix_all_amps.append(energyseries(pid,start_time,end_time,buffer=0)[4])
                     
-                    pix_id_lat.extend((pid, pid, pid, pid))
-                    freq_list.extend((90,90,150,150))
+                    #pix_id_lat.extend((pid, pid, pid, pid))
+                    #freq_list.extend((90,90,150,150))
 
                     
                     Det_pWatts_90_a = []
@@ -186,6 +186,18 @@ class PlotGlitches(Routine):
                         
                         #print '[INFO] Total Power, 150b  is', Tot_pW_150b, 'pWatts'                                                                                                         
                         print '[INFO] Total Energy, 150b is', Tot_pJ_150b, 'pJoules'
+                        
+                        
+                        values = [Tot_pJ_90a,Tot_pJ_90b,Tot_pJ_150a,Tot_pJ_150b]
+                        min_value = np.amin(values)
+                        max_value = np.amax(values)
+                        percent_threshold = 0.50 #Percent Threshold
+                        top = 1+percent_threshold
+                        bot = 1-percent_threshold
+                        if Tot_pJ_90a<=min_value*top and Tot_pJ_90a>=max_value*bot and Tot_pJ_90b<=min_value*top and Tot_pJ_90b>=max_value*bot and Tot_pJ_150a<=min_value*top and Tot_pJ_150a>=max_value*bot and Tot_pJ_150b<=min_value*top and Tot_pJ_150b>=max_value*bot:
+                            print 'FRB frequencies are within specified % threshold'
+                        else:
+                            print 'FRB frequencies fail threshold test'
 
                 for pid in pixels:
 
