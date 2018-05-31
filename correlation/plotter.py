@@ -38,23 +38,15 @@ class PlotGlitches(Routine):
                 end_time = e_time + buffer
                 
                 a1, a2 = self._pr.get_f1(pixel_id)
-                b1, b2 = self._pr.get_f2(pixel_id)
                 d1, d2 = tod_data.data[a1], tod_data.data[a2]
-                d3, d4 = tod_data.data[b1], tod_data.data[b2]
 
                 # try to remove the mean from start_time to end_time
                 d1 -= np.mean(d1[start_time:end_time])
-                d2 -= np.mean(d2[start_time:end_time])
-                d3 -= np.mean(d3[start_time:end_time])
-                d4 -= np.mean(d4[start_time:end_time])
                 
                 time = tod_data.ctime - tod_data.ctime[0]
                 time = time[start_time:end_time]
             
                 d_1 = d1[start_time:end_time]
-                d_2 = d2[start_time:end_time]
-                d_3 = d3[start_time:end_time]
-                d_4 = d4[start_time:end_time]
             
                 return time, d_1
 
