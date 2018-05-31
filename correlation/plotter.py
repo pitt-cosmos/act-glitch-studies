@@ -209,17 +209,17 @@ class PlotGlitches(Routine):
                 Tot_pJ_150a = np.sum(Det_pJoules_150_a)
                 Tot_pJ_150b = np.sum(Det_pJoules_150_b)
 
-                print '[INFO] Total Power of Event on Detector in frequency 90a is', Tot_pW_90a, 'picoWatts'
-                print '[INFO] Total Energy of Event on Detector in frequency 90a is', Tot_pJ_90a, 'picoJoules'
+                #print '[INFO] Total Power, 90a is', Tot_pW_90a, 'pWatts'
+                print '[INFO] Total Energy, 90a is', Tot_pJ_90a, 'pJoules'
+               
+                #print '[INFO] Total Power, 90b is', Tot_pW_90b, 'pWatts'
+                print '[INFO] Total Energy, 90b is', Tot_pJ_90b, 'pJoules'
 
-                print '[INFO] Total Power of Event on Detector in frequency 90b is', Tot_pW_90b, 'picoWatts'
-                print '[INFO] Total Energy of Event on Detector in frequency 90b is', Tot_pJ_90b, 'picoJoules'
+                #print '[INFO] Total Power, 150a is', Tot_pW_150a, 'pWatts'
+                print '[INFO] Total Energy, 150a is', Tot_pJ_150a, 'pJoules'
 
-                print '[INFO] Total Power of Event on Detector in frequency 150a is', Tot_pW_150a, 'picoWatts'
-                print '[INFO] Total Energy of Event on Detector in frequency 150a is', Tot_pJ_150a, 'picoJoules'
-
-                print '[INFO] Total Power of Event on Detector in frequency 150b is', Tot_pW_150b, 'picoWatts'
-                print '[INFO] Total Energy of Event on Detector in frequency 150b is', Tot_pJ_150b, 'picoJoules'
+                #print '[INFO] Total Power, 150b  is', Tot_pW_150b, 'pWatts'
+                print '[INFO] Total Energy, 150b is', Tot_pJ_150b, 'pJoules'
 
 
 
