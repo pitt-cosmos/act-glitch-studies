@@ -104,12 +104,88 @@ class PlotGlitches(Routine):
                 pix_max_y = []
                 pix_location_row = []
                 pix_location_col = []
-                pix_id_lat = []
-                pix_all_amps = []                
-                freq_list = []
+                                                
                 x1, y1 = self._pr.get_x_y_array()
                 plt.subplot2grid((11,11), (4,0), colspan=7, rowspan=7)
                 plt.plot(x1,y1,'r.')
+
+
+                def total_energy(pid,start_time,end_time):
+
+                    pix_id_lat = []
+                    pix_all_amps = []
+                    freq_list = []                
+                                    
+                    pix_all_amps.append(energyseries(pid,start_time,end_time,buffer=0)[1])
+                    pix_all_amps.append(energyseries(pid,start_time,end_time,buffer=0)[2])
+                    pix_all_amps.append(energyseries(pid,start_time,end_time,buffer=0)[3])
+                    pix_all_amps.append(energyseries(pid,start_time,end_time,buffer=0)[4])
+                    
+                    pix_id_lat.extend((pid, pid, pid, pid))
+                    freq_list.extend((90,90,150,150))
+
+                    
+                    Det_pWatts_90_a = []
+                    Det_pWatts_90_b = []
+                    Det_pWatts_150_a = []
+                    Det_pWatts_150_b = []
+                    
+                    Det_pJoules_90_a = []
+                    Det_pJoules_90_b = []
+                    Det_pJoules_150_a = []
+                    Det_pJoules_150_b = []
+                    
+                    for i in range(0, len(pix_all_amps),4):
+                        ampid_1 = pix_all_amps[i]
+                        array_min_1 = np.amin(ampid_1)
+                        new_pix_amps_1 = ampid_1-array_min_1
+                        pWatts_1 = np.sum(new_pix_amps_1)*10**(12)/(400.)
+                        Det_pWatts_90_a.append(pWatts_1)
+                        Det_pJoules_90_a.append(pWatts_1*(end_time-start_time))
+                        
+                        ampid_2 = pix_all_amps[i+1]
+                        array_min_2 = np.amin(ampid_2)
+                        new_pix_amps_2 = ampid_2-array_min_2
+                        pWatts_2 = np.sum(new_pix_amps_2)*10**(12)/(400.)
+                        Det_pWatts_90_b.append(pWatts_2)
+                        Det_pJoules_90_b.append(pWatts_2*(end_time-start_time))
+                        
+                        ampid_3 = pix_all_amps[i+2]
+                        array_min_3 = np.amin(ampid_3)
+                        new_pix_amps_3 = ampid_3-array_min_3
+                        pWatts_3 = np.sum(new_pix_amps_3)*10**(12)/(400.)
+                        Det_pWatts_150_a.append(pWatts_3)
+                        Det_pJoules_150_a.append(pWatts_3*(end_time-start_time))
+                        
+                        ampid_4 = pix_all_amps[i+3]
+                        array_min_4 = np.amin(ampid_4)
+                        new_pix_amps_4 = ampid_4-array_min_4
+                        pWatts_4 = np.sum(new_pix_amps_4)*10**(12)/(400.)
+                        Det_pWatts_150_b.append(pWatts_4)
+                        Det_pJoules_150_b.append(pWatts_4*(end_time-start_time))
+
+
+                        Tot_pW_90a = np.sum(Det_pWatts_90_a)
+                        Tot_pW_90b = np.sum(Det_pWatts_90_b)
+                        Tot_pW_150a = np.sum(Det_pWatts_150_a)
+                        Tot_pW_150b = np.sum(Det_pWatts_150_b)
+                        
+                        Tot_pJ_90a = np.sum(Det_pJoules_90_a)
+                        Tot_pJ_90b = np.sum(Det_pJoules_90_b)
+                        Tot_pJ_150a = np.sum(Det_pJoules_150_a)
+                        Tot_pJ_150b = np.sum(Det_pJoules_150_b)
+                        
+                        #print '[INFO] Total Power, 90a is', Tot_pW_90a, 'pWatts'                                                                                                            
+                        print '[INFO] Total Energy, 90a is', Tot_pJ_90a, 'pJoules'
+                        
+                        #print '[INFO] Total Power, 90b is', Tot_pW_90b, 'pWatts'                                                                                                            
+                        print '[INFO] Total Energy, 90b is', Tot_pJ_90b, 'pJoules'
+                        
+                        #print '[INFO] Total Power, 150a is', Tot_pW_150a, 'pWatts'                                                                                                          
+                        print '[INFO] Total Energy, 150a is', Tot_pJ_150a, 'pJoules'
+                        
+                        #print '[INFO] Total Power, 150b  is', Tot_pW_150b, 'pWatts'                                                                                                         
+                        print '[INFO] Total Energy, 150b is', Tot_pJ_150b, 'pJoules'
 
                 for pid in pixels:
 
@@ -129,15 +205,10 @@ class PlotGlitches(Routine):
                     pix_location_col.append(np.float(self._pr.get_row_col(b1)[1]))
                     pix_location_row.append(np.float(self._pr.get_row_col(b2)[0]))             
                     pix_location_col.append(np.float(self._pr.get_row_col(b2)[1]))  
-
-                    pix_all_amps.append(energyseries(pid,start_time,end_time,buffer=0)[1])
-                    pix_all_amps.append(energyseries(pid,start_time,end_time,buffer=0)[2])
-                    pix_all_amps.append(energyseries(pid,start_time,end_time,buffer=0)[3])
-                    pix_all_amps.append(energyseries(pid,start_time,end_time,buffer=0)[4])
-
-
-                    pix_id_lat.extend((pid, pid, pid, pid))
-                    freq_list.extend((90,90,150,150))
+                    
+                    print 'Detector UID: ', pid
+                    total_energy(pid,start_time,end_time)
+                    
                     #print 'get row of a1 is', np.float(self._pr.get_row_col(a1)[0]),'Row - Cornell', np.floor(pid/32.)
                     #print 'get col of a1 is', np.float(self._pr.get_row_col(a1)[1]),'Col - Cornell method', pid - np.floor(pid/32.)*32. 
                
@@ -159,70 +230,6 @@ class PlotGlitches(Routine):
                 plt.show() 
               
                     
-                Det_pWatts_90_a = []
-                Det_pWatts_90_b = []                
-                Det_pWatts_150_a = []
-                Det_pWatts_150_b = []
-
-                Det_pJoules_90_a = []
-                Det_pJoules_90_b = []      
-                Det_pJoules_150_a = []
-                Det_pJoules_150_b = []
-
-
-                for i in range(0, len(pix_all_amps),4):
-                    ampid_1 = pix_all_amps[i]
-                    array_min_1 = np.amin(ampid_1)
-                    new_pix_amps_1 = ampid_1-array_min_1
-                    pWatts_1 = np.sum(new_pix_amps_1)*10**(12)/(400.)
-                    Det_pWatts_90_a.append(pWatts_1)
-                    Det_pJoules_90_a.append(pWatts_1*(end_time-start_time))
-                   
-                    ampid_2 = pix_all_amps[i+1]
-                    array_min_2 = np.amin(ampid_2)
-                    new_pix_amps_2 = ampid_2-array_min_2
-                    pWatts_2 = np.sum(new_pix_amps_2)*10**(12)/(400.)
-                    Det_pWatts_90_b.append(pWatts_2)
-                    Det_pJoules_90_b.append(pWatts_2*(end_time-start_time)) 
-                   
-                    ampid_3 = pix_all_amps[i+2]
-                    array_min_3 = np.amin(ampid_3)
-                    new_pix_amps_3 = ampid_3-array_min_3
-                    pWatts_3 = np.sum(new_pix_amps_3)*10**(12)/(400.)
-                    Det_pWatts_150_a.append(pWatts_3)
-                    Det_pJoules_150_a.append(pWatts_3*(end_time-start_time))
-                   
-                    ampid_4 = pix_all_amps[i+3]
-                    array_min_4 = np.amin(ampid_4)
-                    new_pix_amps_4 = ampid_4-array_min_4
-                    pWatts_4 = np.sum(new_pix_amps_4)*10**(12)/(400.)
-                    Det_pWatts_150_b.append(pWatts_4)
-                    Det_pJoules_150_b.append(pWatts_4*(end_time-start_time))
-                  
-                Tot_pW_90a = np.sum(Det_pWatts_90_a)
-                Tot_pW_90b = np.sum(Det_pWatts_90_b)
-                Tot_pW_150a = np.sum(Det_pWatts_150_a)
-                Tot_pW_150b = np.sum(Det_pWatts_150_b)
-
-                Tot_pJ_90a = np.sum(Det_pJoules_90_a)
-                Tot_pJ_90b = np.sum(Det_pJoules_90_b)
-                Tot_pJ_150a = np.sum(Det_pJoules_150_a)
-                Tot_pJ_150b = np.sum(Det_pJoules_150_b)
-
-                #print '[INFO] Total Power, 90a is', Tot_pW_90a, 'pWatts'
-                print '[INFO] Total Energy, 90a is', Tot_pJ_90a, 'pJoules'
-               
-                #print '[INFO] Total Power, 90b is', Tot_pW_90b, 'pWatts'
-                print '[INFO] Total Energy, 90b is', Tot_pJ_90b, 'pJoules'
-
-                #print '[INFO] Total Power, 150a is', Tot_pW_150a, 'pWatts'
-                print '[INFO] Total Energy, 150a is', Tot_pJ_150a, 'pJoules'
-
-                #print '[INFO] Total Power, 150b  is', Tot_pW_150b, 'pWatts'
-                print '[INFO] Total Energy, 150b is', Tot_pJ_150b, 'pJoules'
-
-
-
 
             """
             SPECIFIC EVENT
