@@ -51,6 +51,32 @@ class PlotGlitches(Routine):
                 return time, d_1
 
 
+            def energyseries(pixel_id, s_time, e_time, buffer=0):
+
+                start_time = s_time - buffer
+                end_time = e_time + buffer
+
+                a1, a2 = self._pr.get_f1(pixel_id)
+                b1, b2 = self._pr.get_f2(pixel_id)
+                d1, d2 = tod_data.data[a1], tod_data.data[a2]
+                d3, d4 = tod_data.data[b1], tod_data.data[b2]
+
+                d1 -= np.mean(d1[start_time:end_time])
+                d2 -= np.mean(d2[start_time:end_time])
+                d3 -= np.mean(d3[start_time:end_time])
+                d4 -= np.mean(d4[start_time:end_time])
+
+                time = tod_data.ctime - tod_data.ctime[0]
+                time = time[start_time:end_time]
+
+                d_1 = d1[start_time:end_time]
+                d_2 = d2[start_time:end_time]
+                d_3 = d3[start_time:end_time]
+                d_4 = d4[start_time:end_time]
+
+                return time, d_1, d_2, d_3, d_4
+
+
             """
             PLOTTING FUNCTION
             Plot all pixels affected given an array of pixel id
@@ -80,17 +106,17 @@ class PlotGlitches(Routine):
                 pix_location_col = []
                 pix_id_lat = []
                 pix_all_amps = []                
+                freq_list = []
                 x1, y1 = self._pr.get_x_y_array()
                 plt.subplot2grid((11,11), (4,0), colspan=7, rowspan=7)
                 plt.plot(x1,y1,'r.')
 
                 for pid in pixels:
 
-                    #print '[INFO] Pixel #', pid, 'at', self._pr.get_row_col(pid)
-                    pixel_max_amp = np.amax(timeseries(pid,start_time,end_time)[1])
-                    #print '[INFO] Maximum Amplitude of Pixel #', pid, 'is', pixel_max_amp
+                    pixel_max_amp_1 = np.amax(timeseries(pid,start_time,end_time)[1])
                     x, y = self._pr.get_x_y(pid)
-                    pix_max_amps.append(pixel_max_amp)
+                    pix_max_amps.append(pixel_max_amp_1)
+
                     pix_max_x.append(x)
                     pix_max_y.append(y)
                     a1, a2 = self._pr.get_f1(pid)
@@ -102,18 +128,24 @@ class PlotGlitches(Routine):
                     pix_location_row.append(np.float(self._pr.get_row_col(b1)[0]))             
                     pix_location_col.append(np.float(self._pr.get_row_col(b1)[1]))
                     pix_location_row.append(np.float(self._pr.get_row_col(b2)[0]))             
-                    pix_location_col.append(np.float(self._pr.get_row_col(b2)[1]))
-                    pix_all_amps.append(timeseries(pid,stime,etime,buffer=0)[1])
-                    pix_id_lat.append(pid)
- 
+                    pix_location_col.append(np.float(self._pr.get_row_col(b2)[1]))  
+
+                    pix_all_amps.append(energyseries(pid,start_time,end_time,buffer=0)[1])
+                    pix_all_amps.append(energyseries(pid,start_time,end_time,buffer=0)[2])
+                    pix_all_amps.append(energyseries(pid,start_time,end_time,buffer=0)[3])
+                    pix_all_amps.append(energyseries(pid,start_time,end_time,buffer=0)[4])
+
+
+                    pix_id_lat.extend((pid, pid, pid, pid))
+                    freq_list.extend((90,90,150,150))
                     #print 'get row of a1 is', np.float(self._pr.get_row_col(a1)[0]),'Row - Cornell', np.floor(pid/32.)
                     #print 'get col of a1 is', np.float(self._pr.get_row_col(a1)[1]),'Col - Cornell method', pid - np.floor(pid/32.)*32. 
+               
                 
                 max_alpha = np.amax(pix_max_amps)
-                
                 for n in np.arange(0,len(pix_max_amps)):
                     plt.plot(pix_max_x[n],pix_max_y[n], 'b.', alpha=0.8*(pix_max_amps[n]/max_alpha), markersize=20)
-                
+                 
                 plt.subplot2grid((11,11), (6,8), colspan=4, rowspan=4)
                 plt.plot(pix_location_col,pix_location_row, 'b.', alpha = 1, markersize=10)
                 plt.title('Location of Affected Pixels',fontsize=10)
@@ -126,16 +158,68 @@ class PlotGlitches(Routine):
                 plt.grid(color='k', linewidth=1)
                 plt.show() 
               
+                    
+                Det_pWatts_90_a = []
+                Det_pWatts_90_b = []                
+                Det_pWatts_150_a = []
+                Det_pWatts_150_b = []
+
+                Det_pJoules_90_a = []
+                Det_pJoules_90_b = []      
+                Det_pJoules_150_a = []
+                Det_pJoules_150_b = []
 
 
-                for array in pix_all_amps:
-                    array_min = np.amin(array)
-                    new_pix_amps = array-array_min 
-                    pWatts = np.sum(new_pix_amps)*10**(12)/(400.)
-                    for i in range(0,len(pix_all_amps)):
-                        print '[INFO] Total Power of pixel', pix_id_lat[i], 'is', pWatts, 'picoWatts'
-                        print '[INFO] Total Energy of pixel', pix_id_lat[i],' is',pWatts*(end_time-start_time), 'picoJoules'
-                 #redo energy for timeseries to recall pixels  but for all 4 detectors 
+                for i in range(0, len(pix_all_amps),4):
+                    ampid_1 = pix_all_amps[i]
+                    array_min_1 = np.amin(ampid_1)
+                    new_pix_amps_1 = ampid_1-array_min_1
+                    pWatts_1 = np.sum(new_pix_amps_1)*10**(12)/(400.)
+                    Det_pWatts_90_a.append(pWatts_1)
+                    Det_pJoules_90_a.append(pWatts_1*(end_time-start_time))
+                   
+                    ampid_2 = pix_all_amps[i+1]
+                    array_min_2 = np.amin(ampid_2)
+                    new_pix_amps_2 = ampid_2-array_min_2
+                    pWatts_2 = np.sum(new_pix_amps_2)*10**(12)/(400.)
+                    Det_pWatts_90_b.append(pWatts_2)
+                    Det_pJoules_90_b.append(pWatts_2*(end_time-start_time)) 
+                   
+                    ampid_3 = pix_all_amps[i+2]
+                    array_min_3 = np.amin(ampid_3)
+                    new_pix_amps_3 = ampid_3-array_min_3
+                    pWatts_3 = np.sum(new_pix_amps_3)*10**(12)/(400.)
+                    Det_pWatts_150_a.append(pWatts_3)
+                    Det_pJoules_150_a.append(pWatts_3*(end_time-start_time))
+                   
+                    ampid_4 = pix_all_amps[i+3]
+                    array_min_4 = np.amin(ampid_4)
+                    new_pix_amps_4 = ampid_4-array_min_4
+                    pWatts_4 = np.sum(new_pix_amps_4)*10**(12)/(400.)
+                    Det_pWatts_150_b.append(pWatts_4)
+                    Det_pJoules_150_b.append(pWatts_4*(end_time-start_time))
+                  
+                Tot_pW_90a = np.sum(Det_pWatts_90_a)
+                Tot_pW_90b = np.sum(Det_pWatts_90_b)
+                Tot_pW_150a = np.sum(Det_pWatts_150_a)
+                Tot_pW_150b = np.sum(Det_pWatts_150_b)
+
+                Tot_pJ_90a = np.sum(Det_pJoules_90_a)
+                Tot_pJ_90b = np.sum(Det_pJoules_90_b)
+                Tot_pJ_150a = np.sum(Det_pJoules_150_a)
+                Tot_pJ_150b = np.sum(Det_pJoules_150_b)
+
+                print '[INFO] Total Power of Event on Detector in frequency 90a is', Tot_pW_90a, 'picoWatts'
+                print '[INFO] Total Energy of Event on Detector in frequency 90a is', Tot_pJ_90a, 'picoJoules'
+
+                print '[INFO] Total Power of Event on Detector in frequency 90b is', Tot_pW_90b, 'picoWatts'
+                print '[INFO] Total Energy of Event on Detector in frequency 90b is', Tot_pJ_90b, 'picoJoules'
+
+                print '[INFO] Total Power of Event on Detector in frequency 150a is', Tot_pW_150a, 'picoWatts'
+                print '[INFO] Total Energy of Event on Detector in frequency 150a is', Tot_pJ_150a, 'picoJoules'
+
+                print '[INFO] Total Power of Event on Detector in frequency 150b is', Tot_pW_150b, 'picoWatts'
+                print '[INFO] Total Energy of Event on Detector in frequency 150b is', Tot_pJ_150b, 'picoJoules'
 
 
 
