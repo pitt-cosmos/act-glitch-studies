@@ -194,7 +194,7 @@ class PlotGlitches(Routine):
                         percent_threshold = 0.50 #Percent Threshold
                         top = 1+percent_threshold
                         bot = 1-percent_threshold
-                        if Tot_pJ_90a<=min_value*top and Tot_pJ_90a>=max_value*bot and Tot_pJ_90b<=min_value*top and Tot_pJ_90b>=max_value*bot and Tot_pJ_150a<=min_value*top and Tot_pJ_150a>=max_value*bot and Tot_pJ_150b<=min_value*top and Tot_pJ_150b>=max_value*bot:
+                        if max_value<=min_value*top and min_value>=max_value*bot:
                             print 'FRB frequencies are within specified % threshold'
                         else:
                             print 'FRB frequencies fail threshold test'

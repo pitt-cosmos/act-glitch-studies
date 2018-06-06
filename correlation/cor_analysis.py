@@ -37,9 +37,9 @@ loop.add_routine(CalibrateTOD(input_key="tod_data",output_key="tod_data"))
 FILTER ROUTINES 
 """
 
-loop.add_routine(PixelFilter(input_key="cuts",output_key="frb_cuts"))
-loop.add_routine(DurationFilter(max_duration=5,input_key="frb_cuts",output_key="frb_cuts"))
-loop.add_routine(FRBCorrelationFilter(tod_key="tod_data", cosig_key="frb_cuts", output_key ="frb_events",all_coeff_output_key="frb_coeff"))
+#loop.add_routine(PixelFilter(input_key="cuts",output_key="frb_cuts"))
+#loop.add_routine(DurationFilter(max_duration=5,input_key="frb_cuts",output_key="frb_cuts"))
+#loop.add_routine(FRBCorrelationFilter(tod_key="tod_data", cosig_key="frb_cuts", output_key ="frb_events",all_coeff_output_key="frb_coeff"))
 
 #loop.add_routine(PixelFilter(min_pixels=4,max_pixels=10, input_key="cuts", output_key="cr_cuts"))
 #loop.add_routine(CRCorrelationFilter(tod_key="tod_data", cosig_key="cr_cuts", output_key= "cr_events",all_coeff_output_key="cr_coeff"))
@@ -57,6 +57,7 @@ Uncomment to see scatter plots of coefficients
 """
 PLOT A GLITCH
 """
+tod_id = 7074
 loop.add_routine(PlotGlitches(tag=tod_id,tod_key="tod_data", cosig_key="cuts"))
 loop.run(tod_id, tod_id + 1)
 
