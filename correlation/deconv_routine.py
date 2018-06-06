@@ -28,9 +28,9 @@ class Deconvolution(Routine):
         data = self.get_store().get(self._tod_key)
         tc = TimeConstants.read_from_path('/mnt/act3/users/spho/2016/TimeCo\
 nstantsperTOD_170718/pa2/' + tod_string[:5] + '/' + tod_string + '.tau')####array2/3
-       
+        tod = moby2.tod.detrend_tod(data)####
+
         for i in range(1015):
-            tod = moby2.tod.detrend_tod(data) ####
             d_tod = data.data[i] ####
             ftod = np.fft.rfft(d_tod)
             nsamp = len(d_tod)
