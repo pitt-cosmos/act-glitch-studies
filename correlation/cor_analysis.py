@@ -29,7 +29,7 @@ LOAD TOD DATA
 """
 
 #loop.add_routine(TODLoader(output_key="tod_data"))
-loop.add_routine(Deconvolution(output_key="tod_data"))
+loop.add_routine(Deconvolution(output_key="tod_data")) #load deconv data
 loop.add_routine(FixOpticalSign(input_key="tod_data", output_key="tod_data"))
 loop.add_routine(CalibrateTOD(input_key="tod_data",output_key="tod_data"))
 

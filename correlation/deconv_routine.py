@@ -41,7 +41,7 @@ class Deconvolution(Routine):
         tc = TimeConstants.read_from_path('/mnt/act3/users/spho/2016/TimeCo\
 nstantsperTOD_170718/pa3/' + tod_string[:5] + '/' + tod_string + '.tau')
         tod = moby2.tod.detrend_tod(data)
-
+        print '[INFO] Deconvoluting data... '
         for i in range(1015):
             d_tod = data.data[i]
             ftod = np.fft.rfft(d_tod)
