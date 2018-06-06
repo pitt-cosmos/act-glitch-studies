@@ -27,11 +27,11 @@ class Deconvolution(Routine):
         tod_string = str(tod_name)
         data = self.get_store().get(self._tod_key)
         tc = TimeConstants.read_from_path('/mnt/act3/users/spho/2016/TimeCo\
-nstantsperTOD_170718/pa2/' + tod_string[:5] + '/' + tod_string + '.tau')####array2/3
-        tod = moby2.tod.detrend_tod(data)####
+nstantsperTOD_170718/pa3/' + tod_string[:5] + '/' + tod_string + '.tau')
+        tod = moby2.tod.detrend_tod(data)
 
         for i in range(1015):
-            d_tod = data.data[i] ####
+            d_tod = data.data[i]
             ftod = np.fft.rfft(d_tod)
             nsamp = len(d_tod)
             srate = 400 #Hz
@@ -40,11 +40,7 @@ nstantsperTOD_170718/pa2/' + tod_string[:5] + '/' + tod_string + '.tau')####arra
             resp = tconst_filter(freqs,tau)
             ftod /= resp
             deconv_tod = np.fft.irfft(ftod)
-            deconv_data = {
-                'tod' = tod_name,
-                'id' = i,
-                'data' = deconv_tod
-                }
-            deconv_time.append(deconv_data)
+            data.data[i] = deconv_tod
         
-        self.get_store().set(self._output_key,deconv_time)
+        self.get_store().set(self._output_key,data)
+    
