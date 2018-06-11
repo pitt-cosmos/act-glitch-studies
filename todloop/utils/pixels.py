@@ -15,7 +15,7 @@ class PixelReader:
         self._pixel_dict = self.generate_pixel_dict()
         self._mask = mask
         self.calibrate_array(season=self._array_info['season'])
-        # self.get_adjacent_detectors = self.adjacent_detector_generator()
+        self.get_adjacent_detectors = self.adjacent_detector_generator()
 
     def generate_pixel_dict(self):
         """ Generate pixel dictionary that tells which detectors correspond
@@ -89,17 +89,16 @@ class PixelReader:
         else:
             return self._pixel_dict[str(pixel)]['f2']
 
-    """
+
     def get_adjacent_pixels(self, pixel):
-        if self.get_ad
         all_adj_det = self.get_adjacent_detectors(pixel)
         return [int(det) for det in all_adj_det if str(det) in self._pixel_dict]
-    """
+
     
     def get_pixels_within_radius(self, pixel, radius):
         ar = self._array_pos
         dist = np.sqrt(np.sum((ar - ar[pixel, :])**2, axis=1))
-        return [det for det in np.arange(1055)[dist < radius] if str(det) in self._pixel_dict]
+        return [det for det in np.arange(1056)[dist < radius] if str(det) in self._pixel_dict]
         
     def plot(self, pixels=None):
         plt.plot(self._array_data['array_x'], self._array_data['array_y'], 'r.')
