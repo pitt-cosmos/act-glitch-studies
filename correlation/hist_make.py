@@ -48,7 +48,7 @@ FILTER ROUTINES
 PLOT A GLITCH
 """
 #loop.add_routine(PlotGlitches(tag=tod_id,tod_key="tod_data", cosig_key="cuts"))
-loop.run(tod_id, tod_id + 5)
+loop.run(tod_id, tod_id + 1)
 
 
 
