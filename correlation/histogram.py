@@ -152,7 +152,7 @@ class CreateHistogram(Routine):
             event_total_energy = 0
             for pixel in pixels:
                 event_total_energy += total_energy(pixel,s_time,e_time)        
-            energy_hist.fill(event_total_energy)
+            self._hist.fill(event_total_energy)
     
     def finalize(self):
         plt.step(*self._hist.data)
