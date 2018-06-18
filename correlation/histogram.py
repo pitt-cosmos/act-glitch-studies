@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from todloop.routines import Routine
 from todloop.utils.pixels import PixelReader
 from todloop.utils.cuts import pixels_affected_in_event
-from plotter import TotalEnergy
 from todloop.utils.hist import Hist1D
+from todloop.utils.pixels import PixelReader
 
 
 class PlotHistogram(Routine):
@@ -32,15 +32,16 @@ class PlotHistogram(Routine):
 
 class CreateHistogram(Routine):
  
-    def __init__(self, cosig_key, event_key="events"):
+    def __init__(self, cosig_key,tod_key, event_key="events"):
         Routine.__init__(self)
         self._event_key = event_key
-        self._hist = None
+        self._hist = None 
+        self._tod_key = tod_key
         self._cosig_key = cosig_key
-        self._te = None
-
+        self._pr = None
+    
     def initialize(self):
-        self._te = TotalEnergy()
+        self._pr = PixelReader()
         self._hist = Hist1D(1, 50, 100) #min, max, bins ? work on this afterit works
 
 
@@ -48,14 +49,15 @@ class CreateHistogram(Routine):
         cuts = self.get_store().get(self._cosig_key)
         peaks = cuts['peaks']
         cosig = cuts['coincident_signals']
+        tod_data = self.get_store().get(self._tod_key)    
         
         def energyseries(pixel, s_time, e_time, buffer=0):
 
             start_time = s_time - buffer
             end_time = e_time + buffer
 
-            a1, a2 = self._pr.get_f1(pixel_id)
-            b1, b2 = self._pr.get_f2(pixel_id)
+            a1, a2 = self._pr.get_f1(pixel)
+            b1, b2 = self._pr.get_f2(pixel)
             d1, d2 = tod_data.data[a1], tod_data.data[a2]
             d3, d4 = tod_data.data[b1], tod_data.data[b2]
 
@@ -140,7 +142,7 @@ class CreateHistogram(Routine):
                 min_value = np.amin(values)
                 max_value = np.amax(values)
 
-                return values,val_sum
+                return val_sum #,values
 
 
         for event in peaks:
