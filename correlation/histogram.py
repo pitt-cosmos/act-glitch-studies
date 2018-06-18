@@ -3,6 +3,11 @@ matplotlib.use("TKAgg")
 import numpy as np
 import matplotlib.pyplot as plt
 from todloop.routines import Routine
+from todloop.utils.pixels import PixelReader
+from todloop.utils.cuts import pixels_affected_in_event
+from plotter import TotalEnergy
+from todloop.utils.hist import Hist1D
+
 
 class PlotHistogram(Routine):
     
@@ -23,3 +28,149 @@ class PlotHistogram(Routine):
         plt.grid()
         plt.title("Number of Pixels Affected in Events")
         plt.show()
+
+
+class CreateHistogram(Routine):
+ 
+    def __init__(self, cosig_key, event_key="events"):
+        Routine.__init__(self)
+        self._event_key = event_key
+        self._hist = None
+        self._cosig_key = cosig_key
+        self._te = None
+
+    def initialize(self):
+        self._te = TotalEnergy()
+        self._hist = Hist1D(1, 50, 100) #min, max, bins ? work on this afterit works
+
+
+    def execute(self):
+        cuts = self.get_store().get(self._cosig_key)
+        peaks = cuts['peaks']
+        cosig = cuts['coincident_signals']
+        
+        def energyseries(pixel, s_time, e_time, buffer=0):
+
+            start_time = s_time - buffer
+            end_time = e_time + buffer
+
+            a1, a2 = self._pr.get_f1(pixel_id)
+            b1, b2 = self._pr.get_f2(pixel_id)
+            d1, d2 = tod_data.data[a1], tod_data.data[a2]
+            d3, d4 = tod_data.data[b1], tod_data.data[b2]
+
+            d1 -= np.mean(d1[start_time:end_time])
+            d2 -= np.mean(d2[start_time:end_time])
+            d3 -= np.mean(d3[start_time:end_time])
+            d4 -= np.mean(d4[start_time:end_time])
+
+            time = tod_data.ctime - tod_data.ctime[0]
+            time = time[start_time:end_time]
+
+            d_1 = d1[start_time:end_time]
+            d_2 = d2[start_time:end_time]
+            d_3 = d3[start_time:end_time]
+            d_4 = d4[start_time:end_time]
+
+            return time, d_1, d_2, d_3, d_4
+
+
+
+        def total_energy(pid,start_time,end_time):
+
+
+            pix_all_amps = []
+
+            pix_all_amps.append(energyseries(pid,start_time,end_time,buffer=0)[1])
+            pix_all_amps.append(energyseries(pid,start_time,end_time,buffer=0)[2])
+            pix_all_amps.append(energyseries(pid,start_time,end_time,buffer=0)[3])
+            pix_all_amps.append(energyseries(pid,start_time,end_time,buffer=0)[4])
+
+            Det_pWatts_90_a = []
+            Det_pWatts_90_b = []
+            Det_pWatts_150_a = []
+            Det_pWatts_150_b = []
+
+            Det_pJoules_90_a = []
+            Det_pJoules_90_b = []
+            Det_pJoules_150_a = []
+            Det_pJoules_150_b = []
+
+            for i in range(0, len(pix_all_amps),4):
+                ampid_1 = pix_all_amps[i]
+                array_min_1 = np.amin(ampid_1)
+                new_pix_amps_1 = ampid_1-array_min_1
+                pWatts_1 = np.sum(new_pix_amps_1)*10**(12)/(400.)
+                Det_pWatts_90_a.append(pWatts_1)
+                Det_pJoules_90_a.append(pWatts_1*(end_time-start_time))
+
+                ampid_2 = pix_all_amps[i+1]
+                array_min_2 = np.amin(ampid_2)
+                new_pix_amps_2 = ampid_2-array_min_2
+                pWatts_2 = np.sum(new_pix_amps_2)*10**(12)/(400.)
+                Det_pWatts_90_b.append(pWatts_2)
+                Det_pJoules_90_b.append(pWatts_2*(end_time-start_time))
+
+                ampid_3 = pix_all_amps[i+2]
+                array_min_3 = np.amin(ampid_3)
+                new_pix_amps_3 = ampid_3-array_min_3
+                pWatts_3 = np.sum(new_pix_amps_3)*10**(12)/(400.)
+                Det_pWatts_150_a.append(pWatts_3)
+                Det_pJoules_150_a.append(pWatts_3*(end_time-start_time))
+
+                ampid_4 = pix_all_amps[i+3]
+                array_min_4 = np.amin(ampid_4)
+                new_pix_amps_4 = ampid_4-array_min_4
+                pWatts_4 = np.sum(new_pix_amps_4)*10**(12)/(400.)
+                Det_pWatts_150_b.append(pWatts_4)
+                                                                                                                                                                 
+
+                Tot_pW_90a = np.sum(Det_pWatts_90_a)
+                Tot_pW_90b = np.sum(Det_pWatts_90_b)
+                Tot_pW_150a = np.sum(Det_pWatts_150_a)
+                Tot_pW_150b = np.sum(Det_pWatts_150_b)
+
+                Tot_pJ_90a = np.sum(Det_pJoules_90_a)
+                Tot_pJ_90b = np.sum(Det_pJoules_90_b)
+                Tot_pJ_150a = np.sum(Det_pJoules_150_a)
+                Tot_pJ_150b = np.sum(Det_pJoules_150_b)
+
+                values = [Tot_pJ_90a,Tot_pJ_90b,Tot_pJ_150a,Tot_pJ_150b]
+                val_sum = np.sum(values)
+                min_value = np.amin(values)
+                max_value = np.amax(values)
+
+                return values,val_sum
+
+
+        for event in peaks:
+            pixels = pixels_affected_in_event(cosig, event)
+            s_time = event[0]
+            e_time = event[1]
+            event_total_energy = 0
+            for pixel in pixels:
+                event_total_energy += total_energy(pixel,s_time,e_time)        
+            energy_hist.fill(event_total_energy)
+    
+    def finalize(self):
+        plt.step(*self._hist.data)
+        plt.show()
+
+'''                                          
+    def execute(self):
+        cuts = self.get_store().get(self._cosig_key)
+        peaks = cuts['peaks']
+        cosig = cuts['coincident_signals']
+        for event in peaks:
+            pixels = pixels_affected_in_event(cosig, event)
+            s_time = event[0]
+            e_time = event[1]
+            event_total_energy = 0
+            for pixel in pixels:
+                event_total_energy += self._te.total_energy(pixel,s_time,e_time)
+        energy_hist.fill(event_total_energy)
+    def finalize(self):
+        plt.step(*self._hist.data)
+        plt.show()
+                                 
+'''
