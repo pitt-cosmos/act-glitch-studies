@@ -156,6 +156,8 @@ class CreateHistogram(Routine):
     
     def finalize(self):
         plt.step(*self._hist.data)
+        #plt.xlabel(TOD track:' + str(self._tag))
+        #plt.title(
         plt.show()
 
 '''                                          
