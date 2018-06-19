@@ -42,7 +42,7 @@ class CreateHistogram(Routine):
     
     def initialize(self):
         self._pr = PixelReader()
-        self._hist = Hist1D(1, 50, 100) #min, max, bins ? work on this afterit works
+        self._hist = Hist1D(0, 8, 100) #change max
 
 
     def execute(self):
@@ -144,23 +144,34 @@ class CreateHistogram(Routine):
 
                 return val_sum #,values
 
-
+        event_list=[]
         for event in peaks:
             pixels = pixels_affected_in_event(cosig, event)
             s_time = event[0]
             e_time = event[1]
             event_total_energy = 0
             for pixel in pixels:
-                event_total_energy += total_energy(pixel,s_time,e_time)        
+                event_total_energy += total_energy(pixel,s_time,e_time) #* 6.241509 # to convert to GeV         
             self._hist.fill(event_total_energy)
+            event_list.append(event_total_energy)
+    
+        e_min = np.min(event_list)    
+        e_max = np.max(event_list)
+        
+        print "Min energy of event:", e_min,'pJoules. Max energy of event:', e_max,'pJoules' 
     
     def finalize(self):
         plt.step(*self._hist.data)
-        #plt.xlabel(TOD track:' + str(self._tag))
+        #plt.xlabel('TOD track:', + str(self._tag))
+        plt.ylabel('Events')
+        plt.xlabel('in peV')
         #plt.title(
         plt.show()
 
-'''                                          
+''' 
+OLD CODE FOR REFERENCE
+
+                                         
     def execute(self):
         cuts = self.get_store().get(self._cosig_key)
         peaks = cuts['peaks']
