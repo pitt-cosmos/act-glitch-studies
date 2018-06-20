@@ -165,6 +165,8 @@ class CreateHistogram(Routine):
         #plt.xlabel('TOD track:', + str(self._tag))
         plt.ylabel('Events')
         plt.xlabel('in pJoules')
+        plt.xscale('log')
+        plt.yscale('log')
         #plt.title(
         plt.show()
 
