@@ -42,7 +42,7 @@ class CreateHistogram(Routine):
     
     def initialize(self):
         self._pr = PixelReader()
-        self._hist = Hist1D(0, 8, 100) #change max
+        self._hist = Hist1D(0, 5, 100) #change max
 
 
     def execute(self):
@@ -164,7 +164,7 @@ class CreateHistogram(Routine):
         plt.step(*self._hist.data)
         #plt.xlabel('TOD track:', + str(self._tag))
         plt.ylabel('Events')
-        plt.xlabel('in peV')
+        plt.xlabel('in pJoules')
         #plt.title(
         plt.show()
 
