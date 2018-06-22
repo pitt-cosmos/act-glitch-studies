@@ -9,26 +9,19 @@ from moby2.scripting import get_filebase
 from moby2.detectors.stuff import TimeConstants
 
 class Deconvolution(Routine):
-    def __init__(self,output_key="tod_data",abspath=False):
+    def __init__(self,input_key="tod_data", output_key="tod_data",abspath=False):
         Routine.__init__(self)
         self._fb = None
         self._abspath = abspath
+        self._input_key = input_key
         self._output_key = output_key
     
     def initialize(self):
         self._fb = get_filebase()
 
     def execute(self):
-
-        if self._abspath:  # if absolute path is given
-            tod_filename = self.get_name()
-        else:
-            tod_name = self.get_name()
-            tod_filename = self._fb.filename_from_name(tod_name, single=True)  # get file path
-        print '[INFO] Loading TOD: %s ...' % tod_filename
-        data = moby2.scripting.get_tod({'filename': tod_filename, 'repair_pointing': True})
-        print '[INFO] TOD loaded'
-
+        data = self.get_store().get("tod_data")
+        tod_name = self.get_name()
         
         def tconst_filter(freq,tau):
             """
@@ -40,7 +33,7 @@ class Deconvolution(Routine):
         tod_string = str(tod_name)
         tc = TimeConstants.read_from_path('/mnt/act3/users/spho/2016/TimeCo\
 nstantsperTOD_170718/pa3/' + tod_string[:5] + '/' + tod_string + '.tau')
-        tod = moby2.tod.detrend_tod(data)
+        moby2.tod.detrend_tod(data)
         print '[INFO] Deconvoluting data... '
         for i in range(1015):
             d_tod = data.data[i]
