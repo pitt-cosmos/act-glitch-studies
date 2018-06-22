@@ -89,6 +89,12 @@ class PixelReader:
         else:
             return self._pixel_dict[str(pixel)]['f2']
 
+    def get_dets(self, pixel):
+        if self._mask is not None:
+            return [det for det in self._pixel_dict[str(pixel)]['f1'] if self._mask[det] == 1]
+        else:
+            return self._pixel_dict[str(pixel)]['f1']
+
     """
     def get_adjacent_pixels(self, pixel):
         if self.get_ad
