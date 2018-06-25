@@ -151,7 +151,7 @@ class CreateHistogram(Routine):
             e_time = event[1]
             event_total_energy = 0
             for pixel in pixels:
-                event_total_energy += total_energy(pixel,s_time,e_time) #* 6.241509 # to convert to GeV         
+                event_total_energy += total_energy(pixel,s_time,e_time)  # * 6.241509 *10**6 # used if you need to convert from pJ to eV        
             self._hist.fill(event_total_energy)
             event_list.append(event_total_energy)
     
@@ -159,6 +159,8 @@ class CreateHistogram(Routine):
         e_max = np.max(event_list)
         
         print "Min energy of event:", e_min,'pJoules. Max energy of event:', e_max,'pJoules' 
+        #print sorted(event_list)
+
     
     def finalize(self):
         plt.step(*self._hist.data)
