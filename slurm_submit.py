@@ -8,7 +8,7 @@ import argparse
 slurm_template='''#!/bin/sh 
 #SBATCH -N 1                               # nodes=1 
 #SBATCH --ntasks-per-node=1                # ppn=6 
-#SBATCH -p act                             # partition=act
+{{ act }}
 #SBATCH -J {{ name }}                      # job name 
 #SBATCH -t 90:00:00                        # 90 hours walltime
 #SBATCH --mem=8000MB                       # memory in MB 
@@ -18,12 +18,13 @@ slurm_template='''#!/bin/sh
 python {{ script }} {{ opts }}
 '''
 
-def generate_bash(name, script, options, enum=0):
+def generate_bash(name, script, options, act, enum=0):
     """Generate bash based on the template"""
     compiled = Environment().from_string(slurm_template).render(
         name = name,
         logfile = "logs/%s_%d.log" % (name, enum),
         script = script,
+        act = act,
         opts = options
     )
     print '[INFO] Compiling with options:', options
@@ -68,13 +69,19 @@ if __name__ == "__main__":
     parser.add_argument("--nworker", help="number of workers", type=int, required=True)
     parser.add_argument("--start", help="starting index", type=int, required=True)
     parser.add_argument("--end", help="ending index", type=int, required=True)
+    parser.add_argument("--act", help="run in act cluster", type=bool)
     args = parser.parse_args()
     name = args.name
     script = args.script
-    parameters = generate_parameters_2d(args.start, args.end, args.nworker) 
+    if args.act:
+        act = "#SBATCH -p act                             # partition=act"
+    else:
+        act = ""
+    parameters = generate_parameters_2d(args.start, args.end, args.nworker)
     filenames = []
+    
     for i, p in enumerate(parameters):
-        filenames.append(generate_bash(name, script, p, i))
+        filenames.append(generate_bash(name, script, p, act, i))
     
     # run bash
     run_bash(filenames)
