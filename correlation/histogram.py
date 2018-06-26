@@ -172,6 +172,18 @@ class CreateHistogram(Routine):
         #plt.title(
         plt.show()
 
+
+
+
+
+'''
+SAMPLE OF MIDPOINT PLOT
+noise = np.random.normal(0,1,(1000,1))
+n,x,_ = plt.hist(noise, bins = np.linspace(-3,3,7), histtype=u'step' )
+bin_centers = 0.5*(x[1:]+x[:-1])
+plt.plot(bin_centers,n) ## using bin_centers rather than edges
+plt.show()
+'''
 ''' 
 OLD CODE FOR REFERENCE
 
