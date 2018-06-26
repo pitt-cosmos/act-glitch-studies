@@ -22,11 +22,15 @@ class PlotGlitches(Routine):
         print '[INFO] Plotting glitches ...'
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data
         cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
-        # pixels = pixels_affected(cuts['coincident_signals'], 38540)
+        print(pixels_affected_in_event(cuts['coincident_signals'], [88373, 88378, 5, 3]))
         # print('[INFO] pixels affected: ',pixels)
         peaks = cuts['peaks']
         print('[INFO] peaks: ', peaks)
-        
+
+        def cs_cuts():
+            cuts = self.get_store().get(self._cosig_key) 
+            return cuts['coincident_signals']
+
         def timeseries(pixel_id, s_time, e_time, buffer=10):
 
             start_time = s_time - buffer
@@ -76,7 +80,7 @@ class PlotGlitches(Routine):
                
                 x = timeseries(pid,start_time,end_time)[0]
                 y = timeseries(pid,start_time,end_time)[1]
-
+                
                 plt.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
                 plt.xlabel('TOD track: 1641')  # CHANGE TOD TRACK NAME
                 plt.plot(x,y,'.-')
@@ -106,17 +110,18 @@ class PlotGlitches(Routine):
         To plot specific event, copy event from peaks below 
         """
         #"""
-        event = [62401,62449,48,29]
+        event = [88373, 88378, 5, 3]
         stime = event[0]
         etime = event[1]
         pixels = pixels_affected_in_event(cs, event)
         plotter(pixels, stime, etime)
+        
         self._pr.plot(pixels)
         plt.show()
-#        """
+        #"""
 
 
-"""
+        """
         print(self._pr.get_x_y(24))
         print(self._pr.get_x_y(537))
         print(self._pr.get_x_y(712))
@@ -125,4 +130,5 @@ class PlotGlitches(Routine):
         print(self._pr.get_x_y(64))
         print(self._pr.get_x_y(462))
         print(self._pr.get_x_y(322))
-"""
+        """
+
