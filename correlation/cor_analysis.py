@@ -12,7 +12,7 @@ LOAD CUTS DATA
 """
 
 loop = TODLoop()
-tod_id = 3731
+tod_id = 10000
 loop.add_tod_list("../data/s16_pa3_list.txt")
 loop.add_routine(DataLoader(input_dir="../outputs/s16_pa3_list/cosig/", output_key="cuts"))
 

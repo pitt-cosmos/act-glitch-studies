@@ -2,6 +2,7 @@ import matplotlib
 matplotlib.use("TKAgg")
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from scipy.interpolate import interp1d
 from todloop.base import Routine
 from todloop.utils.pixels import PixelReader
@@ -137,14 +138,15 @@ class CorrelationFilter(Routine):
 
        
         def correlation(x1,x2,y1,y2):
-          
+            
+            """
             #NORMALIZE THE SIGNAL BEFORE CORRELATING
             min_y1,max_y1= np.min(y1), np.max(y1)
             min_y2,max_y2 = np.min(y2), np.max(y2)
             
             norm_y1 = (y1 - min_y1)/(max_y1 - min_y1)
             norm_y2 = (y2 - min_y2)/(max_y2 - min_y2)
-          
+            """
             
             f1 = interp1d(x1,norm_y1)
             f2 = interp1d(x2,norm_y2)
@@ -157,10 +159,17 @@ class CorrelationFilter(Routine):
 
             y1new = f1(x1new)
             y2new = f2(x2new)
+            
+            py1 = pd.DataFrame(y1new)
+            py2 = pd.DataFrame(y2new)
+            cor = pd.rolling_cor(py1,py2,5,center=True)
+            coeff = np.array(cor)
+            coeff = coeff[np.logical_not(np.isnan(coeff))]
+            coeff = abs(coeff)
+            
+            max_coeff = max(coeff)
 
-            m_coeff = np.corrcoef(y1new,y2new)[0][1]
-
-            return m_coeff
+            return max_coeff
 
             """
             plt.subplot(211)

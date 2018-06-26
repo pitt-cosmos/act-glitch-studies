@@ -8,6 +8,7 @@ from todloop.base import Routine
 from todloop.utils.pixels import PixelReader
 from todloop.utils.cuts import pixels_affected_in_event
 
+
 class Filter(Routine):
     def __init__(self, input_key, output_key):
         Routine.__init__(self)
