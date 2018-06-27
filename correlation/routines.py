@@ -325,3 +325,4 @@ class ScatterPlot(Routine):
         plt.ylabel('CR Coefficients')
         plt.title('Slow Decay vs CR Correlation Coeff')
         plt.show()
+

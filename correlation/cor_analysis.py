@@ -5,7 +5,7 @@ from routines import CRCorrelationFilter, FRBCorrelationFilter, SlowCorrelationF
 from deconv_routine import Deconvolution
 from calibration.routines import FixOpticalSign, CalibrateTOD
 from plotter import PlotGlitches
-from histogram import PlotHistogram 
+from histogram import PlotHistogram, CreateHistogram
 
 """
 LOAD CUTS DATA
@@ -23,6 +23,7 @@ LOAD FILTERED DATA (UPTO TRACK 5000) AND PLOT A HISTOGRAM OF # OF PIXELS AFFECTE
 #loop.add_routine(DataLoader(input_dir="../outputs/s16_pa3_list/events/",output_key ="events"))
 #loop.add_routine(Logger(input_key="events"))
 #loop.add_routine(PlotHistogram(events_key="events"))
+#loop.add_routine(CreateHistogram(cosig_key="cuts"))
 
 """
 LOAD TOD DATA 
