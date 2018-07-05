@@ -21,7 +21,7 @@ class PlotGlitches(Routine):
         self._pr = PixelReader()
 
     def execute(self):
-        print '[INFO] Plotting glitches ...'
+        print '[INFO] Loading Glitch Data ...'
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data
         cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
 
@@ -120,7 +120,7 @@ class PlotGlitches(Routine):
         To plot specific event, copy event from peaks below 
         """
       
-        e = raw_input('Please copy the event list to plot 2 freq channels:')
+        e = raw_input('Please copy the event list to plot 4 freq channels:')
         event = json.loads(e)
         stime = event[0]
         etime = event[1]
@@ -136,7 +136,7 @@ class PlotGlitches(Routine):
         while y_n != 'n':
             y_n = raw_input ("Would you like to plot another event? Enter y/n...")
             if y_n == 'y':
-                e= raw_input('Please copy the event list to plot 2 freq channels:')
+                e= raw_input('Please copy the event list to plot 4 freq channels:')
                 event = json.loads(e)
                 stime = event[0]
                 etime = event[1]
