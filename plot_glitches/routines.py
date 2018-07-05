@@ -1,5 +1,6 @@
 import matplotlib
 matplotlib.use("TKAgg")
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 from todloop.routines import Routine
@@ -9,8 +10,9 @@ from todloop.utils.cuts import pixels_affected_in_event
 
 class PlotGlitches(Routine):
     """A routine that plot glitches"""
-    def __init__(self, cosig_key, tod_key):
+    def __init__(self,tag, cosig_key, tod_key):
         Routine.__init__(self)
+        self._tag = tag
         self._cosig_key = cosig_key
         self._tod_key = tod_key
         self._pr = None
@@ -22,10 +24,10 @@ class PlotGlitches(Routine):
         print '[INFO] Plotting glitches ...'
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data
         cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
-        print(pixels_affected_in_event(cuts['coincident_signals'], [88373, 88378, 5, 3]))
+
         # print('[INFO] pixels affected: ',pixels)
         peaks = cuts['peaks']
-        print('[INFO] peaks: ', peaks)
+        #print('[INFO] peaks: ', peaks)
 
         def cs_cuts():
             cuts = self.get_store().get(self._cosig_key) 
@@ -65,7 +67,7 @@ class PlotGlitches(Routine):
             plt.show()
             """
 
-            return time, d_1
+            return time, d_1, d_2, d_3, d_4
 
 
         """
@@ -79,13 +81,21 @@ class PlotGlitches(Routine):
             for pid in pixels:
                
                 x = timeseries(pid,start_time,end_time)[0]
-                y = timeseries(pid,start_time,end_time)[1]
+                y1 = timeseries(pid,start_time,end_time)[1]
+                y2 = timeseries(pid,start_time,end_time)[2]
+                y3 = timeseries(pid,start_time,end_time)[3]
+                y4 = timeseries(pid,start_time,end_time)[4]
+
+
+                plt.title('Pixel affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz, Pixel ' + str(pid))
+                plt.xlabel('TOD track:' + str(self._tag))  # CHANGE TOD TRACK NAME
+                plt.plot(x,y1,'.-',label='90 GHz')
+                plt.plot(x,y2,'.-',label='90 GHz')
+                plt.plot(x,y3,'.-',label='150 GHz')
+                plt.plot(x,y4,'.-',label='150 GHz')
                 
-                plt.title('Pixels affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz')
-                plt.xlabel('TOD track: 1641')  # CHANGE TOD TRACK NAME
-                plt.plot(x,y,'.-')
-            
-            plt.show()
+                plt.legend()
+                plt.show()
 
 
 
@@ -109,16 +119,35 @@ class PlotGlitches(Routine):
         SPECIFIC EVENT
         To plot specific event, copy event from peaks below 
         """
-        #"""
-        event = [88373, 88378, 5, 3]
+      
+        e = raw_input('Please copy the event list to plot 2 freq channels:')
+        event = json.loads(e)
         stime = event[0]
         etime = event[1]
         pixels = pixels_affected_in_event(cs, event)
+        print 'Pixels Affected:', pixels
         plotter(pixels, stime, etime)
         
         self._pr.plot(pixels)
         plt.show()
-        #"""
+        
+        y_n = ' '
+
+        while y_n != 'n':
+            y_n = raw_input ("Would you like to plot another event? Enter y/n...")
+            if y_n == 'y':
+                e= raw_input('Please copy the event list to plot 2 freq channels:')
+                event = json.loads(e)
+                stime = event[0]
+                etime = event[1]
+                pixels = pixels_affected_in_event(cs, event)
+                print '[INFO] Plotting Glitch...'
+                plotter(pixels, stime, etime)
+                self._pr.plot(pixels)
+                plt.show()
+            
+            else:
+                print 'No plot will be displayed!'      
 
 
         """
