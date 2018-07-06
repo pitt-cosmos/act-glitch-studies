@@ -10,7 +10,6 @@ from todloop.routines import Routine
 from todloop.utils.pixels import PixelReader
 from todloop.utils.cuts import pixels_affected_in_event
 
-
 class PlotGlitches(Routine):
     """A routine that plot glitches"""
     def __init__(self, tag, cosig_key, tod_key):
@@ -198,6 +197,7 @@ class PlotGlitches(Routine):
                             print 'FRB frequencies are within specified % threshold'
                         else:
                             print 'FRB frequencies fail threshold test'
+                        
 
                 for pid in pixels:
 
@@ -271,3 +271,7 @@ class PlotGlitches(Routine):
                     plotter(pixels, stime, etime)
         else:
             print 'No plot will be displayed!'
+
+
+
+

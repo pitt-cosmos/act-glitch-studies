@@ -8,6 +8,7 @@ from todloop.base import Routine
 from todloop.utils.pixels import PixelReader
 from todloop.utils.cuts import pixels_affected_in_event
 
+
 class Filter(Routine):
     def __init__(self, input_key, output_key):
         Routine.__init__(self)
@@ -34,7 +35,7 @@ class DurationFilter(Filter):
 
 class PixelFilter(Filter):
     """An event filter based on the number of pixels affected (set max n_pixels)"""
-    def __init__(self,min_pixels=0, max_pixels=5, input_key='data', output_key='data'):
+    def __init__(self,min_pixels=0, max_pixels=3, input_key='data', output_key='data'):
         Filter.__init__(self, input_key, output_key)
         self._min_pixels = min_pixels
         self._max_pixels = max_pixels
@@ -324,3 +325,4 @@ class ScatterPlot(Routine):
         plt.ylabel('CR Coefficients')
         plt.title('Slow Decay vs CR Correlation Coeff')
         plt.show()
+
