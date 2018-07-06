@@ -55,3 +55,22 @@ class TODInfoLoader(Routine):
             self.get_store().set(self._output_key, tod_info_dict)
         else:  # if no entry is found
             print '[WARNING] No TODInfo found with name: %s' % tod_name
+
+
+class TODSelector(Routine):
+    def __init__(self, tod_list):
+        """A routine that takes a list of TOD names and run the TODLoop on 
+        the given TOD list based on a base list
+        :param: 
+            tod_list: a list of tods names to run over"""
+        Routine.__init__(self)
+        self._tod_list = tod_list 
+            
+    def execute(self):
+        """Scripts that run for each TOD"""
+        tod_name = self.get_name()
+        if tod_name not in self._tod_list:
+            self.veto()  # halt subsequent routines
+
+
+
