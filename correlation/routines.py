@@ -252,7 +252,50 @@ class CorrelationFilter(Routine):
         print '[INFO] Events passed: %d / %d' % (len(events), len(peaks))
         self.get_store().set(self._output_key, events)
         self.get_store().set(self._all_coeff_output_key,all_coeffs)
-       
+
+
+class EdgeFilter(Filter):
+    """
+    A filter that will go through Highly Likely Events and only return those
+    that are not located at the edge of the detector plane.
+    """
+    
+    def __init__(self,input_key = 'data', output_key='data'):
+        Filter.__init__(self, input_key, output_key)
+    
+    def execute(self):
+
+        print '[INFO] Filtering out edge pixels...'
+        high_events = self.get_context().get_store().get(self._input_key)
+
+        #Pixel IDs of edge pixels
+        edge_pids = [152,664,25,409,665,793,921,26,794,922,592,337,210,147,84,852,725,470,343,283,155,667,28,412,668,796,924,576,321,194,131,68,836,709,454,327,285,157,669,30,414,670,798,926,31,799,927,588,333,206,143,72,840,713,458,714,280]
+        #Initialize empty list to hold all events that take do not take place on edge of detector 
+        cen_events = []
+        
+        for event in high_events:
+            pids = event['pixels_affected']
+            #event_list = []
+            #event_list.append(event['start'])
+            #event_list.append(event['end'])
+            #event_list.append(event['duration'])
+            #event_list.append(event['number_of_pixels'])
+            for pid in pids:
+                if pid in edge_pids:
+                    pass
+                else:
+                    cen_events.append(event)
+        central_events = {v['start']:v for v in cen_events}.values()
+        for event in central_events:
+            event_list = []                                                 
+            event_list.append(event['start'])                                  
+            event_list.append(event['end'])                                    
+            event_list.append(event['duration'])                               
+            event_list.append(event['number_of_pixels'])  
+            print '[INFO] Not on edge of detector plane: ',event_list
+        print '[INFO] Events passed: %d /%d' % (len(central_events),len(high_events))
+        
+        self.get_store().set(self._output_key,central_events)
 
 class CRCorrelationFilter(CorrelationFilter):
     """A routine that checks for correlation between two signals"""
