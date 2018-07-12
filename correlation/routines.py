@@ -96,7 +96,7 @@ class CorrelationFilter(Routine):
             d_3 = d3[start_time:end_time]
             d_4 = d4[start_time:end_time]
 
-            return time, d_1
+            return time, d_1, d_2, d_3, d_4
 
         def avg_signal(pixels, start_time, end_time):
 
@@ -104,16 +104,22 @@ class CorrelationFilter(Routine):
 
                 # x = timeseries(pid,start_time,end_time)[0]
                 # y = timeseries(pid,start_time,end_time)[1]
-                x, y = timeseries(pid,start_time,end_time)
+                x, y1, y2, y3, y4 = timeseries(pid,start_time,end_time)
 
-                avg_y = np.zeros(len(y))
+                avg_y1, avg_y2, avg_y3, avg_y4  = np.zeros(len(y1)),np.zeros(len(y2)),np.zeros(len(y3)),np.zeros(len(y4))
 
                 avg_x = x
-                avg_y += y
+                avg_y1 += y1
+                avg_y2 += y2
+                avg_y3 += y3
+                avg_y4 += y4
 
             x = avg_x
-            y = avg_y/len(avg_y)
-            return x, y
+            y1 = avg_y1/len(avg_y1)
+            y2 = avg_y2/len(avg_y2)
+            y3 = avg_y3/len(avg_y3)
+            y4 = avg_y4/len(avg_y4)
+            return x, y1,y2,y3,y4
 
         def correlation(x1,x2,y1,y2):
             """
@@ -219,14 +225,17 @@ class CorrelationFilter(Routine):
 
         for peak in peaks:
             all_pixels = pixels_affected_in_event(cs, peak)
-            avg_x2, avg_y2 = avg_signal(all_pixels, peak[0], peak[1])
-            coeff = correlation(avg_x1, avg_x2, avg_y1, avg_y2)
-            all_coeffs.append(coeff)
-            if lower_threshold <= coeff < upper_threshold:
-                print '[INFO] Possible %s' % self._tag, peak, 'Coeff = ', coeff
+            avg_x2, avg_y2_1,avg_y2_2,avg_y2_3,avg_y2_4 = avg_signal(all_pixels, peak[0], peak[1])
+            coeff1 = correlation(avg_x1, avg_x2, avg_y1, avg_y2_1)
+            coeff2 = correlation(avg_x1, avg_x2, avg_y1, avg_y2_2)
+            coeff3 = correlation(avg_x1, avg_x2, avg_y1, avg_y2_3)
+            coeff4 = correlation(avg_x1, avg_x2, avg_y1, avg_y2_4)
+            all_coeffs.append(coeff1)
+            if (lower_threshold <= coeff1)  & (lower_threshold <=  coeff2 ) & (lower_threshold <= coeff3)  & (lower_threshold <= coeff4) & (coeff1 < upper_threshold) & (coeff2 < upper_threshold) & (coeff3 < upper_threshold) & (coeff4 < upper_threshold):
+                print '[INFO] Possible %s' % self._tag, peak, 'Coeff = ', coeff1, coeff2, coeff3, coeff4
                 #all_coeffs.append(coeff)
-            elif coeff >= upper_threshold:
-                print '[INFO] Highly Likely %s' % self._tag, peak, 'Coeff = ', coeff
+            elif (coeff1 >= upper_threshold) & (coeff2 >= upper_threshold) & (coeff3 >= upper_threshold) & (coeff4 >= upper_threshold):
+                print '[INFO] Highly Likely %s' % self._tag, peak, 'Coeff = ', coeff1, coeff2, coeff3, coeff4 
                 #all_coeffs.append(coeff)
                 start = peak[0]
                 end = peak[1]
@@ -244,7 +253,7 @@ class CorrelationFilter(Routine):
                     'az': tod_data.az[ref_index],  # ref az
                     'number_of_pixels': number_of_pixels,
                     'pixels_affected': all_pixels,
-                    'coefficient': coeff,
+                    'coefficients': [coeff1,coeff2,coeff3,coeff4],
                     'tag': self._tag
                 }
                 events.append(event)

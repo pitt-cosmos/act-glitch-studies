@@ -4,7 +4,7 @@ from todloop.base import TODLoop
 from routines import PlotGlitches
 from calibration.routines import FixOpticalSign, CalibrateTOD
 
-tod_id = 10000
+tod_id = 1300
 loop = TODLoop()
 loop.add_tod_list("../data/s16_pa3_list.txt")
 

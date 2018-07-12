@@ -87,7 +87,7 @@ class PlotGlitches(Routine):
                 y4 = timeseries(pid,start_time,end_time)[4]
 
 
-                plt.title('Pixel affected from ' +str(start_time)+ '-' + str(end_time)+ ' at 90 GHz, Pixel ' + str(pid))
+                plt.title('Pixel affected from ' +str(start_time)+ '-' + str(end_time)+ ', Pixel ' + str(pid))
                 plt.xlabel('TOD track:' + str(self._tag))  # CHANGE TOD TRACK NAME
                 plt.plot(x,y1,'.-',label='90 GHz')
                 plt.plot(x,y2,'.-',label='90 GHz')
