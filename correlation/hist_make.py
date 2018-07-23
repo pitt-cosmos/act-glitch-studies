@@ -1,5 +1,5 @@
 from todloop.routines import Logger, DataLoader
-from todloop.tod import TODLoader, TODInfoLoader
+from todloop.tod import TODLoader, TODInfoLoader, TODSelector
 from todloop.base import TODLoop
 from routines import CRCorrelationFilter, FRBCorrelationFilter, SlowCorrelationFilter, DurationFilter, PixelFilter,ScatterPlot
 from deconv_routine import Deconvolution
@@ -11,7 +11,7 @@ LOAD CUTS DATA
 """
 
 loop = TODLoop()
-tod_id = 3731
+tod_id = 12501
 loop.add_tod_list("../data/s16_pa3_list.txt")
 loop.add_routine(DataLoader(input_dir="../outputs/s16_pa3_list/cosig/", output_key="cuts"))
 
@@ -27,6 +27,7 @@ loop.add_routine(CalibrateTOD(input_key="tod_data",output_key="tod_data"))
 """
 LOAD FILTERED DATA (UPTO TRACK 5000) AND PLOT A HISTOGRAM OF # OF PIXELS AFFECTED
 """
+loop.add_routine(TODSelector(tod_list="tod_list"))
 loop.add_routine(CreateHistogram(cosig_key="cuts", tod_key="tod_data"))
 
 
