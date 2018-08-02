@@ -15,4 +15,4 @@ loop.add_routine(FixOpticalSign(input_key="tod_data", output_key="tod_data"))
 loop.add_routine(CalibrateTOD(input_key="tod_data",output_key="tod_data"))
 loop.add_routine(PlotGlitches(tag=tod_id,tod_key="tod_data", cosig_key="cuts"))
 #Equivalent of loop.run...?
-loop.TODSelector("../data/covered_tods.txt")
+loop.add_routine(TODSelector(tod_list="../data/covered_tods.txt"))
