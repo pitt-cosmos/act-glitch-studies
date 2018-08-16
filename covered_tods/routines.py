@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from todloop.routines import Routine
 from todloop.utils.pixels import PixelReader
 from todloop.utils.cuts import pixels_affected_in_event
-
+from todloop.utils.hist import Hist1D 
 
 class PlotGlitches(Routine):
     """A routine that plot glitches"""
@@ -22,7 +22,7 @@ class PlotGlitches(Routine):
         print '[INFO] Loading Glitch Data ...'
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data                                                    
         cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data                                                    
-        array_name = raw_input("Name of array? ")
+        array_name = raw_input("Name of array? AR4, AR5, AR6? ")
         peaks = cuts['peaks']
         print('[INFO] peaks: ', peaks)
         self._pr = PixelReader(season='2017',array = str(array_name))        
@@ -84,7 +84,7 @@ class PlotGlitches(Routine):
                     
                     
                     plt.title('Pixel affected from ' +str(start_time)+ '-' + str(end_time)+ ', Pixel ' + str(pid))
-                    plt.xlabel('TOD track:' + str(self._tag))  # CHANGE TOD TRACK NAME
+                    plt.xlabel('TOD track:' + str(self._tag)) 
                     plt.plot(x,y1,'.-',label='90 GHz')
                     plt.plot(x,y2,'.-',label='90 GHz')
                     plt.plot(x,y3,'.-',label='150 GHz')
@@ -127,5 +127,67 @@ class PlotGlitches(Routine):
                         
         else:
             print 'No plot will be displayed!'      
+            
 
 
+
+class SaveEvents(Routine):
+    """ A routine that saves all events data in a dictionary """
+    def __init__(self,cosig_key,tod_key,output_key):
+        Routine.__init__(self)
+        self._cosig_key = cosig_key
+        self._tod_key = tod_key
+        self._output_key = output_key 
+
+
+    def execute(self):
+        print '[INFO] Saving events data to dictionary...'
+        tod_data = self.get_store().get(self._tod_key)
+        cuts = self.get_store().get(self._cosig_key)
+        peaks = cuts['peaks']
+        cs = cuts['coincident_signals']
+        
+        #Initialize and fill empty dictionary
+        events = []
+        for peak in peaks:
+            all_pixels = pixels_affected_in_event(cs, peak)
+            start = peak[0]
+            end = peak[1]
+            duration = peak[2]
+            number_of_pixels = peak[3]
+            ref_index = int((start + end)/2)
+            id = "%d.%d" % (self.get_id(), start)
+            event = {
+                'id': id,
+                'start': start,
+                'end': end,
+                'duration': duration,
+                'ctime': tod_data.ctime[ref_index],
+                'alt': tod_data.alt[ref_index],
+                'az': tod_data.az[ref_index],
+                'number_of_pixels': float(number_of_pixels),
+                'pixels_affected': all_pixels,
+            }
+            events.append(event)
+        
+        self.get_store().set(self._output_key,events)
+
+
+class NPixelStudy(Routine):
+    def __init__(self,event_key="events"):
+        Routine.__init__(self)
+        self._event_key = event_key
+        self._hist = None
+    
+    def initialize(self):
+        self._hist = Hist1D(1,50,48)
+
+    def execute(self):
+        events = self.get_store().get(self._event_key)
+        for event in events:
+            self._hist.fill(event['number_of_pixels'])
+
+    def finalize(self):
+        plt.step(*self._hist.data)
+        plt.title('Number of Pixels Affected')
+        plt.show()
