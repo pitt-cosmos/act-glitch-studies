@@ -9,7 +9,7 @@ from todloop.utils.cuts import pixels_affected_in_event
 from todloop.utils.hist import Hist1D 
 
 class PlotGlitches(Routine):
-    """A routine that plot glitches"""
+    """A routine that plot glitches """
     def __init__(self, tag, cosig_key, tod_key):
         Routine.__init__(self)
         self._tag = tag
@@ -64,6 +64,34 @@ class PlotGlitches(Routine):
                 
                 
                 return time, d_1, d_2, d_3, d_4
+
+
+            """
+            Calculate the energy of each detector in an affected pixel
+            """
+            def energy_calculator(self,pid,stime,etime):
+                all_amps = []
+                all_amps.append(timeseries(pid,stime,etime,buffer=0)[1])
+                all_amps.append(timeseries(pid,stime,etime,buffer=0)[2])
+                all_amps.append(timeseries(pid,stime,etime,buffer=0)[3])
+                all_amps.append(timeseries(pid,stime,etime,buffer=0)[4])
+
+                pJ_90a, pJ_90b, pJ_150a, pJ_150b = [],[],[],[]
+
+                for i in range(0,len(all_amps),4):
+                    amp_90a,amp_90b,amp_150a,amp_150b = all_amps[i],all_amps[i+1],all_amps[i+2],all_amps[i+3]
+
+                    norm_90a,norm_90b,norm_150a,norm_150b = amp_90a-np.amin(amp_90a),amp_90b-np.amin(amp_90b),amp_150a-np.amin(amp_150a),amp_150b-np.amin(amp_150b)
+                    pJ_90a.append((etime-stime)*np.sum(norm_90a)*10**(12)/(400.))
+                    pJ_90b.append((etime-stime)*np.sum(norm_90b)*10**(12)/(400.))
+                    pJ_150a.append((etime-stime)*np.sum(norm_150a)*10**(12)/(400.))
+                    pJ_150b.append((etime-stime)*np.sum(norm_150b)*10**(12)/(400.))
+
+
+                return np.sum(pJ_90a),np.sum(pJ_90b),np.sum(pJ_150a),np.sum(pJ_150b)
+
+
+
 
 
             """
@@ -127,10 +155,9 @@ class PlotGlitches(Routine):
                         
         else:
             print 'No plot will be displayed!'      
-            
+        
 
-
-
+        
 class SaveEvents(Routine):
     """ A routine that saves all events data in a dictionary """
     def __init__(self,cosig_key,tod_key,output_key):
@@ -156,6 +183,14 @@ class SaveEvents(Routine):
             duration = peak[2]
             number_of_pixels = peak[3]
             ref_index = int((start + end)/2)
+            energy = []
+            """
+            for pid in all_pixels:
+                e1,e2,e3,e4 = PlotGlitches.energy_calculator(pid,start,end)
+                energy_dict = {str(pid): [e1,e2,e3,e4]}
+                energy.append(energy_dict)
+            """
+
             id = "%d.%d" % (self.get_id(), start)
             event = {
                 'id': id,
@@ -167,6 +202,7 @@ class SaveEvents(Routine):
                 'az': tod_data.az[ref_index],
                 'number_of_pixels': float(number_of_pixels),
                 'pixels_affected': all_pixels,
+                'energy': energy,
             }
             events.append(event)
         
@@ -183,6 +219,7 @@ class NPixelStudy(Routine):
         self._hist = Hist1D(1,50,48)
 
     def execute(self):
+        print '[INFO] Adding data to plot histogram...'
         events = self.get_store().get(self._event_key)
         for event in events:
             self._hist.fill(event['number_of_pixels'])

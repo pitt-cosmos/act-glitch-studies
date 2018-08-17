@@ -27,4 +27,4 @@ ROUTINES
 loop.add_routine(SaveEvents(tod_key="tod_data",cosig_key="cuts",output_key="events"))
 loop.add_routine(NPixelStudy(event_key="events"))
 
-loop.run(tod_id, tod_id + 5)
+loop.run(tod_id, tod_id + 3)
