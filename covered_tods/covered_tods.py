@@ -23,8 +23,8 @@ loop.add_routine(CalibrateTOD(input_key="tod_data",output_key="tod_data"))
 """
 ROUTINES
 """
-#loop.add_routine(PlotGlitches(tag=tod_id,tod_key="tod_data", cosig_key="cuts"))
-loop.add_routine(SaveEvents(tod_key="tod_data",cosig_key="cuts",output_key="events"))
+#loop.add_routine(PlotGlitches(tag=tod_id,cosig_key="cuts",tod_key="tod_data"))
+loop.add_routine(SaveEvents(tag=tod_id,tod_key="tod_data",cosig_key="cuts",output_key="events"))
 loop.add_routine(NPixelStudy(event_key="events"))
 
 loop.run(tod_id, tod_id + 3)

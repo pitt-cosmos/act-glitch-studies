@@ -16,7 +16,41 @@ class PlotGlitches(Routine):
         self._cosig_key = cosig_key
         self._tod_key = tod_key
         self._pr = None
+    
+    def initialize(self):
+        tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data                                                                        
+        cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data                                                                          
+        array_name = raw_input("Name of array? AR4, AR5, AR6? ")
+        self._pr = PixelReader(season='2017',array = str(array_name))
 
+
+
+    def timeseries(self, pixel_id, s_time, e_time, buffer=10):
+        
+        start_time = s_time - buffer
+        end_time = e_time + buffer
+    
+        a1, a2 = self._pr.get_f1(pixel_id)
+        b1, b2 = self._pr.get_f2(pixel_id)
+        d1, d2 = tod_data.data[a1], tod_data.data[a2]
+        d3, d4 = tod_data.data[b1], tod_data.data[b2]
+        
+        # try to remove the mean from start_time to end_time
+        d1 -= np.mean(d1[start_time:end_time])
+        d2 -= np.mean(d2[start_time:end_time])
+        d3 -= np.mean(d3[start_time:end_time])
+        d4 -= np.mean(d4[start_time:end_time])
+        
+        time = tod_data.ctime - tod_data.ctime[0]
+        time = time[start_time:end_time]
+        
+        d_1 = d1[start_time:end_time]
+        d_2 = d2[start_time:end_time]
+        d_3 = d3[start_time:end_time]
+        d_4 = d4[start_time:end_time]
+        
+        
+        return time, d_1, d_2, d_3, d_4
 
     def execute(self):
         print '[INFO] Loading Glitch Data ...'
@@ -37,7 +71,8 @@ class PlotGlitches(Routine):
             def cs_cuts():
                 cuts = self.get_store().get(self._cosig_key) 
                 return cuts['coincident_signals']
-
+            
+            """
             def timeseries(pixel_id, s_time, e_time, buffer=10):
 
                 start_time = s_time - buffer
@@ -64,34 +99,7 @@ class PlotGlitches(Routine):
                 
                 
                 return time, d_1, d_2, d_3, d_4
-
-
             """
-            Calculate the energy of each detector in an affected pixel
-            """
-            def energy_calculator(self,pid,stime,etime):
-                all_amps = []
-                all_amps.append(timeseries(pid,stime,etime,buffer=0)[1])
-                all_amps.append(timeseries(pid,stime,etime,buffer=0)[2])
-                all_amps.append(timeseries(pid,stime,etime,buffer=0)[3])
-                all_amps.append(timeseries(pid,stime,etime,buffer=0)[4])
-
-                pJ_90a, pJ_90b, pJ_150a, pJ_150b = [],[],[],[]
-
-                for i in range(0,len(all_amps),4):
-                    amp_90a,amp_90b,amp_150a,amp_150b = all_amps[i],all_amps[i+1],all_amps[i+2],all_amps[i+3]
-
-                    norm_90a,norm_90b,norm_150a,norm_150b = amp_90a-np.amin(amp_90a),amp_90b-np.amin(amp_90b),amp_150a-np.amin(amp_150a),amp_150b-np.amin(amp_150b)
-                    pJ_90a.append((etime-stime)*np.sum(norm_90a)*10**(12)/(400.))
-                    pJ_90b.append((etime-stime)*np.sum(norm_90b)*10**(12)/(400.))
-                    pJ_150a.append((etime-stime)*np.sum(norm_150a)*10**(12)/(400.))
-                    pJ_150b.append((etime-stime)*np.sum(norm_150b)*10**(12)/(400.))
-
-
-                return np.sum(pJ_90a),np.sum(pJ_90b),np.sum(pJ_150a),np.sum(pJ_150b)
-
-
-
 
 
             """
@@ -104,11 +112,11 @@ class PlotGlitches(Routine):
                         
                 for pid in pixels:
                
-                    x = timeseries(pid,start_time,end_time)[0]
-                    y1 = timeseries(pid,start_time,end_time)[1]
-                    y2 = timeseries(pid,start_time,end_time)[2]
-                    y3 = timeseries(pid,start_time,end_time)[3]
-                    y4 = timeseries(pid,start_time,end_time)[4]
+                    x = self.timeseries(pid,start_time,end_time)[0]
+                    y1 = self.timeseries(pid,start_time,end_time)[1]
+                    y2 = self.timeseries(pid,start_time,end_time)[2]
+                    y3 = self.timeseries(pid,start_time,end_time)[3]
+                    y4 = self.timeseries(pid,start_time,end_time)[4]
                     
                     
                     plt.title('Pixel affected from ' +str(start_time)+ '-' + str(end_time)+ ', Pixel ' + str(pid))
@@ -156,7 +164,29 @@ class PlotGlitches(Routine):
         else:
             print 'No plot will be displayed!'      
         
-
+    """
+    Calculate the energy of each detector in an affected pixel
+    """
+    def energy_calculator(self,pid,stime,etime):
+        all_amps = []
+        all_amps.append(self.timeseries(pid,stime,etime,buffer=0)[1])
+        all_amps.append(self.timeseries(pid,stime,etime,buffer=0)[2])
+        all_amps.append(self.timeseries(pid,stime,etime,buffer=0)[3])
+        all_amps.append(self.timeseries(pid,stime,etime,buffer=0)[4])
+        
+        pJ_90a, pJ_90b, pJ_150a, pJ_150b = [],[],[],[]
+        
+        for i in range(0,len(all_amps),4):
+            amp_90a,amp_90b,amp_150a,amp_150b = all_amps[i],all_amps[i+1],all_amps[i+2],all_amps[i+3]
+            
+            norm_90a,norm_90b,norm_150a,norm_150b = amp_90a-np.amin(amp_90a),amp_90b-np.amin(amp_90b),amp_150a-np.amin(amp_150a),amp_150b-np.amin(amp_150b)
+            pJ_90a.append((etime-stime)*np.sum(norm_90a)*10**(12)/(400.))
+            pJ_90b.append((etime-stime)*np.sum(norm_90b)*10**(12)/(400.))
+            pJ_150a.append((etime-stime)*np.sum(norm_150a)*10**(12)/(400.))
+            pJ_150b.append((etime-stime)*np.sum(norm_150b)*10**(12)/(400.))
+            
+            
+        return np.sum(pJ_90a),np.sum(pJ_90b),np.sum(pJ_150a),np.sum(pJ_150b)
         
 class SaveEvents(Routine):
     """ A routine that saves all events data in a dictionary """
@@ -166,12 +196,13 @@ class SaveEvents(Routine):
         self._cosig_key = cosig_key
         self._tod_key = tod_key
         self._output_key = output_key 
-    
-    def initialize(self):
-        self._PG = PlotGlitches(self._tag, self._cosig_key, self._tod_key)
+        self._PG = None 
 
+        
     def execute(self):
         print '[INFO] Saving events data to dictionary...'
+        
+        self._PG = PlotGlitches(self._tag,self._cosig_key,self._tod_key)
         tod_data = self.get_store().get(self._tod_key)
         cuts = self.get_store().get(self._cosig_key)
         peaks = cuts['peaks']
@@ -187,12 +218,12 @@ class SaveEvents(Routine):
             number_of_pixels = peak[3]
             ref_index = int((start + end)/2)
             energy = []
-            """
+            #"""
             for pid in all_pixels:
-                e1,e2,e3,e4 = PG.energy_calculator(pid,start,end)
+                e1,e2,e3,e4 =self._PG.energy_calculator(pid,start,end)
                 energy_dict = {str(pid): [e1,e2,e3,e4]}
                 energy.append(energy_dict)
-            """
+            #"""
 
             id = "%d.%d" % (self.get_id(), start)
             event = {
