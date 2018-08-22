@@ -151,7 +151,11 @@ class Routine:
     def get_name(self):
         """A short cut to calling the get_name of parent pipeline"""
         return self.get_context().get_name()
-
+    
+    def get_array(self):
+        tod_name = self.get_context().get_name()
+        array_name = tod_name.split(".")[-2]
+        return array_name 
 
 class DataStore:
     """Cache class for event loop"""
