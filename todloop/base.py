@@ -81,6 +81,11 @@ class TODLoop:
         # get metadata
         return self._tod_name
 
+    def get_array(self):
+        """Return name of the TOD"""
+        # get metadata
+        return self._tod_name.split('.')[-1]
+
     def add_metadata(self, key, obj):
         """Add a metadata, which will be saved together with the output
         to be used as reference for the future, for example, the list

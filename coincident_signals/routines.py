@@ -45,7 +45,11 @@ class TrimEdges(Routine):
 
 class FindCosigs(Routine):
     """A routine that compiles the coincident signals from cuts"""
-    def __init__(self, season="2017", array="AR5", input_key="cuts", output_key="cosig", strict=True, polarized=False):
+
+    #def __init__(self, season="2017", array="AR5", input_key="cuts", output_key="cosig", strict=True, polarized=False):
+
+    def __init__(self, season="2016", input_key="cuts", output_key="cosig", strict=True, polarized=False):
+
         """
         :param input_key: string
         :param output_key: string
@@ -63,15 +67,14 @@ class FindCosigs(Routine):
         self._strict = strict
         self._polarized = polarized
         self._season = season
-        self._array = array
 
     def initialize(self):
-        self._pr = PixelReader(season=self._season, array=self._array)
         if (not self._strict) and (not self._polarized):  # give a warning
             print '[WARNING] Using loose mode for unpolarized signals may not be accurate'
 
     def execute(self):
         # retrieve all cuts
+        self._pr = PixelReader(season=self._season, array=self.get_context().get_array())
         cuts_data = self.get_store().get(self._input_key)  # get saved cut data
         cuts = cuts_data['cuts']
         nsamps = cuts_data['nsamps']
