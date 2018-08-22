@@ -2,6 +2,7 @@ import matplotlib
 matplotlib.use("TKAgg")
 import json
 import numpy as np
+from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 from todloop.routines import Routine
 from todloop.utils.pixels import PixelReader
@@ -34,7 +35,7 @@ class TimeSeries(Routine):
             d1, d2 = tod_data.data[a1], tod_data.data[a2]
             d3, d4 = tod_data.data[b1], tod_data.data[b2]
             
-            # try to remove the mean from start_time to end_time                                                                                                                         
+            # try to remove the mean from start_time to end_time                                                                                                                
             d1 -= np.mean(d1[start_time:end_time])
             d2 -= np.mean(d2[start_time:end_time])
             d3 -= np.mean(d3[start_time:end_time])
@@ -270,7 +271,7 @@ class EnergyStudy(Routine):
         self._hist = None
 
     def initialize(self):
-        self._hist = Hist1D(1,20,48)
+        self._hist = Hist1D(0,50,50)
 
     def execute(self):
         print '[INFO] Adding data to plot histogram...'
@@ -284,10 +285,25 @@ class EnergyStudy(Routine):
 
     def finalize(self):
         plt.step(*self._hist.data)
+        
+        centers = self._hist.data[1]
+        x = np.linspace(0,50,50)
+        f = interp1d(x, centers)
+        plt.plot(x,f(x),label="interp")
+        
+        slope, intercept = np.polyfit(x,f(x),1)
+        y = slope*x + intercept
+        plt.plot(x,y, label='Slope = ' + str(slope))
+        
         plt.title('Energy per Detector')
-        plt.xlabel('Energy pJ')
+        plt.ylabel('log(Events)')
+        plt.xlabel('log(Energy pJ)')
+        plt.legend()
+        plt.xscale('log')
+        plt.yscale('log')
+        plt.autoscale(enable=True)
         plt.show()
-
+        
 class NPixelStudy(Routine):
     def __init__(self,event_key="events"):
         Routine.__init__(self)
