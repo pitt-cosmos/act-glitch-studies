@@ -45,7 +45,7 @@ class TrimEdges(Routine):
 
 class FindCosigs(Routine):
     """A routine that compiles the coincident signals from cuts"""
-    def __init__(self, season="2016", array="AR3", input_key="cuts", output_key="cosig", strict=True, polarized=False):
+    def __init__(self, season="2017", array="AR5", input_key="cuts", output_key="cosig", strict=True, polarized=False):
         """
         :param input_key: string
         :param output_key: string
