@@ -1,6 +1,6 @@
 from todloop.base import TODLoop
 from todloop.routines import Logger, SaveData, DataLoader
-from routines import RemoveMCE, TrimEdges, FindCosigs, FindEvents
+from coincident_signals.routines import RemoveMCE, TrimEdges, FindCosigs, FindEvents
 
 loop = TODLoop()
 loop.add_tod_list("data/s17_icecube_list.txt")
