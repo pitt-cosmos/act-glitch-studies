@@ -191,8 +191,8 @@ class Energy(Routine):
                 pJ_150a.append((etime-stime)*np.sum(norm_150a)*10**(12)/(400.))
                 pJ_150b.append((etime-stime)*np.sum(norm_150b)*10**(12)/(400.))
                 
-            
-            return np.sum(pJ_90a),np.sum(pJ_90b),np.sum(pJ_150a),np.sum(pJ_150b)
+            """Returns the total energy of the pixel (sum of 4 detectors)"""
+            return np.sum(pJ_90a) + np.sum(pJ_90b) + np.sum(pJ_150a) + np.sum(pJ_150b)
 
         self.get_store().set(self._output_key,energy_calculator)
 
@@ -232,11 +232,11 @@ class SaveEvents(Routine):
             duration = peak[2]
             number_of_pixels = peak[3]
             ref_index = int((start + end)/2)
-            energy = []
+            energy_per_detector = []
             for pid in all_pixels:
-                e1,e2,e3,e4 = energy_calculator(pid,start,end)
-                energy_dict = {str(pid): [e1,e2,e3,e4]}
-                energy.append(energy_dict)
+                pix_energy = energy_calculator(pid,start,end)
+                energy_per_detector.append(pix_energy)
+            energy = np.sum(energy_per_detector)
 
             id = "%d.%d" % (self.get_id(), start)
             event = {
@@ -270,25 +270,23 @@ class EnergyStudy(Routine):
     def execute(self):
         print '[INFO] Adding data to plot histogram...'
         events = self.get_store().get(self._event_key)
-        evals = []
         for event in events:
-            energies = event['energy']
-            for pixel in energies:
-                evals.append(pixel.values())
-        self._hist.fill(evals)
+            self._hist.fill(event['energy'])
 
     def finalize(self):
         plt.step(*self._hist.data)
         hist_data = np.array(self._hist.data)
-        #np.savetxt('10000_10150_unf_tods_hist.txt',hist_data)
+        ###CHANGE NAME OF TEXT FILE OR IT WILL OVERWRITE
+        np.savetxt('10000_10150_crf_tods_hist.txt',hist_data)
+
         
-        
+        """
         slope, intercept = np.polyfit(self._hist.data[0],self._hist.data[1],1)
         y = slope*self._hist.data[0] + intercept
         plt.plot(self._hist.data[0],y,'--', label='Slope = ' + str(slope))
-        
-
-        plt.title('Energy per Detector')
+        """
+        #"""
+        plt.title('Energy per Event')
         plt.ylabel('log(Events)')
         plt.xlabel('log(Energy pJ)')
         plt.legend()
@@ -296,7 +294,7 @@ class EnergyStudy(Routine):
         plt.yscale('log')
         plt.autoscale(enable=True)
         plt.show()
-
+        #"""
 
 class NPixelStudy(Routine):
     def __init__(self,event_key="events"):
