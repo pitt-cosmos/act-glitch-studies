@@ -229,6 +229,7 @@ class SaveEvents(Routine):
         
         #Initialize and fill empty dictionary
         events = []
+        
         for peak in peaks:
             all_pixels = pixels_affected_in_event(cs, peak)
             start = peak[0]
@@ -284,17 +285,16 @@ class EnergyStudy(Routine):
         self._hist.fill(evals)
 
     def finalize(self):
-        plt.step(*self._hist.data)
+        #plt.step(*self._hist.data)
+        hist_data = np.array(self._hist.data)
+        np.savetxt('0_150_unfiltered_tods_hist.txt',hist_data)
         
-        centers = self._hist.data[1]
-        x = np.linspace(0,50,50)
-        f = interp1d(x, centers)
-        plt.plot(x,f(x),label="interp")
         
-        slope, intercept = np.polyfit(x,f(x),1)
-        y = slope*x + intercept
-        plt.plot(x,y, label='Slope = ' + str(slope))
+        #slope, intercept = np.polyfit(data[0],data[1],1)
+        #y = slope*x + intercept
+        #plt.plot(x,y, label='Slope = ' + str(slope))
         
+        """
         plt.title('Energy per Detector')
         plt.ylabel('log(Events)')
         plt.xlabel('log(Energy pJ)')
@@ -303,7 +303,8 @@ class EnergyStudy(Routine):
         plt.yscale('log')
         plt.autoscale(enable=True)
         plt.show()
-        
+        """
+
 class NPixelStudy(Routine):
     def __init__(self,event_key="events"):
         Routine.__init__(self)
@@ -324,3 +325,98 @@ class NPixelStudy(Routine):
         plt.title('Number of Pixels Affected')
         plt.xlabel('Number of Pixels')
         plt.show()
+
+
+class CorrelationFilter(Routine):
+    """ Does the same thing as the CorrelationFilter in correlation directory but returns list of cuts instead of dictionary """
+    def __init__(self,timeseries_key,cosig_key,tod_key,output_key,coeff=0.8):
+        Routine.__init__(self)
+        self._timeseries_key = timeseries_key
+        self._cosig_key = cosig_key
+        self._tod_key = tod_key 
+        self._pr = None
+        self._template = None
+        self._output_key = output_key 
+        self._coeff = coeff 
+        self._tag = None
+
+
+    def initialize(self):
+        self._pr = PixelReader()
+
+    def execute(self):
+        print '[INFO] Checking for correlation ...'
+        tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data
+        cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
+        peaks = cuts['peaks']
+        timeseries = self.get_store().get(self._timeseries_key)
+        cs = cuts['coincident_signals']
+
+        def avg_signal(pixels, start_time, end_time):
+
+            for pid in pixels:
+                x, y1, y2, y3, y4 = timeseries(pid,start_time,end_time)
+                avg_y1, avg_y2, avg_y3, avg_y4  = np.zeros(len(y1)),np.zeros(len(y2)),np.zeros(len(y3)),np.zeros(len(y4))
+                avg_x = x
+                avg_y1 += y1
+                avg_y2 += y2
+                avg_y3 += y3
+                avg_y4 += y4
+
+            x = avg_x
+            y1 = avg_y1/len(avg_y1)
+            y2 = avg_y2/len(avg_y2)
+            y3 = avg_y3/len(avg_y3)
+            y4 = avg_y4/len(avg_y4)
+            return x, y1,y2,y3,y4
+
+
+
+        def correlation(x1,x2,y1,y2):
+
+            ts1 = y1
+            ts2 = y2 
+            l1 = len(ts1)
+            l2 = len(ts2)
+            if l1 < l2:
+                n = l1
+                return max([np.corrcoef(ts1, ts2[i:n+i])[0][1] for i in range(0, l2-l1)])
+            elif l2 < l1:
+                n = l2
+                return max([np.corrcoef(ts1[i:n+i], ts2)[0][1] for i in range(0, l1-l2)])
+            else: 
+                return np.corrcoef(ts1, ts2)[0][1]
+
+
+        avg_x1, avg_y1 = self._template[0], self._template[1]
+
+        possible_events = []
+        highlylikely_events = []
+        lower_threshold = 0.6
+        upper_threshold = self._coeff
+        
+        for peak in peaks:
+            all_pixels = pixels_affected_in_event(cs, peak)
+            avg_x2, avg_y2_1,avg_y2_2,avg_y2_3,avg_y2_4 = avg_signal(all_pixels, peak[0], peak[1])
+            coeff1 = correlation(avg_x1, avg_x2, avg_y1, avg_y2_1)
+            coeff2 = correlation(avg_x1, avg_x2, avg_y1, avg_y2_2)
+            coeff3 = correlation(avg_x1, avg_x2, avg_y1, avg_y2_3)
+            coeff4 = correlation(avg_x1, avg_x2, avg_y1, avg_y2_4)
+
+            if (lower_threshold <= coeff1)  & (lower_threshold <=  coeff2 ) & (lower_threshold <= coeff3)  & (lower_threshold <= coeff4) & (coeff1 < upper_threshold) & (coeff2 < upper_threshold) & (coeff3 < upper_threshold) & (coeff4 < upper_threshold):
+                possible_events.append(peak)
+        
+            elif (coeff1 >= upper_threshold) & (coeff2 >= upper_threshold) & (coeff3 >= upper_threshold) & (coeff4 >= upper_threshold):
+                highlylikely_events.append(peak)
+        print highlylikely_events
+        cuts['peaks'] = highlylikely_events
+
+        self.get_store().set(self._output_key,cuts)
+
+
+class CRCorrelationFilter(CorrelationFilter):
+    """A routine that checks for correlation between two signals"""
+    def __init__(self, timeseries_key,cosig_key, tod_key, output_key, coeff=0.8):
+        CorrelationFilter.__init__(self, timeseries_key,cosig_key, tod_key, output_key,coeff)
+        self._template = np.genfromtxt('cr_template.txt')
+        self._tag = "CR"
