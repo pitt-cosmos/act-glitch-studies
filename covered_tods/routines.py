@@ -197,7 +197,8 @@ class Energy(Routine):
                 pJ_150b.append((etime-stime)*np.sum(norm_150b)*10**(12)/(400.))
                 
             
-            return np.sum(pJ_90a),np.sum(pJ_90b),np.sum(pJ_150a),np.sum(pJ_150b)
+            """Returns the total energy of the pixel (sum of 4 detectors)"""
+            return np.sum(pJ_90a) + np.sum(pJ_90b) + np.sum(pJ_150a) + np.sum(pJ_150b)
 
         self.get_store().set(self._output_key,energy_calculator)
 
@@ -237,11 +238,11 @@ class SaveEvents(Routine):
             duration = peak[2]
             number_of_pixels = peak[3]
             ref_index = int((start + end)/2)
-            energy = []
+            energy_per_detector = []
             for pid in all_pixels:
-                e1,e2,e3,e4 = energy_calculator(pid,start,end)
-                energy_dict = {str(pid): [e1,e2,e3,e4]}
-                energy.append(energy_dict)
+                pix_energy = energy_calculator(pid,start,end)
+                energy_per_detector.append(pix_energy)
+            energy = np.sum(energy_per_detector)
 
             id = "%d.%d" % (self.get_id(), start)
             event = {
@@ -277,17 +278,13 @@ class EnergyStudy(Routine):
     def execute(self):
         print '[INFO] Adding data to plot histogram...'
         events = self.get_store().get(self._event_key)
-        evals = []
         for event in events:
-            energies = event['energy']
-            for pixel in energies:
-                evals.append(pixel.values())
-        self._hist.fill(evals)
+            self._hist.fill(event['energy'])
 
     def finalize(self):
         #plt.step(*self._hist.data)
         hist_data = np.array(self._hist.data)
-        np.savetxt('0_150_unfiltered_tods_hist.txt',hist_data)
+        np.savetxt('0_150_crf_events_hist.txt',hist_data)
         
         
         #slope, intercept = np.polyfit(data[0],data[1],1)
