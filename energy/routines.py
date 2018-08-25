@@ -274,10 +274,10 @@ class EnergyStudy(Routine):
             self._hist.fill(event['energy'])
 
     def finalize(self):
-        plt.step(*self._hist.data)
+        #plt.step(*self._hist.data)
         hist_data = np.array(self._hist.data)
         ###CHANGE NAME OF TEXT FILE OR IT WILL OVERWRITE
-        np.savetxt('10000_10150_crf_tods_hist.txt',hist_data)
+        np.savetxt('10000_10150_unf_events_hist.txt',hist_data)
 
         
         """
@@ -285,7 +285,7 @@ class EnergyStudy(Routine):
         y = slope*self._hist.data[0] + intercept
         plt.plot(self._hist.data[0],y,'--', label='Slope = ' + str(slope))
         """
-        #"""
+        """
         plt.title('Energy per Event')
         plt.ylabel('log(Events)')
         plt.xlabel('log(Energy pJ)')
@@ -294,7 +294,7 @@ class EnergyStudy(Routine):
         plt.yscale('log')
         plt.autoscale(enable=True)
         plt.show()
-        #"""
+        """
 
 class NPixelStudy(Routine):
     def __init__(self,event_key="events"):
