@@ -17,11 +17,14 @@ class TimeSeries(Routine):
         self._tod_key = tod_key
         self._pr = None
         self._output_key = output_key
-
+    
+    """
     def initialize(self):
         self._pr = PixelReader()
-        
+    """
+    
     def execute(self):
+        self._pr = PixelReader(season = '2017', array=self.get_context().get_array())
         print '[INFO] Getting timeseries...'
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data                                                                                                     
 
@@ -77,8 +80,9 @@ class PlotGlitches(Routine):
         array_name = self.get_array()
         peaks = cuts['peaks']
         print('[INFO] peaks: ', peaks)
-        self._pr = PixelReader(season='2017',array = str(array_name))        
-               
+        #self._pr = PixelReader(season='2017',array = str(array_name))        
+        self._pr = PixelReader(season='2017', array=self.get_context().get_array())
+      
         plot = raw_input("Do you want to plot an event? Enter y/n: ")
         if plot == "y":
             tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data     
@@ -274,10 +278,10 @@ class EnergyStudy(Routine):
             self._hist.fill(event['energy'])
 
     def finalize(self):
-        #plt.step(*self._hist.data)
+        plt.step(*self._hist.data)
         hist_data = np.array(self._hist.data)
         ###CHANGE NAME OF TEXT FILE OR IT WILL OVERWRITE
-        np.savetxt('10000_10150_unf_events_hist.txt',hist_data)
+        #np.savetxt('10000_10150_unf_events_hist.txt',hist_data)
 
         
         """
@@ -331,12 +335,14 @@ class CorrelationFilter(Routine):
         self._coeff = coeff 
         self._tag = None
 
-
+    """
     def initialize(self):
         self._pr = PixelReader()
+    """
 
     def execute(self):
         print '[INFO] Checking for correlation ...'
+        self._pr = PixelReader(season = '2017', array=self.get_context().get_array())
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data
         cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
         peaks = cuts['peaks']
