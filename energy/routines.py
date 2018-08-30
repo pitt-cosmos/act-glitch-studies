@@ -278,10 +278,10 @@ class EnergyStudy(Routine):
             self._hist.fill(event['energy'])
 
     def finalize(self):
-        plt.step(*self._hist.data)
+        #plt.step(*self._hist.data)
         hist_data = np.array(self._hist.data)
         ###CHANGE NAME OF TEXT FILE OR IT WILL OVERWRITE
-        #np.savetxt('10000_10150_unf_events_hist.txt',hist_data)
+        np.savetxt('icecube_crf.txt',hist_data)
 
         
         """
@@ -316,11 +316,14 @@ class NPixelStudy(Routine):
             self._hist.fill(event['number_of_pixels'])
 
     def finalize(self):
+        """
         plt.step(*self._hist.data)
         plt.title('Number of Pixels Affected')
         plt.xlabel('Number of Pixels')
         plt.show()
-
+        """
+        pixel_data = np.array(self._hist.data)
+        np.savetxt('Unf_unc_pixhist.txt',pixel_data)
 
 class CorrelationFilter(Routine):
     """ Does the same thing as the CorrelationFilter in correlation directory but returns list of cuts instead of dictionary """
