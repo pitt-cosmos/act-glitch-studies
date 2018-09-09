@@ -119,20 +119,34 @@ class CRPWVStudy(Routine):
 
 
 class RaDecStudy(Routine):
-    def __init__(self, input_key):
+    def __init__(self, input_key, ra_range=None, dec_range=None):
         """Scripts that run during initialization of the routine"""
         Routine.__init__(self)
         self._input_key = input_key
         self._ras = []
         self._decs = []
+        self._ra_range = ra_range
+        self._dec_range = dec_range
 
     def execute(self):
         """Scripts that run for each TOD"""
         events = self.get_store().get(self._input_key)
+
         for event in events:
-            self._ras.append(event['ra'])
-            self._decs.append(event['dec'])
-        
+            select = True
+            if self._ra_range and self._dec_range:  # select a range of RA / DEC if given
+                ra_lower = self._ra_range[0]
+                ra_upper = self._ra_range[1]
+                dec_lower = self._dec_range[0]
+                dec_upper = self._dec_range[1]
+
+                if event['ra'] < ra_lower or event['ra'] > ra_upper or \
+                   event['dec'] < dec_lower or event['dec'] > dec_upper :
+                    select = False
+                    
+            if select:
+                self._decs.append(event['dec'])
+                self._ras.append(event['ra'])        
 
     def finalize(self):
         """Scripts that run after processing all TODs"""
@@ -150,11 +164,9 @@ class SpatialStudy(Routine):
         self._rows = []
         self._cols = []
 
-    def initialize(self):
-        self._pr = PixelReader()
-
     def execute(self):
         """Scripts that run for each TOD"""
+        self._pr = PixelReader(array=self.get_context().get_array())
         events = self.get_store().get(self._input_key)  # get events
         for event in events:
             # find the pixels affected

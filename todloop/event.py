@@ -79,7 +79,7 @@ class CoeffFilter(Routine):
     def execute(self):
         """Scripts that run for each TOD"""
         events = self.get_store().get(self._input_key)
-        events_filtered = [event for event in events if self._min_coeff <= event['coefficient'] < self._max_coeff]
+        events_filtered = [event for event in events if self._min_coeff <= min(event['coefficients']) < self._max_coeff]
         self._events_passed += len(events_filtered)
         self._events_processed += len(events)
 
