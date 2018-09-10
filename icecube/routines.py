@@ -2,6 +2,8 @@ from todloop.base import Routine
 import moby2
 import numpy as np
 import cPickle
+from utils import get_cuts_tag, get_pointing_par
+from moby2.scripting import products
 
 class ExtractRaDec(Routine):
     def __init__(self, input_key, output_key, ra_range, dec_range):
@@ -24,16 +26,90 @@ class ExtractRaDec(Routine):
 
     def execute(self):
         """Scripts that run for each TOD"""
+        # Obtain tod_data from memory store
         tod_data = self.get_store().get(self._input_key)
-        ra, dec = moby2.pointing.get_coords(tod_data.ctime, tod_data.az, tod_data.alt)
+        
+        # Reference ra and dec: reference values are used to select
+        # a reasonably sized chunk instead of the whole time stream
+        # which takes a long time to process
+        
+        # Set reference range to 2 times the search range
+        ref_ra_lo = 1.5*self._ra_range[0] - 0.5*self._ra_range[1]
+        ref_ra_up = 1.5*self._ra_range[1] - 0.5*self._ra_range[0]
+        ref_dec_lo = 1.5*self._dec_range[0] - 0.5*self._dec_range[1]
+        ref_dec_up = 1.5*self._dec_range[1] - 0.5*self._dec_range[0]
+        print "Ref ra: [%.2f, %.2f]" % (ref_ra_lo, ref_ra_up)
+        print "Ref dec: [%.2f, %.2f]" % (ref_dec_lo, ref_dec_up)
+        
+        # Set physical range
+        ra_lower, ra_upper = self._ra_range
+        dec_lower, dec_upper = self._dec_range
+        print "ra: [%.2f, %.2f]" % (ra_lower, ra_upper)
+        print "dec: [%.2f, %.2f]" % (dec_lower, dec_upper)
 
-        ra_lower = self._ra_range[0]
-        ra_upper = self._ra_range[1]
-        dec_lower = self._dec_range[0]
-        dec_upper = self._dec_range[1]
+        # Retrieve ra, dec in reference range
+        ref_ra, ref_dec = moby2.pointing.get_coords(tod_data.ctime, tod_data.az, tod_data.alt)
+        
+        # Reduce data to the reference range only
+        ref_sel = np.all((ref_ra>ref_ra_lo, ref_ra<ref_ra_up, \
+                          ref_dec>ref_dec_lo, ref_dec<ref_dec_up), axis=0)
+        ctime = tod_data.ctime[ref_sel]
+        az = tod_data.az[ref_sel]
+        alt = tod_data.alt[ref_sel]
+        print 'Ref region reduction: %d/%d' % (len(ctime), len(tod_data.ctime))
 
-        # Select the elements that fall into the range
-        sel = np.all((ra>ra_lower, ra<ra_upper, dec>dec_lower, dec<dec_upper), axis=0)
+        # Calculate physical ra and dec in reference region
+        pointpar = get_pointing_par(tod_data)
+        print 'Getting focal plane'
+        fplane = products.get_focal_plane(pointpar,\
+                                          det_uid=tod_data.det_uid, \
+                                          tod_info=tod_data.info, \
+                                          tod=tod_data)
+        
+        phy_ra, phy_dec = moby2.pointing.get_coords(ctime, az, alt, \
+                                                    focal_plane=fplane)
+        print "ra.shape: ", phy_ra.shape
+        print "dec.shape: ", phy_dec.shape
+
+        # Reduction in size by detector analysis (cuts, freq,
+        # det_type, etc.)  First load tag to locate the cuts depot.
+        # This part has been commented off, because I couldn't figure
+        # out which depot to use -> will need to ask from Loic
+        
+        # tag = get_cuts_tag(tod_data)
+        
+        # print "[INFO] Trying cut depot: ", tag
+        # cuts = moby2.scripting.get_cuts({'depot': '/mnt/act3/users/lmaurin/depot',\
+        #                                  'tag':  tag}, tod=tod_data)
+                        
+        # Find the live detectors
+        # ld = cuts.get_uncut()
+        # print "# of live detectors: ", len(ld)
+
+        # Find only TES detectors and only look at 150GHz dets
+        tod_info = tod_data.info 
+        tes_mask = tod_info.array_data['det_type'] == 'tes'
+        f150_mask = tod_info.array_data['nom_freq'] == 150.0
+        
+        mask = np.all((tes_mask, f150_mask), axis=0) 
+
+        all_dets = tod_info.det_uid 
+        sel_dets = all_dets[mask]
+        print '# of all dets:', len(all_dets)
+        print '# of sel dets:', len(sel_dets)
+                                    
+        # Reduce ra, dec to only good detectors
+        ra = phy_ra[sel_dets, :]
+        dec = phy_dec[sel_dets, :]
+        _tod = tod_data.data[sel_dets, :]
+        tod = _tod[:, ref_sel]
+        
+        # Restrict to only physical range
+        mask_ra = np.logical_and(ra>ra_lower, ra<ra_upper)
+        mask_dec = np.logical_and(dec>dec_lower, dec<dec_upper)
+        mask = np.logical_and(mask_ra, mask_dec) 
+
+        print '[INFO] mask obtained: mask.shape', mask.shape
 
         # Simplest calculation -> get all data points that pass our 
         # selection and plot the average temperature of all det and
@@ -41,25 +117,17 @@ class ExtractRaDec(Routine):
         # that the time scale of variation that we are looking at 
         # here is on the order of days, so the variation on the 
         # scale of 10 mins is irrelevant
-        snippets = tod_data.data[:, sel]
-
-        # Next find only TES detectors and only look at 150GHz dets
-        tod_info = tod_data.info
-        tes_mask = tod_info.array_data['det_type'] == 'tes'
-        f150_mask = tod_info.array_data['fcode'] == 'f150'
-
-        mask = np.all((tes_mask, f150_mask), axis=0)
-
-        all_detectors = tod_info.det_uid
-        sel_detectors = all_detectors[mask]
-        print "Good detector: ", sel_detectors
-        print "# good det: ", len(sel_detectors)
-        print "# all det: ", len(all_detectors)
+        
+        snippets = tod[mask]
+        
+        print '[INFO] snippet obtained'
+        print '[DEBUG] snippets.shape: ', snippets.shape
+        
 
         # Next find the mean temperature and error
-        t_mean = snippets[sel_detectors, :].mean()  
-        t_std = snippets[sel_detectors, :].std()  
-        ctime_mean = tod_data.ctime[sel].mean()  # find mean time
+        t_mean = snippets.mean()  
+        t_std = snippets.std()  
+        ctime_mean = ctime.mean()  # find mean time
 
         print "Mean temperature: ", t_mean
         print "Temperature stddev: ", t_std
