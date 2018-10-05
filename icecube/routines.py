@@ -61,27 +61,30 @@ class TimeSeries(Routine):
 
 class PlotGlitches(Routine):
     """A routine that plots glitches """
-    def __init__(self, tag, cosig_key, tod_key,timeseries_key):
+    def __init__(self, tag,input_key, tod_key,timeseries_key):
         Routine.__init__(self)
         self._tag = tag
-        self._cosig_key = cosig_key
+        self._input_key = input_key
         self._tod_key = tod_key
         self._timeseries_key = timeseries_key
         self._pr = None
     
     def initialize(self):
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data                                                                        
-        cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data                                                                          
+        events = self.get_store().get(self._input_key)  # retrieve tod_data                                                                          
 
 
     def execute(self):
         print '[INFO] Loading Glitch Data ...'
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data                                                    
-        cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data                                                    
+        #cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data                                                    
         array_name = self.get_array()
-        peaks = cuts['peaks']
+        events = self.get_store().get(self._input_key)
+        peaks = [event['peak'] for event in events]
+        
         #print('[INFO] All glitches, unfiltered...')
-        print('[INFO] peaks: ', peaks)
+        for i in range(len(peaks)):
+            print ('[INFO] peaks: ', i,peaks[i])
         self._pr = PixelReader(season= '2017', array=self.get_context().get_array())
         #self._pr = PixelReader(season='2017',array = str(array_name))        
         #self._pr = PixelReader(season='2017', array=self.get_context().get_array())
@@ -89,15 +92,15 @@ class PlotGlitches(Routine):
         plot = raw_input("Do you want to plot an event? Enter y/n: ")
         if plot == "y":
             tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data     
-            cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
-            peaks = cuts['peaks']
+            events = self.get_store().get(self._input_key)  # retrieve tod_data
+            peaks = [event['peak'] for event in events]
           
           
-        
+            """
             def cs_cuts():
                 cuts = self.get_store().get(self._cosig_key) 
                 return cuts['coincident_signals']
-            
+            """
         
             timeseries = self.get_store().get(self._timeseries_key)
             
@@ -136,12 +139,18 @@ class PlotGlitches(Routine):
             To plot specific event, this interface will ask you to supply the event list, make sure you 
             manually convert the last string to a float or integer
             """
-            cs = cuts['coincident_signals']            
-            e = raw_input('Please copy the event list to plot 4 freq channels:')
+
+            e = raw_input('Please copy the event index to plot 4 freq channels:')
+            """
             event = json.loads(e)
             stime = event[0]
             etime = event[1]
-            pixels = pixels_affected_in_event(cs, event)
+            pixels = pixels_affected_in_event(cs,event)
+            """
+            event = events[int(e)]
+            stime = event['start']
+            etime = event['end']
+            pixels = event['pixels_affected']
             plotter(pixels, stime, etime)
             
             self._pr.plot(pixels)
@@ -152,11 +161,11 @@ class PlotGlitches(Routine):
             while y_n != 'n':
                 y_n = raw_input ("Would you like to plot another event? Enter y/n...")
                 if y_n == 'y':
-                    e= raw_input('Please copy the event list to plot 4 freq channels:')
-                    event = json.loads(e)
-                    stime = event[0]
-                    etime = event[1]
-                    pixels = pixels_affected_in_event(cs, event)
+                    e= raw_input('Please copy the event index  to plot 4 freq channels:')
+                    event = events[int(e)]
+                    stime = event['start']
+                    etime = event['end']
+                    pixels = event['pixels_affected']
                     print '[INFO] Plotting Glitch...'
                     plotter(pixels, stime, etime)
                     self._pr.plot(pixels)
@@ -200,7 +209,10 @@ class Energy(Routine):
                 pJ_150b.append((etime-stime)*np.sum(norm_150b)*10**(12)/(400.))
                 
             """Returns the total energy of the pixel (sum of 4 detectors)"""
-            return np.sum(pJ_90a) + np.sum(pJ_90b) + np.sum(pJ_150a) + np.sum(pJ_150b)
+            #return np.sum(pJ_90a) + np.sum(pJ_90b) + np.sum(pJ_150a) + np.sum(pJ_150b)
+            
+            """ Returns the total energy PER detector"""
+            return np.sum(pJ_90a),np.sum(pJ_90b),np.sum(pJ_150a),np.sum(pJ_150b)
 
         self.get_store().set(self._output_key,energy_calculator)
 
@@ -242,9 +254,20 @@ class SaveEvents(Routine):
             ref_index = int((start + end)/2)
             energy_per_detector = []
             for pid in all_pixels:
+                """
+                Uncomment this if you are analyzing energy per event, also, 
+                change the return statement of energy calculator to return the sum of 4 det
+                """
+                
+                """
                 pix_energy = energy_calculator(pid,start,end)
                 energy_per_detector.append(pix_energy)
-            energy = np.sum(energy_per_detector)
+                """
+                e1,e2,e3,e4 = energy_calculator(pid,start,end)
+                energy_dict ={str(pid): [e1,e2,e3,e4]}
+                energy_per_detector.append(energy_dict)
+            """Uncomment this if you are analyzing energy per detector"""
+            #energy = np.sum(energy_per_detector)
 
             id = "%d.%d" % (self.get_id(), start)
             event = {
@@ -253,11 +276,12 @@ class SaveEvents(Routine):
                 'end': end,
                 'duration': duration,
                 'ctime': tod_data.ctime[ref_index],
+                'peak': [int(start),int(end),int(duration),int(number_of_pixels)],
                 'alt': tod_data.alt[ref_index],
                 'az': tod_data.az[ref_index],
                 'number_of_pixels': float(number_of_pixels),
                 'pixels_affected': all_pixels,
-                'energy': energy,
+                'energy': energy_per_detector,
             }
             events.append(event)
         
@@ -278,12 +302,22 @@ class EnergyStudy(Routine):
     def execute(self):
         print '[INFO] Adding data to plot histogram...'
         events = self.get_store().get(self._event_key)
+        evals = []
         for event in events:
-            self._hist.fill(event['energy'])
+            """ Uncomment for event energies"""
+            #self._hist.fill(event['energy'])
+            energies = event['energy']
+            for pixel in energies:
+                evals.append(pixel.values())
+        self._hist.fill(evals)
 
     def finalize(self):
-        #plt.step(*self._hist.data)
-        hist_data = np.array(self._hist.data)
+        plt.step(*self._hist.data)
+        plt.title('Energy per Detector')
+        plt.show()
+        """Comment out above and uncomment below if you want to save output for multiple TODs to txt file for remote analysis"""
+
+        #hist_data = np.array(self._hist.data)
         ###CHANGE NAME OF TEXT FILE OR IT WILL OVERWRITE
         #np.savetxt('icecube_crf.txt',hist_data)
 
@@ -327,14 +361,14 @@ class NPixelStudy(Routine):
         plt.show()
         """
         pixel_data = np.array(self._hist.data)
-        np.savetxt('Unf_cov_pixhist.txt',pixel_data)
+        #np.savetxt('Unf_cov_pixhist.txt',pixel_data)
 
 class CorrelationFilter(Routine):
     """ Does the same thing as the CorrelationFilter in correlation directory but returns list of cuts instead of dictionary """
-    def __init__(self,timeseries_key,cosig_key,tod_key,output_key,coeff=0.8):
+    def __init__(self,timeseries_key,input_key,tod_key,output_key,coeff=0.8):
         Routine.__init__(self)
         self._timeseries_key = timeseries_key
-        self._cosig_key = cosig_key
+        self._input_key = input_key
         self._tod_key = tod_key 
         self._pr = None
         self._template = None
@@ -351,10 +385,12 @@ class CorrelationFilter(Routine):
         print '[INFO] Checking for correlation ...'
         self._pr = PixelReader(season = '2017', array=self.get_context().get_array())
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data
-        cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
-        peaks = cuts['peaks']
+        #cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
+        events = self.get_store().get(self._input_key)
+        peaks = [event['peak'] for event in events]
+        #peaks = cuts['peaks']
         timeseries = self.get_store().get(self._timeseries_key)
-        cs = cuts['coincident_signals']
+        #cs = cuts['coincident_signals']
 
         def avg_signal(pixels, start_time, end_time):
 
@@ -400,7 +436,8 @@ class CorrelationFilter(Routine):
         upper_threshold = self._coeff
         
         for peak in peaks:
-            all_pixels = pixels_affected_in_event(cs, peak)
+            #all_pixels = pixels_affected_in_event(cs,peak)
+            all_pixels = peak['pixels_affected']
             avg_x2, avg_y2_1,avg_y2_2,avg_y2_3,avg_y2_4 = avg_signal(all_pixels, peak[0], peak[1])
             coeff1 = correlation(avg_x1, avg_x2, avg_y1, avg_y2_1)
             coeff2 = correlation(avg_x1, avg_x2, avg_y1, avg_y2_2)
@@ -414,9 +451,10 @@ class CorrelationFilter(Routine):
                 highlylikely_events.append(peak)
 
         print highlylikely_events
-        print '[INFO] Events passed: %d / %d' % (len(highlylikely_events), len(peaks))
-        cuts['peaks'] = highlylikely_events
-        self.get_store().set(self._output_key,cuts)
+        print '[INFO] Correlation events passed: %d / %d' % (len(highlylikely_events), len(peaks))
+        
+        #cuts['peaks'] = highlylikely_events
+        self.get_store().set(self._output_key,events)
 
 
 class CRCorrelationFilter(CorrelationFilter):
@@ -427,7 +465,7 @@ class CRCorrelationFilter(CorrelationFilter):
         self._tag = "CR"
 
 
-class RaDecStudy(Routine):
+class RaDecFilter(Routine):
     def __init__(self, output_key="events",input_key="events", ra_range=None, dec_range=None):
         """Scripts that run during initialization of the routine"""
         Routine.__init__(self)
@@ -468,6 +506,5 @@ class RaDecStudy(Routine):
         else:
             print '[INFO] RA/Dec Events passed: %d / %d' % (len(filtered_events),len(events))
 
-    def finalize(self):
-        print '[INFO] Total RA/Dec events passed: %d / %d' % (self._events_passed, self._events_processed)
+
 
