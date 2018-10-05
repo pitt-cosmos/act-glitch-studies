@@ -22,7 +22,11 @@ class Timer(Routine):
         self._start_time = time.time()
 
     def finalize(self):
-        print '[INFO] Elapsed time = %s seconds' % (time.time()-self._start_time)
+        elapsed_time = (time.time()-self._start_time)
+        if elapsed_time >= 60.0:
+            print '[INFO] Elapsed time = %s minutes' % (elapsed_time/60.)
+        else:
+            print '[INFO] Elapsed time = %s seconds' % elapsed_time
 
 class TimeSeries(Routine):
     """ A routine that returns a function to find the timeseries of a pixel in 4 frequencies """
