@@ -36,14 +36,9 @@ class TimeSeries(Routine):
         self._pr = None
         self._output_key = output_key
     
-    """
-    def initialize(self):
-        self._pr = PixelReader()
-    """
     
     def execute(self):
         self._pr = PixelReader(season = '2017', array=self.get_context().get_array())
-        #self._pr = PixelReader(season = '2017', array=str(self.get_array())) 
         print '[INFO] Getting timeseries...'
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data                                                                                                     
 
@@ -95,31 +90,20 @@ class PlotGlitches(Routine):
     def execute(self):
         print '[INFO] Loading Glitch Data ...'
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data                                                    
-        #cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data                                                    
         array_name = self.get_array()
         events = self.get_store().get(self._input_key)
         peaks = [event['peak'] for event in events]
-        
-        #print('[INFO] All glitches, unfiltered...')
+
         for i in range(len(peaks)):
-            print ('[INFO] peaks: ', i,peaks[i])
+            print ('[INFO] Filtered peak: ', i,peaks[i])
         self._pr = PixelReader(season= '2017', array=self.get_context().get_array())
-        #self._pr = PixelReader(season='2017',array = str(array_name))        
-        #self._pr = PixelReader(season='2017', array=self.get_context().get_array())
+
       
         plot = raw_input("Do you want to plot an event? Enter y/n: ")
         if plot == "y":
             tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data     
             events = self.get_store().get(self._input_key)  # retrieve tod_data
             peaks = [event['peak'] for event in events]
-          
-          
-            """
-            def cs_cuts():
-                cuts = self.get_store().get(self._cosig_key) 
-                return cuts['coincident_signals']
-            """
-        
             timeseries = self.get_store().get(self._timeseries_key)
             
 
@@ -159,12 +143,7 @@ class PlotGlitches(Routine):
             """
 
             e = raw_input('Please copy the event index to plot 4 freq channels:')
-            """
-            event = json.loads(e)
-            stime = event[0]
-            etime = event[1]
-            pixels = pixels_affected_in_event(cs,event)
-            """
+
             event = events[int(e)]
             stime = event['start']
             etime = event['end']
@@ -394,21 +373,15 @@ class CorrelationFilter(Routine):
         self._coeff = coeff 
         self._tag = None
 
-    """
-    def initialize(self):
-        self._pr = PixelReader()
-    """
+
 
     def execute(self):
         print '[INFO] Checking for correlation ...'
         self._pr = PixelReader(season = '2017', array=self.get_context().get_array())
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data
-        #cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
         events = self.get_store().get(self._input_key)
         peaks = [event['peak'] for event in events]
-        #peaks = cuts['peaks']
         timeseries = self.get_store().get(self._timeseries_key)
-        #cs = cuts['coincident_signals']
 
         def avg_signal(pixels, start_time, end_time):
 
@@ -453,32 +426,30 @@ class CorrelationFilter(Routine):
         lower_threshold = 0.6
         upper_threshold = self._coeff
         
-        for peak in peaks:
-            #all_pixels = pixels_affected_in_event(cs,peak)
-            all_pixels = peak['pixels_affected']
-            avg_x2, avg_y2_1,avg_y2_2,avg_y2_3,avg_y2_4 = avg_signal(all_pixels, peak[0], peak[1])
+        for event in events:
+            all_pixels = event['pixels_affected']
+            avg_x2, avg_y2_1,avg_y2_2,avg_y2_3,avg_y2_4 = avg_signal(all_pixels, event['start'], event['end'])
             coeff1 = correlation(avg_x1, avg_x2, avg_y1, avg_y2_1)
             coeff2 = correlation(avg_x1, avg_x2, avg_y1, avg_y2_2)
             coeff3 = correlation(avg_x1, avg_x2, avg_y1, avg_y2_3)
             coeff4 = correlation(avg_x1, avg_x2, avg_y1, avg_y2_4)
 
             if (lower_threshold <= coeff1)  & (lower_threshold <=  coeff2 ) & (lower_threshold <= coeff3)  & (lower_threshold <= coeff4) & (coeff1 < upper_threshold) & (coeff2 < upper_threshold) & (coeff3 < upper_threshold) & (coeff4 < upper_threshold):
-                possible_events.append(peak)
+                possible_events.append(event)
         
             elif (coeff1 >= upper_threshold) & (coeff2 >= upper_threshold) & (coeff3 >= upper_threshold) & (coeff4 >= upper_threshold):
-                highlylikely_events.append(peak)
-
-        print highlylikely_events
+                highlylikely_events.append(event)
+                
+        #print highlylikely_events
         print '[INFO] Correlation events passed: %d / %d' % (len(highlylikely_events), len(peaks))
         
-        #cuts['peaks'] = highlylikely_events
-        self.get_store().set(self._output_key,events)
+        self.get_store().set(self._output_key,highlylikely_events)
 
 
 class CRCorrelationFilter(CorrelationFilter):
     """A routine that checks for correlation between two signals"""
-    def __init__(self, timeseries_key,cosig_key, tod_key, output_key, coeff=0.8):
-        CorrelationFilter.__init__(self, timeseries_key,cosig_key, tod_key, output_key,coeff)
+    def __init__(self, timeseries_key,input_key, tod_key, output_key, coeff=0.8):
+        CorrelationFilter.__init__(self, timeseries_key,input_key, tod_key, output_key,coeff)
         self._template = np.genfromtxt('cr_template.txt')
         self._tag = "CR"
 
