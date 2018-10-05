@@ -1,5 +1,6 @@
 import matplotlib
 matplotlib.use("TKAgg")
+import time
 import json
 import numpy as np
 from scipy.interpolate import interp1d
@@ -9,6 +10,19 @@ from todloop.utils.pixels import PixelReader
 from todloop.utils.cuts import pixels_affected_in_event
 from todloop.utils.hist import Hist1D 
 
+
+class Timer(Routine):
+    """ A routine that tells you how long it takes a program to run"""
+
+    def __init__(self):
+        Routine.__init__(self)
+        self._start_time = None
+
+    def execute(self):
+        self._start_time = time.time()
+
+    def finalize(self):
+        print '[INFO] Elapsed time = %s seconds' % (time.time()-self._start_time)
 
 class TimeSeries(Routine):
     """ A routine that returns a function to find the timeseries of a pixel in 4 frequencies """

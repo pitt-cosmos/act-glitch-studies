@@ -2,7 +2,7 @@ from todloop.event import LoadRaDec, NPixelFilter, CoeffFilter, DurationFilter
 from todloop.routines import DataLoader
 from todloop.tod import TODLoader
 from todloop.base import TODLoop
-from routines import TimeSeries, PlotGlitches, Energy,SaveEvents, NPixelStudy, EnergyStudy,CRCorrelationFilter, RaDecFilter
+from routines import TimeSeries, PlotGlitches, Energy,SaveEvents, NPixelStudy, EnergyStudy,CRCorrelationFilter, RaDecFilter,Timer
 from calibration.routines import FixOpticalSign, CalibrateTOD
 
 
@@ -10,7 +10,8 @@ from calibration.routines import FixOpticalSign, CalibrateTOD
 INITIALIZE TODLoop
 """
 loop = TODLoop()
-tod_id = 16
+tod_id = 0
+loop.add_routine(Timer())
 """
 ICECUBE
 """
