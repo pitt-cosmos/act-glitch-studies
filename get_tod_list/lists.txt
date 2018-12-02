@@ -1,6 +1,0 @@
-/mnt/act3/users/lmaurin/depot/SelectedTODs/mr3_pa3_s16/selectedTODs_wide_01h_n.txt
-/mnt/act3/users/lmaurin/depot/SelectedTODs/mr3_pa3_s16/selectedTODs_wide_01h_s.txt
-/mnt/act3/users/lmaurin/depot/SelectedTODs/mr3_pa3_s16/selectedTODs_wide_12h_n.txt
-/mnt/act3/users/lmaurin/depot/SelectedTODs/mr3_pa3_s16/selectedTODs_deep5.txt
-/mnt/act3/users/lmaurin/depot/SelectedTODs/mr3_pa3_s16/selectedTODs_day_02h_s.txt
-/mnt/act3/users/lmaurin/depot/SelectedTODs/mr3_pa3_s16/selectedTODs_day_14h_n.txt
