@@ -24,7 +24,10 @@ class TimeSeries(Routine):
     """
     
     def execute(self):
-        self._pr = PixelReader(season = '2017', array=self.get_context().get_array())
+
+        #array_name = self.get_array()
+        #self._pr = PixelReader(season = '2017', array=str(array_name)) #use this for covered TODs
+        self._pr = PixelReader() #use this for uncovered TODs
         print '[INFO] Getting timeseries...'
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data                                                                                                     
 
@@ -79,16 +82,19 @@ class PlotGlitches(Routine):
         cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data                                                    
         array_name = self.get_array()
         peaks = cuts['peaks']
+        print('[INFO] All glitches, unfiltered...')
         print('[INFO] peaks: ', peaks)
+        self._pr = PixelReader(season= '2017', array=self.get_context().get_array())
         #self._pr = PixelReader(season='2017',array = str(array_name))        
-        self._pr = PixelReader(season='2017', array=self.get_context().get_array())
+        #self._pr = PixelReader(season='2017', array=self.get_context().get_array())
       
         plot = raw_input("Do you want to plot an event? Enter y/n: ")
         if plot == "y":
             tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data     
             cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
             peaks = cuts['peaks']
-            print('[INFO] peaks: ', peaks)
+          
+          
         
             def cs_cuts():
                 cuts = self.get_store().get(self._cosig_key) 
@@ -307,7 +313,7 @@ class NPixelStudy(Routine):
         self._hist = None
     
     def initialize(self):
-        self._hist = Hist1D(1,50,48)
+        self._hist = Hist1D(1,200,50)
 
     def execute(self):
         print '[INFO] Adding data to plot histogram...'
@@ -323,7 +329,7 @@ class NPixelStudy(Routine):
         plt.show()
         """
         pixel_data = np.array(self._hist.data)
-        np.savetxt('Unf_unc_pixhist.txt',pixel_data)
+        np.savetxt('Unf_uncov_pix.txt',pixel_data)
 
 class CorrelationFilter(Routine):
     """ Does the same thing as the CorrelationFilter in correlation directory but returns list of cuts instead of dictionary """
@@ -408,9 +414,10 @@ class CorrelationFilter(Routine):
         
             elif (coeff1 >= upper_threshold) & (coeff2 >= upper_threshold) & (coeff3 >= upper_threshold) & (coeff4 >= upper_threshold):
                 highlylikely_events.append(peak)
-        print highlylikely_events
-        cuts['peaks'] = highlylikely_events
 
+        print highlylikely_events
+        print '[INFO] Events passed: %d / %d' % (len(highlylikely_events), len(peaks))
+        cuts['peaks'] = highlylikely_events
         self.get_store().set(self._output_key,cuts)
 
 
@@ -420,3 +427,39 @@ class CRCorrelationFilter(CorrelationFilter):
         CorrelationFilter.__init__(self, timeseries_key,cosig_key, tod_key, output_key,coeff)
         self._template = np.genfromtxt('cr_template.txt')
         self._tag = "CR"
+
+
+class RaDecStudy(Routine):
+    def __init__(self, output_key,input_key, ra_range=None, dec_range=None):
+        """Scripts that run during initialization of the routine"""
+        Routine.__init__(self)
+        self._input_key = input_key
+        self._ra_range = ra_range
+        self._dec_range = dec_range
+        self._output_key = output_key 
+
+    def execute(self):
+        """Scripts that run for each TOD"""
+        cuts= self.get_store().get(self._input_key)
+            
+        filtered_events = []
+
+        
+        for event in events:
+            select = True
+            if self._ra_range and self._dec_range:  # select a range of RA / DEC if given
+                ra_lower = self._ra_range[0]
+                ra_upper = self._ra_range[1]
+                dec_lower = self._dec_range[0]
+                dec_upper = self._dec_range[1]
+
+                if event['ra'] < ra_lower or event['ra'] > ra_upper or \
+                   event['dec'] < dec_lower or event['dec'] > dec_upper :
+                    select = False
+            if select:
+                self._filtered_events.append(event)
+
+        self.get_store().set(self._output_key,filtered_events)
+
+    def finalize(self):
+        print '[INFO] Total events passed: %d / %d' % (len(filtered_events), len(events))
