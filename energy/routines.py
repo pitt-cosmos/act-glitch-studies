@@ -84,7 +84,8 @@ class PlotGlitches(Routine):
         peaks = cuts['peaks']
         print('[INFO] All glitches, unfiltered...')
         print('[INFO] peaks: ', peaks)
-        self._pr = PixelReader(season= '2017', array=self.get_context().get_array())
+        #self._pr = PixelReader(season= '2017', array=self.get_context().get_array()) #for covered
+        self._pr = PixelReader() #for uncovered
         #self._pr = PixelReader(season='2017',array = str(array_name))        
         #self._pr = PixelReader(season='2017', array=self.get_context().get_array())
       

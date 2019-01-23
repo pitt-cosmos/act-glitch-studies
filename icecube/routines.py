@@ -25,7 +25,7 @@ class Timer(Routine):
         elapsed_time = (time.time()-self._start_time)
         if elapsed_time >= 60.0:
             print '[INFO] Elapsed time = %s minutes' % (elapsed_time/60.)
-        else:
+        elif elapsed_time <60.0:
             print '[INFO] Elapsed time = %s seconds' % elapsed_time
 
 class TimeSeries(Routine):
@@ -84,7 +84,7 @@ class PlotGlitches(Routine):
     
     def initialize(self):
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data                                                                        
-        events = self.get_store().get(self._input_key)  # retrieve tod_data                                                                          
+        events = self.get_store().get(self._input_key) 
 
 
     def execute(self):
@@ -310,8 +310,7 @@ class EnergyStudy(Routine):
 
     def finalize(self):
         plt.step(*self._hist.data)
-        plt.title('Energy per Detector')
-        plt.show()
+        
         """Comment out above and uncomment below if you want to save output for multiple TODs to txt file for remote analysis"""
 
         #hist_data = np.array(self._hist.data)
@@ -324,8 +323,8 @@ class EnergyStudy(Routine):
         y = slope*self._hist.data[0] + intercept
         plt.plot(self._hist.data[0],y,'--', label='Slope = ' + str(slope))
         """
-        """
-        plt.title('Energy per Event')
+        #"""
+        plt.title('Energy per Detector')
         plt.ylabel('log(Events)')
         plt.xlabel('log(Energy pJ)')
         plt.legend()
@@ -333,7 +332,7 @@ class EnergyStudy(Routine):
         plt.yscale('log')
         plt.autoscale(enable=True)
         plt.show()
-        """
+        #"""
 
 class NPixelStudy(Routine):
     def __init__(self,event_key="events"):

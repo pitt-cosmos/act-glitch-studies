@@ -10,7 +10,7 @@ from calibration.routines import FixOpticalSign, CalibrateTOD
 INITIALIZE TODLoop
 """
 loop = TODLoop()
-tod_id = 0
+tod_id = 15
 loop.add_routine(Timer())
 """
 ICECUBE
@@ -39,7 +39,7 @@ loop.add_routine(SaveEvents(tag=tod_id,cosig_key ="cuts",tod_key="tod_data",ener
 loop.add_routine(LoadRaDec(input_key="events", output_key="events"))
 loop.add_routine(RaDecFilter(input_key="events", ra_range=[1.2, 1.4], dec_range=[0.08, 0.11],output_key="events"))
 loop.add_routine(NPixelFilter(min_pixels=0, max_pixels=3, input_key="events", output_key="events"))
-#loop.add_routine(CRCorrelationFilter(timeseries_key="timeseries",cosig_key = "cuts",tod_key="tod_data", output_key= "cr_cuts"))          
+#loop.add_routine(CRCorrelationFilter(timeseries_key="timeseries",input_key="events",tod_key="tod_data", output_key= "events"))          
 loop.add_routine(PlotGlitches(tag=tod_id,input_key="events",tod_key="tod_data",timeseries_key = "timeseries"))
 #loop.add_routine(NPixelStudy(event_key="events"))
 loop.add_routine(EnergyStudy(event_key="events"))

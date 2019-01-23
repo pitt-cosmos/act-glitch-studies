@@ -9,6 +9,74 @@ from todloop.utils.pixels import PixelReader
 from todloop.utils.cuts import pixels_affected_in_event
 from todloop.utils.hist import Hist1D 
 
+"""
+#######################
+ROUTINES IN THIS FILE #
+#######################
+
+1. Filter - Routine
+   Can be applied to make new filters
+
+2. Timeseries - Routine
+   Returns function of timeseries
+
+3. PlotGlitches - Routine
+   User input event gets plotted, for every pixel affected
+   then the location of pixels affected on detector plane is plotted
+
+4. Energy - Routine
+   Returns the total energy of a pixel (four detectors) 
+   This info can be saved in events dictionary
+
+5. SaveEvents - Routine
+   Takes initial cuts data and generates a dictionary 
+   with various well defined parameters
+
+6. EnergyStudy - Routine
+   Generates histogram data about the energy associated with an event
+   Saves data to a text file
+
+7. NPixelStudy - Routine
+   Generates histogram data about the number of pixels affected in an event 
+   Saves data to a text file
+
+8. CorrelationFilter - Routine
+   Routine that takes timeseries and compares it to a template and returns a 
+   coffecient of correlation. If coeff > 0.8, it gets passed further down pipeline
+ 
+  a.CRCorrelationFilter - Instance of CorrelationFilter
+    Applies cosmic ray template to correlation filter routine
+ 
+  b.FRBCorrelationFilter - Instance of CorrelationFilter
+    Applies FRB template to correlation filter routine
+
+9. Duration Filter - Filter
+   Filters out cuts based on how many timesamples the glitch spans
+   WIP not well incorporated in timeline yet!!
+
+10. Pixel Filter - Filter
+    Filters out events that affect more than a specified number of pixels
+
+11. EdgeFilter - Filter
+   Filters out events that take place on the edge of the detector plane
+   WIP not well incorporated in timeline yet!!
+
+12. RADecStudy - Routine
+   Filters out events that take place outside of a specified RA and Dec range
+
+
+
+"""
+
+
+
+class Filter(Routine):
+    def __init__(self, input_key, output_key):
+        Routine.__init__(self)
+        self._input_key = input_key
+        self._output_key = output_key
+
+
 class TimeSeries(Routine):
     """ A routine that returns a function to find the timeseries of a pixel in 4 frequencies """
     def __init__(self,tod_key,output_key):
@@ -16,13 +84,19 @@ class TimeSeries(Routine):
         self._tod_key = tod_key
         self._pr = None
         self._output_key = output_key
-
-
+    
+    """
+    def initialize(self):
+        self._pr = PixelReader()
+    """
+    
     def execute(self):
+
+        #array_name = self.get_array()
+        #self._pr = PixelReader(season = '2017', array=str(array_name)) #use this for covered TODs
+        self._pr = PixelReader() #use this for uncovered TODs
         print '[INFO] Getting timeseries...'
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data                                                                                                     
-        array_name = self.get_array()
-        self._pr = PixelReader(season='2017',array = str(array_name))
 
     
         def timeseries(pixel_id, s_time, e_time, buffer=10):
@@ -54,11 +128,6 @@ class TimeSeries(Routine):
 
         self.get_store().set(self._output_key,timeseries)
 
-
-
-
-
-
 class PlotGlitches(Routine):
     """A routine that plots glitches """
     def __init__(self, tag, cosig_key, tod_key,timeseries_key):
@@ -80,15 +149,20 @@ class PlotGlitches(Routine):
         cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data                                                    
         array_name = self.get_array()
         peaks = cuts['peaks']
+        print('[INFO] All glitches, unfiltered...')
         print('[INFO] peaks: ', peaks)
-        self._pr = PixelReader(season='2017',array = str(array_name))        
-               
+        #self._pr = PixelReader(season= '2017', array=self.get_context().get_array()) #for covered
+        self._pr = PixelReader() #for uncovered
+        #self._pr = PixelReader(season='2017',array = str(array_name))        
+        #self._pr = PixelReader(season='2017', array=self.get_context().get_array())
+      
         plot = raw_input("Do you want to plot an event? Enter y/n: ")
         if plot == "y":
             tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data     
             cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
             peaks = cuts['peaks']
-            print('[INFO] peaks: ', peaks)
+          
+          
         
             def cs_cuts():
                 cuts = self.get_store().get(self._cosig_key) 
@@ -161,7 +235,6 @@ class PlotGlitches(Routine):
         else:
             print 'No plot will be displayed!'      
 
-
 class Energy(Routine):
     """ A routine that returns a function to calculate the energy per detector in a pixel """
 
@@ -196,7 +269,6 @@ class Energy(Routine):
                 pJ_150a.append((etime-stime)*np.sum(norm_150a)*10**(12)/(400.))
                 pJ_150b.append((etime-stime)*np.sum(norm_150b)*10**(12)/(400.))
                 
-            
             """Returns the total energy of the pixel (sum of 4 detectors)"""
             return np.sum(pJ_90a) + np.sum(pJ_90b) + np.sum(pJ_150a) + np.sum(pJ_150b)
 
@@ -262,13 +334,8 @@ class SaveEvents(Routine):
         self.get_store().set(self._output_key,events)
 
 
-
-
 class EnergyStudy(Routine):
-    """ 
-    A routine to plot a histogram of the energy per detector in a list of peaks in a TOD 
-    Alternatively, save the output to a .txt file and use the jupyter notebook to overlay plots for comparison
-    """
+    """ A routine to plot a histogram of the energy per detector in a list of peaks in a TOD """
 
     def __init__(self,event_key="events"):
         Routine.__init__(self)
@@ -287,15 +354,17 @@ class EnergyStudy(Routine):
     def finalize(self):
         #plt.step(*self._hist.data)
         hist_data = np.array(self._hist.data)
-        np.savetxt('0_150_crf_events_hist.txt',hist_data)
-        
-        
-        #slope, intercept = np.polyfit(data[0],data[1],1)
-        #y = slope*x + intercept
-        #plt.plot(x,y, label='Slope = ' + str(slope))
+        ###CHANGE NAME OF TEXT FILE OR IT WILL OVERWRITE
+        np.savetxt('icecube_crf.txt',hist_data)
+
         
         """
-        plt.title('Energy per Detector')
+        slope, intercept = np.polyfit(self._hist.data[0],self._hist.data[1],1)
+        y = slope*self._hist.data[0] + intercept
+        plt.plot(self._hist.data[0],y,'--', label='Slope = ' + str(slope))
+        """
+        """
+        plt.title('Energy per Event')
         plt.ylabel('log(Events)')
         plt.xlabel('log(Energy pJ)')
         plt.legend()
@@ -312,7 +381,7 @@ class NPixelStudy(Routine):
         self._hist = None
     
     def initialize(self):
-        self._hist = Hist1D(1,50,48)
+        self._hist = Hist1D(1,200,50)
 
     def execute(self):
         print '[INFO] Adding data to plot histogram...'
@@ -321,11 +390,14 @@ class NPixelStudy(Routine):
             self._hist.fill(event['number_of_pixels'])
 
     def finalize(self):
+        """
         plt.step(*self._hist.data)
         plt.title('Number of Pixels Affected')
         plt.xlabel('Number of Pixels')
         plt.show()
-
+        """
+        pixel_data = np.array(self._hist.data)
+        np.savetxt('Unf_uncov_pix.txt',pixel_data)
 
 class CorrelationFilter(Routine):
     """ Does the same thing as the CorrelationFilter in correlation directory but returns list of cuts instead of dictionary """
@@ -340,12 +412,15 @@ class CorrelationFilter(Routine):
         self._coeff = coeff 
         self._tag = None
 
-
+    """
     def initialize(self):
         self._pr = PixelReader()
+    """
 
     def execute(self):
         print '[INFO] Checking for correlation ...'
+        self._pr = PixelReader()
+        #self._pr = PixelReader(season = '2017', array=self.get_context().get_array())
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data
         cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
         peaks = cuts['peaks']
@@ -392,7 +467,6 @@ class CorrelationFilter(Routine):
 
         possible_events = []
         highlylikely_events = []
-        discarded_events = []
         lower_threshold = 0.6
         upper_threshold = self._coeff
         
@@ -403,20 +477,16 @@ class CorrelationFilter(Routine):
             coeff2 = correlation(avg_x1, avg_x2, avg_y1, avg_y2_2)
             coeff3 = correlation(avg_x1, avg_x2, avg_y1, avg_y2_3)
             coeff4 = correlation(avg_x1, avg_x2, avg_y1, avg_y2_4)
-            
-            if (coeff1 < lower_threshold) & (coeff2 < lower_threshold) & (coeff3 < lower_threshold) & (coeff4 < lower_threshold):
-                discarded_events.append(peak)
-        
 
             if (lower_threshold <= coeff1)  & (lower_threshold <=  coeff2 ) & (lower_threshold <= coeff3)  & (lower_threshold <= coeff4) & (coeff1 < upper_threshold) & (coeff2 < upper_threshold) & (coeff3 < upper_threshold) & (coeff4 < upper_threshold):
                 possible_events.append(peak)
         
             elif (coeff1 >= upper_threshold) & (coeff2 >= upper_threshold) & (coeff3 >= upper_threshold) & (coeff4 >= upper_threshold):
                 highlylikely_events.append(peak)
+
         print highlylikely_events
-        #cuts['peaks'] = highlylikely_events
-        cuts['peaks'] = discarded_events
-        
+        print '[INFO] Events passed: %d / %d' % (len(highlylikely_events), len(peaks))
+        cuts['peaks'] = highlylikely_events
         self.get_store().set(self._output_key,cuts)
 
 
@@ -426,3 +496,120 @@ class CRCorrelationFilter(CorrelationFilter):
         CorrelationFilter.__init__(self, timeseries_key,cosig_key, tod_key, output_key,coeff)
         self._template = np.genfromtxt('cr_template.txt')
         self._tag = "CR"
+
+
+
+class DurationFilter(Filter):
+    """An event filter based on the duration of events (set max duration)"""
+    def __init__(self, min_duration=0,max_duration=10000, input_key='data', output_key='data'):
+        Filter.__init__(self, input_key=input_key, output_key=output_key)
+        self._min_duration = min_duration
+        self._max_duration = max_duration
+
+    def execute(self):
+        cosig = self.get_context().get_store().get(self._input_key)
+        peaks = cosig['peaks']
+        print '[INFO] Before: n_tracks = %d' % len(cosig['peaks'])
+        peaks_filtered = [peak for peak in peaks if self._min_duration < peak[2] <= self._max_duration]
+        #dur_cuts = {'peaks': peaks_filtered,'coincident_signal':}
+        dur_cuts = cosig.copy()
+        dur_cuts['peaks'] = peaks_filtered
+        print '[INFO] After: n_tracks = %d' % len(dur_cuts['peaks'])
+        self.get_context().get_store().set(self._output_key, dur_cuts)
+
+
+
+class PixelFilter(Filter):
+    """An event filter based on the number of pixels affected (set max n_pixels)"""
+    def __init__(self,min_pixels=0, max_pixels=3, input_key='data', output_key='data'):
+        Filter.__init__(self, input_key, output_key)
+        self._min_pixels = min_pixels
+        self._max_pixels = max_pixels
+        
+    def execute(self):
+        cosig = self.get_context().get_store().get(self._input_key)
+        peaks = cosig['peaks']
+        print '[INFO] Before: n_tracks = %d' % len(cosig['peaks'])
+        peaks_filtered = [peak for peak in peaks if self._min_pixels < peak[3] <= self._max_pixels]
+        pix_cuts = cosig.copy()
+        pix_cuts['peaks'] = peaks_filtered
+        print '[INFO] After: n_tracks = %d' % len(pix_cuts['peaks'])
+        self.get_context().get_store().set(self._output_key, pix_cuts)
+
+
+class EdgeFilter(Filter):
+    """
+    A filter that will go through Highly Likely Events and only return those
+    that are not located at the edge of the detector plane.
+    """
+    
+    def __init__(self,input_key = 'data', output_key='data'):
+        Filter.__init__(self, input_key, output_key)
+    
+    def execute(self):
+
+        print '[INFO] Filtering out edge pixels...'
+        high_events = self.get_context().get_store().get(self._input_key)
+
+        #Pixel IDs of edge pixels
+        edge_pids = [152,664,25,409,665,793,921,26,794,922,592,337,210,147,84,852,725,470,343,283,155,667,28,412,668,796,924,576,321,194,131,68,836,709,454,327,285,157,669,30,414,670,798,926,31,799,927,588,333,206,143,72,840,713,458,714,280]
+        #Initialize empty list to hold all events that take do not take place on edge of detector 
+        cen_events = []
+        
+        for event in high_events:
+            pids = event['pixels_affected']
+            for pid in pids:
+                if pid in edge_pids:
+                    pass
+                else:
+                    cen_events.append(event)
+        print '[INFO] Events passed: %d /%d' % (len(cen_events),len(high_events))
+        
+        self.get_store().set(self._output_key,cen_events)
+
+
+
+class FRBCorrelationFilter(CorrelationFilter):
+    """A routine that checks for correlation between two signals"""
+    def __init__(self, cosig_key, tod_key, output_key, all_coeff_output_key, coeff=0.8):
+        CorrelationFilter.__init__(self, cosig_key, tod_key, output_key, all_coeff_output_key, coeff)
+        #self._template = np.genfromtxt('frb_nobuff_template.txt')
+        self._template = np.genfromtxt('frb_template.txt')
+        self._tag = "FRB"
+
+
+
+class RaDecStudy(Routine):
+    def __init__(self, output_key,input_key, ra_range=None, dec_range=None):
+        """Scripts that run during initialization of the routine"""
+        Routine.__init__(self)
+        self._input_key = input_key
+        self._ra_range = ra_range
+        self._dec_range = dec_range
+        self._output_key = output_key 
+
+    def execute(self):
+        """Scripts that run for each TOD"""
+        cuts= self.get_store().get(self._input_key)
+            
+        filtered_events = []
+
+        
+        for event in events:
+            select = True
+            if self._ra_range and self._dec_range:  # select a range of RA / DEC if given
+                ra_lower = self._ra_range[0]
+                ra_upper = self._ra_range[1]
+                dec_lower = self._dec_range[0]
+                dec_upper = self._dec_range[1]
+
+                if event['ra'] < ra_lower or event['ra'] > ra_upper or \
+                   event['dec'] < dec_lower or event['dec'] > dec_upper :
+                    select = False
+            if select:
+                self._filtered_events.append(event)
+
+        self.get_store().set(self._output_key,filtered_events)
+
+    def finalize(self):
+        print '[INFO] Total events passed: %d / %d' % (len(filtered_events), len(events))
