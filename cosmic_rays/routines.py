@@ -4,6 +4,8 @@ import json
 import numpy as np
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
+import todloop
+
 from todloop.routines import Routine
 from todloop.utils.pixels import PixelReader
 from todloop.utils.cuts import pixels_affected_in_event
@@ -96,7 +98,7 @@ class TimeSeries(Routine):
         #self._pr = PixelReader(season = '2017', array=str(array_name)) #use this for covered TODs
         self._pr = PixelReader() #use this for uncovered TODs
         print '[INFO] Getting timeseries...'
-        tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data                                                                                                     
+        tod_data = self.get_store.get(self._tod_key)  # retrieve tod_data                                                                                                     
 
     
         def timeseries(pixel_id, s_time, e_time, buffer=10):
