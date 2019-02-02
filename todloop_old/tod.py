@@ -27,6 +27,7 @@ class TODLoader(Routine):
             tod_filename = self._fb.filename_from_name(tod_name, single=True)  # get file path
         print '[INFO] Loading TOD: %s ...' % tod_filename
         tod_data = moby2.scripting.get_tod({'filename': tod_filename, 'repair_pointing': True})
+
         print '[INFO] TOD loaded'
         self.get_store().set(self._output_key, tod_data)  # save tod_data in memory for routines to process
 

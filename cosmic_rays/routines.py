@@ -4,10 +4,79 @@ import json
 import numpy as np
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
+import todloop
+
 from todloop.routines import Routine
 from todloop.utils.pixels import PixelReader
 from todloop.utils.cuts import pixels_affected_in_event
 from todloop.utils.hist import Hist1D 
+
+"""
+#######################
+ROUTINES IN THIS FILE #
+#######################
+
+1. Filter - Routine
+   Can be applied to make new filters
+
+2. Timeseries - Routine
+   Returns function of timeseries
+
+3. PlotGlitches - Routine
+   User input event gets plotted, for every pixel affected
+   then the location of pixels affected on detector plane is plotted
+
+4. Energy - Routine
+   Returns the total energy of a pixel (four detectors) 
+   This info can be saved in events dictionary
+
+5. SaveEvents - Routine
+   Takes initial cuts data and generates a dictionary 
+   with various well defined parameters
+
+6. EnergyStudy - Routine
+   Generates histogram data about the energy associated with an event
+   Saves data to a text file
+
+7. NPixelStudy - Routine
+   Generates histogram data about the number of pixels affected in an event 
+   Saves data to a text file
+
+8. CorrelationFilter - Routine
+   Routine that takes timeseries and compares it to a template and returns a 
+   coffecient of correlation. If coeff > 0.8, it gets passed further down pipeline
+ 
+  a.CRCorrelationFilter - Instance of CorrelationFilter
+    Applies cosmic ray template to correlation filter routine
+ 
+  b.FRBCorrelationFilter - Instance of CorrelationFilter
+    Applies FRB template to correlation filter routine
+
+9. Duration Filter - Filter
+   Filters out cuts based on how many timesamples the glitch spans
+   WIP not well incorporated in timeline yet!!
+
+10. Pixel Filter - Filter
+    Filters out events that affect more than a specified number of pixels
+
+11. EdgeFilter - Filter
+   Filters out events that take place on the edge of the detector plane
+   WIP not well incorporated in timeline yet!!
+
+12. RADecStudy - Routine
+   Filters out events that take place outside of a specified RA and Dec range
+
+
+
+"""
+
+
+
+class Filter(Routine):
+    def __init__(self, input_key, output_key):
+        Routine.__init__(self)
+        self._input_key = input_key
+        self._output_key = output_key
 
 
 class TimeSeries(Routine):
@@ -29,7 +98,7 @@ class TimeSeries(Routine):
         #self._pr = PixelReader(season = '2017', array=str(array_name)) #use this for covered TODs
         self._pr = PixelReader() #use this for uncovered TODs
         print '[INFO] Getting timeseries...'
-        tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data                                                                                                     
+        tod_data = self.get_store.get(self._tod_key)  # retrieve tod_data                                                                                                     
 
     
         def timeseries(pixel_id, s_time, e_time, buffer=10):
@@ -84,7 +153,8 @@ class PlotGlitches(Routine):
         peaks = cuts['peaks']
         print('[INFO] All glitches, unfiltered...')
         print('[INFO] peaks: ', peaks)
-        self._pr = PixelReader(season= '2017', array=self.get_context().get_array())
+        #self._pr = PixelReader(season= '2017', array=self.get_context().get_array()) #for covered
+        self._pr = PixelReader() #for uncovered
         #self._pr = PixelReader(season='2017',array = str(array_name))        
         #self._pr = PixelReader(season='2017', array=self.get_context().get_array())
       
@@ -351,7 +421,8 @@ class CorrelationFilter(Routine):
 
     def execute(self):
         print '[INFO] Checking for correlation ...'
-        self._pr = PixelReader(season = '2017', array=self.get_context().get_array())
+        self._pr = PixelReader()
+        #self._pr = PixelReader(season = '2017', array=self.get_context().get_array())
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data
         cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
         peaks = cuts['peaks']
@@ -427,6 +498,87 @@ class CRCorrelationFilter(CorrelationFilter):
         CorrelationFilter.__init__(self, timeseries_key,cosig_key, tod_key, output_key,coeff)
         self._template = np.genfromtxt('cr_template.txt')
         self._tag = "CR"
+
+
+
+class DurationFilter(Filter):
+    """An event filter based on the duration of events (set max duration)"""
+    def __init__(self, min_duration=0,max_duration=10000, input_key='data', output_key='data'):
+        Filter.__init__(self, input_key=input_key, output_key=output_key)
+        self._min_duration = min_duration
+        self._max_duration = max_duration
+
+    def execute(self):
+        cosig = self.get_context().get_store().get(self._input_key)
+        peaks = cosig['peaks']
+        print '[INFO] Before: n_tracks = %d' % len(cosig['peaks'])
+        peaks_filtered = [peak for peak in peaks if self._min_duration < peak[2] <= self._max_duration]
+        #dur_cuts = {'peaks': peaks_filtered,'coincident_signal':}
+        dur_cuts = cosig.copy()
+        dur_cuts['peaks'] = peaks_filtered
+        print '[INFO] After: n_tracks = %d' % len(dur_cuts['peaks'])
+        self.get_context().get_store().set(self._output_key, dur_cuts)
+
+
+
+class PixelFilter(Filter):
+    """An event filter based on the number of pixels affected (set max n_pixels)"""
+    def __init__(self,min_pixels=0, max_pixels=3, input_key='data', output_key='data'):
+        Filter.__init__(self, input_key, output_key)
+        self._min_pixels = min_pixels
+        self._max_pixels = max_pixels
+        
+    def execute(self):
+        cosig = self.get_context().get_store().get(self._input_key)
+        peaks = cosig['peaks']
+        print '[INFO] Before: n_tracks = %d' % len(cosig['peaks'])
+        peaks_filtered = [peak for peak in peaks if self._min_pixels < peak[3] <= self._max_pixels]
+        pix_cuts = cosig.copy()
+        pix_cuts['peaks'] = peaks_filtered
+        print '[INFO] After: n_tracks = %d' % len(pix_cuts['peaks'])
+        self.get_context().get_store().set(self._output_key, pix_cuts)
+
+
+class EdgeFilter(Filter):
+    """
+    A filter that will go through Highly Likely Events and only return those
+    that are not located at the edge of the detector plane.
+    """
+    
+    def __init__(self,input_key = 'data', output_key='data'):
+        Filter.__init__(self, input_key, output_key)
+    
+    def execute(self):
+
+        print '[INFO] Filtering out edge pixels...'
+        high_events = self.get_context().get_store().get(self._input_key)
+
+        #Pixel IDs of edge pixels
+        edge_pids = [152,664,25,409,665,793,921,26,794,922,592,337,210,147,84,852,725,470,343,283,155,667,28,412,668,796,924,576,321,194,131,68,836,709,454,327,285,157,669,30,414,670,798,926,31,799,927,588,333,206,143,72,840,713,458,714,280]
+        #Initialize empty list to hold all events that take do not take place on edge of detector 
+        cen_events = []
+        
+        for event in high_events:
+            pids = event['pixels_affected']
+            for pid in pids:
+                if pid in edge_pids:
+                    pass
+                else:
+                    cen_events.append(event)
+        print '[INFO] Events passed: %d /%d' % (len(cen_events),len(high_events))
+        
+        self.get_store().set(self._output_key,cen_events)
+
+
+
+class FRBCorrelationFilter(CorrelationFilter):
+    """A routine that checks for correlation between two signals"""
+    def __init__(self, cosig_key, tod_key, output_key, all_coeff_output_key, coeff=0.8):
+        CorrelationFilter.__init__(self, cosig_key, tod_key, output_key, all_coeff_output_key, coeff)
+        #self._template = np.genfromtxt('frb_nobuff_template.txt')
+        self._template = np.genfromtxt('frb_template.txt')
+        self._tag = "FRB"
+
 
 
 class RaDecStudy(Routine):

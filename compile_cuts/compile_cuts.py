@@ -4,7 +4,7 @@ from todloop.routines import Logger
 from routines import CompileCuts
 
 loop = TODLoop()
-loop.add_tod_list("data/s16_pa3_list.txt")
+loop.add_tod_list("../data/covered_tods.txt")
 
 glitchp = {
     'nSig': 10, 
@@ -17,6 +17,6 @@ glitchp = {
 
 loop.add_routine(TODLoader(output_key="tod_data", abspath=True))
 # loop.add_routine(TODInfoLoader(output_key="tod_info"))
-loop.add_routine(CompileCuts(input_key="tod_data", glitchp=glitchp, output_dir="outputs/s16_pa3_list/"))
+loop.add_routine(CompileCuts(input_key="tod_data", glitchp=glitchp, output_dir="outputs/covered_tods/"))
 
-loop.run(0, 10)
+loop.run(0, 153)
