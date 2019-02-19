@@ -92,13 +92,13 @@ class TimeSeries(Routine):
         self._pr = PixelReader()
     """
     
-    def execute(self):
+    def execute(self,store):
 
         #array_name = self.get_array()
         #self._pr = PixelReader(season = '2017', array=str(array_name)) #use this for covered TODs
         self._pr = PixelReader() #use this for uncovered TODs
         print '[INFO] Getting timeseries...'
-        tod_data = self.get_store.get(self._tod_key)  # retrieve tod_data                                                                                                     
+        tod_data = store.get(self._tod_key)  # retrieve tod_data                                                                                                     
 
     
         def timeseries(pixel_id, s_time, e_time, buffer=10):
@@ -128,7 +128,7 @@ class TimeSeries(Routine):
             
             return time, d_1, d_2, d_3, d_4
 
-        self.get_store().set(self._output_key,timeseries)
+        store.set(self._output_key,timeseries)
 
 class PlotGlitches(Routine):
     """A routine that plots glitches """
@@ -140,15 +140,18 @@ class PlotGlitches(Routine):
         self._timeseries_key = timeseries_key
         self._pr = None
     
+    
+    """
     def initialize(self):
         tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data                                                                        
         cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data                                                                          
+    """
 
 
-    def execute(self):
+    def execute(self,store):
         print '[INFO] Loading Glitch Data ...'
-        tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data                                                    
-        cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data                                                    
+        tod_data = store.get(self._tod_key)  # retrieve tod_data                                                    
+        cuts = store.get(self._cosig_key)  # retrieve tod_data                                                    
         array_name = self.get_array()
         peaks = cuts['peaks']
         print('[INFO] All glitches, unfiltered...')
@@ -160,18 +163,18 @@ class PlotGlitches(Routine):
       
         plot = raw_input("Do you want to plot an event? Enter y/n: ")
         if plot == "y":
-            tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data     
-            cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
+            tod_data = store.get(self._tod_key)  # retrieve tod_data     
+            cuts = store.get(self._cosig_key)  # retrieve tod_data
             peaks = cuts['peaks']
           
           
         
             def cs_cuts():
-                cuts = self.get_store().get(self._cosig_key) 
+                cuts = store.get(self._cosig_key) 
                 return cuts['coincident_signals']
             
         
-            timeseries = self.get_store().get(self._timeseries_key)
+            timeseries = store.get(self._timeseries_key)
             
 
             """
@@ -246,9 +249,9 @@ class Energy(Routine):
         self._output_key = output_key 
 
 
-    def execute(self):
+    def execute(self,store):
         print '[INFO] Running energy analysis...'
-        timeseries = self.get_store().get(self._timeseries_key)
+        timeseries = store.get(self._timeseries_key)
     
         """
         Calculate the energy of each detector in an affected pixel
@@ -274,7 +277,7 @@ class Energy(Routine):
             """Returns the total energy of the pixel (sum of 4 detectors)"""
             return np.sum(pJ_90a) + np.sum(pJ_90b) + np.sum(pJ_150a) + np.sum(pJ_150b)
 
-        self.get_store().set(self._output_key,energy_calculator)
+        store.set(self._output_key,energy_calculator)
 
 
 
@@ -293,12 +296,12 @@ class SaveEvents(Routine):
         
 
         
-    def execute(self):
+    def execute(self,store):
         print '[INFO] Saving events data to dictionary...'
         
-        energy_calculator = self.get_store().get(self._energy_key)
-        tod_data = self.get_store().get(self._tod_key)
-        cuts = self.get_store().get(self._cosig_key)
+        energy_calculator = store.get(self._energy_key)
+        tod_data = store.get(self._tod_key)
+        cuts = store.get(self._cosig_key)
         peaks = cuts['peaks']
         cs = cuts['coincident_signals']
         
@@ -333,7 +336,7 @@ class SaveEvents(Routine):
             }
             events.append(event)
         
-        self.get_store().set(self._output_key,events)
+        store.set(self._output_key,events)
 
 
 class EnergyStudy(Routine):
@@ -347,7 +350,7 @@ class EnergyStudy(Routine):
     def initialize(self):
         self._hist = Hist1D(0,50,50)
 
-    def execute(self):
+    def execute(self,store):
         print '[INFO] Adding data to plot histogram...'
         events = self.get_store().get(self._event_key)
         for event in events:
@@ -385,9 +388,9 @@ class NPixelStudy(Routine):
     def initialize(self):
         self._hist = Hist1D(1,200,50)
 
-    def execute(self):
+    def execute(self,store):
         print '[INFO] Adding data to plot histogram...'
-        events = self.get_store().get(self._event_key)
+        events = store.get(self._event_key)
         for event in events:
             self._hist.fill(event['number_of_pixels'])
 
@@ -419,14 +422,14 @@ class CorrelationFilter(Routine):
         self._pr = PixelReader()
     """
 
-    def execute(self):
+    def execute(self,store):
         print '[INFO] Checking for correlation ...'
         self._pr = PixelReader()
         #self._pr = PixelReader(season = '2017', array=self.get_context().get_array())
-        tod_data = self.get_store().get(self._tod_key)  # retrieve tod_data
-        cuts = self.get_store().get(self._cosig_key)  # retrieve tod_data
+        tod_data = store.get(self._tod_key)  # retrieve tod_data
+        cuts = store.get(self._cosig_key)  # retrieve tod_data
         peaks = cuts['peaks']
-        timeseries = self.get_store().get(self._timeseries_key)
+        timeseries = store.get(self._timeseries_key)
         cs = cuts['coincident_signals']
 
         def avg_signal(pixels, start_time, end_time):
@@ -489,7 +492,7 @@ class CorrelationFilter(Routine):
         print highlylikely_events
         print '[INFO] Events passed: %d / %d' % (len(highlylikely_events), len(peaks))
         cuts['peaks'] = highlylikely_events
-        self.get_store().set(self._output_key,cuts)
+        store.set(self._output_key,cuts)
 
 
 class CRCorrelationFilter(CorrelationFilter):
@@ -508,8 +511,8 @@ class DurationFilter(Filter):
         self._min_duration = min_duration
         self._max_duration = max_duration
 
-    def execute(self):
-        cosig = self.get_context().get_store().get(self._input_key)
+    def execute(self,store):
+        cosig = store.get(self._input_key)
         peaks = cosig['peaks']
         print '[INFO] Before: n_tracks = %d' % len(cosig['peaks'])
         peaks_filtered = [peak for peak in peaks if self._min_duration < peak[2] <= self._max_duration]
@@ -517,7 +520,7 @@ class DurationFilter(Filter):
         dur_cuts = cosig.copy()
         dur_cuts['peaks'] = peaks_filtered
         print '[INFO] After: n_tracks = %d' % len(dur_cuts['peaks'])
-        self.get_context().get_store().set(self._output_key, dur_cuts)
+        store.set(self._output_key, dur_cuts)
 
 
 
@@ -528,15 +531,15 @@ class PixelFilter(Filter):
         self._min_pixels = min_pixels
         self._max_pixels = max_pixels
         
-    def execute(self):
-        cosig = self.get_context().get_store().get(self._input_key)
+    def execute(self,store):
+        cosig = store.get(self._input_key)
         peaks = cosig['peaks']
         print '[INFO] Before: n_tracks = %d' % len(cosig['peaks'])
         peaks_filtered = [peak for peak in peaks if self._min_pixels < peak[3] <= self._max_pixels]
         pix_cuts = cosig.copy()
         pix_cuts['peaks'] = peaks_filtered
         print '[INFO] After: n_tracks = %d' % len(pix_cuts['peaks'])
-        self.get_context().get_store().set(self._output_key, pix_cuts)
+        store.set(self._output_key, pix_cuts)
 
 
 class EdgeFilter(Filter):
@@ -548,10 +551,10 @@ class EdgeFilter(Filter):
     def __init__(self,input_key = 'data', output_key='data'):
         Filter.__init__(self, input_key, output_key)
     
-    def execute(self):
+    def execute(self,store):
 
         print '[INFO] Filtering out edge pixels...'
-        high_events = self.get_context().get_store().get(self._input_key)
+        high_events = store.get(self._input_key)
 
         #Pixel IDs of edge pixels
         edge_pids = [152,664,25,409,665,793,921,26,794,922,592,337,210,147,84,852,725,470,343,283,155,667,28,412,668,796,924,576,321,194,131,68,836,709,454,327,285,157,669,30,414,670,798,926,31,799,927,588,333,206,143,72,840,713,458,714,280]
@@ -590,9 +593,9 @@ class RaDecStudy(Routine):
         self._dec_range = dec_range
         self._output_key = output_key 
 
-    def execute(self):
+    def execute(self,store):
         """Scripts that run for each TOD"""
-        cuts= self.get_store().get(self._input_key)
+        cuts= store.get(self._input_key)
             
         filtered_events = []
 
@@ -611,7 +614,7 @@ class RaDecStudy(Routine):
             if select:
                 self._filtered_events.append(event)
 
-        self.get_store().set(self._output_key,filtered_events)
+        store.set(self._output_key,filtered_events)
 
     def finalize(self):
         print '[INFO] Total events passed: %d / %d' % (len(filtered_events), len(events))
