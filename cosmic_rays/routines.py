@@ -4,12 +4,15 @@ import json
 import numpy as np
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
-import todloop
-
-from todloop.routines import Routine
+from  todloop import Routine
+#from todloop.routines import Routine
 from todloop.utils.pixels import PixelReader
 from todloop.utils.cuts import pixels_affected_in_event
 from todloop.utils.hist import Hist1D 
+import moby2
+from moby2.instruments import actpol
+from moby2.scripting import get_filebase
+from moby2.detectors.stuff import TimeConstants
 
 """
 #######################
@@ -66,6 +69,8 @@ ROUTINES IN THIS FILE #
 12. RADecStudy - Routine
    Filters out events that take place outside of a specified RA and Dec range
 
+13. Deconvolution - Routine
+    Deconvolves the effects of the detector time constant
 
 
 """
@@ -618,3 +623,92 @@ class RaDecStudy(Routine):
 
     def finalize(self):
         print '[INFO] Total events passed: %d / %d' % (len(filtered_events), len(events))
+
+
+class Deconvolution(Routine):
+    def __init__(self,input_key="tod_data", output_key="tod_data",abspath=False):
+        Routine.__init__(self)
+        self._fb = None
+        self._abspath = abspath
+        self._input_key = input_key
+        self._output_key = output_key
+    
+    def initialize(self):
+        self._fb = get_filebase()
+
+    def execute(self,store):
+        data = store.get("tod_data")
+        tod_name = self.get_name()
+        
+        def tconst_filter(freq,tau):
+            """
+            Return the fourier space representation of the effect of 
+            detector time constants, for the given frequencies
+            """
+            return 1/(2*np.pi*1j*freq*tau+1)
+ 
+        tod_string = str(tod_name)
+        tc = TimeConstants.read_from_path('/mnt/act3/users/spho/2016/TimeCo\
+nstantsperTOD_170718/pa3/' + tod_string[:5] + '/' + tod_string + '.tau')
+        moby2.tod.detrend_tod(data)
+        print '[INFO] Deconvoluting data... '
+        for i in range(998):#1015
+            d_tod = data.data[i]
+            ftod = np.fft.rfft(d_tod)
+            nsamp = len(d_tod)
+            srate = 400 #Hz
+            freqs = np.arange(nsamp//2 + 1) * srate/nsamp
+            tau = tc.get_property('tau')[1][i]
+            resp = tconst_filter(freqs,tau)
+            ftod /= resp
+            deconv_tod = np.fft.irfft(ftod)
+            data.data[i] = deconv_tod
+        
+        store.set(self._output_key,data)
+
+
+class Convolution(Routine):
+    """
+    Provide this routine with a .txt file with time on the first axis and signal on the second axis, and with a time constant (tau) and it will convolve the signal to show how different detector response times affect the profile of the signal 
+    """
+    
+    def __init__(self,data='frb_template.txt', tau=0.2):
+        Routine.__init__(self)
+        self._data = data
+        self._tau = tau
+
+
+    def execute(self,store):
+        data = np.genfromtxt(self._data)
+        raw_x = data[0]
+        raw_y = data[1]
+
+        def tconst_filter(freq,tau):
+            """
+            Return the fourier space representation of the effect of 
+            detector time constants, for the given frequencies
+            """
+            return 1/(2*np.pi*1j*freq*tau+1)
+
+        print '[INFO] Convoluting Data...'
+
+        f_y = np.fft.rfft(raw_y)
+        nsamp = len(raw_y)
+        srate = 400 #Hz, adjust based on the parameters of the signal you are trying to convolve
+        freqs = np.arange(nsamp//2 + 1) * srate/nsamp
+        resp = tconst_filter(freqs,self._tau)
+        f_y *= resp
+        conv_data = np.fft.irfft(f_y)
+
+        """
+        Return Output as Plot
+        """
+        plt.subplot(211)
+        plt.plot(raw_x,raw_y,color='teal')
+        plt.title('Unconvoluted')
+
+        plt.subplot(212)
+        plt.plot(raw_x[:len(conv_data)],conv_data,color='darkslateblue')
+        plt.title('Convolved')
+        plt.show()
+    
