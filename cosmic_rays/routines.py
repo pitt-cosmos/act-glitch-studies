@@ -72,6 +72,8 @@ ROUTINES IN THIS FILE #
 13. Deconvolution - Routine
     Deconvolves the effects of the detector time constant
 
+14. TimeConstant - Routine
+    Generates a dictionary of time constants and corresponding detector uids for a TOD
 
 """
 
@@ -159,8 +161,8 @@ class PlotGlitches(Routine):
         cuts = store.get(self._cosig_key)  # retrieve tod_data                                                    
         array_name = self.get_array()
         peaks = cuts['peaks']
-        print('[INFO] All glitches, unfiltered...')
-        print('[INFO] peaks: ', peaks)
+        #print('[INFO] All glitches, unfiltered...')
+        #print('[INFO] peaks: ', peaks)
         #self._pr = PixelReader(season= '2017', array=self.get_context().get_array()) #for covered
         self._pr = PixelReader() #for uncovered
         #self._pr = PixelReader(season='2017',array = str(array_name))        
@@ -297,7 +299,8 @@ class SaveEvents(Routine):
         self._cosig_key = cosig_key
         self._tod_key = tod_key
         self._energy_key = energy_key
-        self._output_key = output_key 
+        self._output_key = output_key
+
         
 
         
@@ -325,7 +328,6 @@ class SaveEvents(Routine):
                 pix_energy = energy_calculator(pid,start,end)
                 energy_per_detector.append(pix_energy)
             energy = np.sum(energy_per_detector)
-
             id = "%d.%d" % (self.get_id(), start)
             event = {
                 'id': id,
@@ -357,7 +359,7 @@ class EnergyStudy(Routine):
 
     def execute(self,store):
         print '[INFO] Adding data to plot histogram...'
-        events = self.get_store().get(self._event_key)
+        events = store.get(self._event_key)
         for event in events:
             self._hist.fill(event['energy'])
 
@@ -365,7 +367,7 @@ class EnergyStudy(Routine):
         #plt.step(*self._hist.data)
         hist_data = np.array(self._hist.data)
         ###CHANGE NAME OF TEXT FILE OR IT WILL OVERWRITE
-        np.savetxt('icecube_crf.txt',hist_data)
+        #np.savetxt('icecube_crf.txt',hist_data)
 
         
         """
@@ -508,6 +510,15 @@ class CRCorrelationFilter(CorrelationFilter):
         self._tag = "CR"
 
 
+class FRBCorrelationFilter(CorrelationFilter):
+    """A routine that checks for correlation between two signals"""
+    def __init__(self, timeseries_key,cosig_key, tod_key, output_key, coeff=0.9):
+        CorrelationFilter.__init__(self, timeseries_key,cosig_key, tod_key, output_key,coeff=0.9)
+        #self._template = np.genfromtxt('frb_nobuff_template.txt')                                                                                                               
+        #self._template = np.genfromtxt('frb_template.txt')                                                                                                                      
+        self._template = np.genfromtxt('act_frb180110.txt')
+        self._tag = "FRB"
+
 
 class DurationFilter(Filter):
     """An event filter based on the duration of events (set max duration)"""
@@ -575,17 +586,8 @@ class EdgeFilter(Filter):
                     cen_events.append(event)
         print '[INFO] Events passed: %d /%d' % (len(cen_events),len(high_events))
         
-        self.get_store().set(self._output_key,cen_events)
+        store.set(self._output_key,cen_events)
 
-
-
-class FRBCorrelationFilter(CorrelationFilter):
-    """A routine that checks for correlation between two signals"""
-    def __init__(self, cosig_key, tod_key, output_key, all_coeff_output_key, coeff=0.8):
-        CorrelationFilter.__init__(self, cosig_key, tod_key, output_key, all_coeff_output_key, coeff)
-        #self._template = np.genfromtxt('frb_nobuff_template.txt')
-        self._template = np.genfromtxt('frb_template.txt')
-        self._tag = "FRB"
 
 
 
@@ -672,7 +674,7 @@ class Convolution(Routine):
     Provide this routine with a .txt file with time on the first axis and signal on the second axis, and with a time constant (tau) and it will convolve the signal to show how different detector response times affect the profile of the signal 
     """
     
-    def __init__(self,data='frb_template.txt', tau=0.2):
+    def __init__(self,data='frb180110.txt', tau=0.2):
         Routine.__init__(self)
         self._data = data
         self._tau = tau
@@ -704,11 +706,83 @@ class Convolution(Routine):
         Return Output as Plot
         """
         plt.subplot(211)
-        plt.plot(raw_x,raw_y,color='teal')
-        plt.title('Unconvoluted')
+        plt.plot(raw_x,raw_y,'.-',color='teal')
+        plt.title('Raw')
 
         plt.subplot(212)
-        plt.plot(raw_x[:len(conv_data)],conv_data,color='darkslateblue')
+        plt.plot(raw_x[:len(conv_data)],conv_data,'.-',color='darkslateblue')
         plt.title('Convolved')
+        plt.xlabel('Tau =' + str(self._tau))
         plt.show()
     
+
+class TimeConstant(Routine):
+    """ Returns dictionary that maps pixel ids to corresponding time constants"""
+
+    def __init__(self,input_key='tod_data',output_key='time_constants',abspath=False):
+        Routine.__init__(self)
+        self._input_key = input_key
+        self._output_key = output_key
+        self._abspath = abspath
+        
+    def initialize(self):
+        self._fb = get_filebase()
+
+    def execute(self,store):
+        data = store.get("tod_data")
+        tod_name = self.get_name()
+        tod_string = str(tod_name)
+        tc = TimeConstants.read_from_path('/mnt/act3/users/spho/2016/TimeConstantsperTOD_170718/pa3/' + tod_string[:5] + '/' + tod_string + '.tau')
+        time_constants = []
+        for i in range(998):#1015  
+            tau = tc.get_property('tau')[1][i]
+            pid = tc.get_property('det_uid')[1][i]
+            tcs = {
+                'tau': tau,
+                'det_uid':pid,
+                }
+            time_constants.append(tcs)
+            #print('Tau = ', tau)
+            #print('Det UID =', pid)
+        
+        
+        store.set(self._output_key,time_constants)
+
+#class TauStudy(Routine):
+    """ Study which detectors are slow and which are fast for a given TOD"""
+
+
+
+class NEventsStudy(Routine):
+    def __init__(self,allevents_key="peaks",event_key="frb_cuts"):
+        Routine.__init__(self)
+        self._allevents_key = allevents_key
+        self._event_key = event_key
+        self._hist1 = None
+        #self._hist2 = None
+
+    def initialize(self):
+        self._hist1 = Hist1D(1,100,50)
+        #self._hist2 = Hist1D(1,100,50)
+
+    def execute(self,store):
+        print '[INFO] Adding data to plot histogram...'
+        events = store.get(self._event_key)
+        allevents = store.get(self._allevents_key)
+        percent = len(events)/len(allevents)
+
+        self._hist1.fill(percent*100)
+        #self._hist2.fill(len(allevents))
+
+    def finalize(self):
+        #"""                                                                                                                                                                       
+        plt.step(*self._hist1.data)
+        #plt.step(*self._hist2.data,label='All Events')
+        plt.title('Percentage of FRB events per TOD')                                                                                                                                    
+        plt.xlabel('Percentage of Events')                                                                                                                                            
+        plt.show()                                                                                                                                                                
+        #"""
+        """
+        pixel_data = np.array(self._hist.data)
+        np.savetxt('Unf_uncov_pix.txt',pixel_data)
+        """
