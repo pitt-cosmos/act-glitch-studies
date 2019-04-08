@@ -75,6 +75,10 @@ ROUTINES IN THIS FILE #
 14. TimeConstant - Routine
     Generates a dictionary of time constants and corresponding detector uids for a TOD
 
+15. PlotDetectorGlitches - Routine
+    Provide a Detector UID to plot all of the events that take place on that detector, 
+    *also includes the time constant associated with the detector
+
 """
 
 
@@ -738,6 +742,7 @@ class TimeConstant(Routine):
             tau = tc.get_property('tau')[1][i]
             pid = tc.get_property('det_uid')[1][i]
             tcs = {
+                str(pid): tau, #key is det_uid, and value is time constant 
                 'tau': tau,
                 'det_uid':pid,
                 }
@@ -786,3 +791,71 @@ class NEventsStudy(Routine):
         pixel_data = np.array(self._hist.data)
         np.savetxt('Unf_uncov_pix.txt',pixel_data)
         """
+
+
+class PlotDetectorGlitches(Routine):
+    def __init__(self,detuid,tag,cosig_key,tod_key,timeseries_key,time_constants):
+        Routine.__init__(self)
+        self._detuid = detuid
+        self._tag = tag
+        self._cosig_key = cosig_key
+        self._tod_key = tod_key
+        self._timeseries_key = timeseries_key
+        self._time_constants = time_constants
+        self._pr = None
+
+
+    def execute(self,store):
+        print '[INFO] Plotting all glitches affecting detector ...'
+        taus = store.get(self._time_constants)
+        for tc in taus:
+            if tc['det_uid'] == self._detuid:
+                tau = tc['tau']
+        
+        tod_data = store.get(self._tod_key)  # retrieve tod_data                       
+        cuts = store.get(self._cosig_key)  # retrieve tod_data           
+        array_name = self.get_array()
+        peaks = cuts['peaks']
+        self._pr = PixelReader()
+
+        def cs_cuts():
+            cuts = store.get(self._cosig_key)
+            return cuts['coincident_signals']
+
+        timeseries = store.get(self._timeseries_key)
+
+        def plotter(pid,tau,start_time,end_time):
+                
+            x = timeseries(pid,start_time,end_time)[0]
+            y1 = timeseries(pid,start_time,end_time)[1]
+            y2 = timeseries(pid,start_time,end_time)[2]
+            y3 = timeseries(pid,start_time,end_time)[3]
+            y4 = timeseries(pid,start_time,end_time)[4]
+
+
+            plt.title('Pixel affected from ' +str(start_time)+ '-' + str(end_time)+
+', Pixel ' + str(pid))
+            plt.xlabel('TOD track:' + str(self._tag) + ' Tau:' + str(tau))
+            plt.plot(x,y1,'.-',label='90 GHz')
+            plt.plot(x,y2,'.-',label='90 GHz')
+            plt.plot(x,y3,'.-',label='150 GHz')
+            plt.plot(x,y4,'.-',label='150 GHz')
+            
+            plt.legend()
+            plt.show()
+        
+
+
+        cs = cuts['coincident_signals']
+        
+        for peak in peaks:
+
+            stime = peak[0]
+            etime = peak[1]
+            pixels = pixels_affected_in_event(cs,peak)
+            for pixel in pixels:
+                if pixel == self._detuid:
+                    plotter(pixel,tau,stime,etime)
+                
+                
+
